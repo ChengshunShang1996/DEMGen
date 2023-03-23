@@ -1,12 +1,15 @@
+#/////////////////////////////////////////////////
+#// Main author: Chengshun Shang (CIMNE)
+#// Email: chengshun.shang1996@gmail.com
+#// Date: March 2023
+#/////////////////////////////////////////////////
 
 import KratosMultiphysics
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
-import KratosMultiphysics.DEMApplication as DEM
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
-import datetime
 
 class ParticlePackingGenerator(DEMAnalysisStage):
 
@@ -76,7 +79,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.CalculateFillingRatioAndSetInletStop()
 
     def GetInitialDemSphereVolume(self):
-        
+
         for element in self.spheres_model_part.Elements:
             r = element.GetNode(0).GetSolutionStepValue(RADIUS)
             element_volume = 4/3 * math.pi * r * r * r
