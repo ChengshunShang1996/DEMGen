@@ -29,7 +29,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.aim_final_packing_porosity = 0.35
         self.max_porosity_tolerance = 0.03
         self.aim_container_filling_ratio = 0.8 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
-        self.max_particle_velocity_in_phase_2 = 0.001
+        self.max_particle_velocity_in_phase_1_2 = 0.001
         
         self.container_filling_ratio = 0.0
         self.initial_sphere_volume = 0.0
@@ -38,6 +38,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.generator_process_marker_phase_2 = False # Phase 2: Operate on initial particle packing for getting a desired porosity
         self.generator_process_marker_phase_3 = False # Phase 3: Get the final particle packing
         self.is_operations_running = False
+        self.is_after_delete_outside_particles = False
         
         self.container_shape = "cylinder"  #input: "cylinder" or "box"  
 
@@ -91,6 +92,10 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.generator_process_marker_phase_1:
             self.CalculateFillingRatioAndSetInletStop()
 
+        #waitting until partciles calm down
+        if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
+            self.CheckVelocityAndChangeOperationMarker()
+
         if self.generator_process_marker_phase_2:
             self.MeasureLocalPorosityOfFinalPacking()
             self.MeasureTotalPorosityOfFinalPacking()
@@ -107,7 +112,10 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                         self.CheckVelocityAndChangeOperationMarker()
 
         if self.generator_process_marker_phase_3:
-            pass
+            if not self.is_after_delete_outside_particles:
+                self.DeleteOutsideParticles()
+            if self.is_after_delete_outside_particles:
+                self.WriteOutMdpaFileOfParticles()
 
     def GetInitialDemSphereVolume(self):
 
@@ -136,8 +144,6 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                     submp[INLET_STOP_TIME] = self.time + self.dt
 
             self.generator_process_marker_phase_1 = False
-            self.generator_process_marker_phase_2 = True
-            print("********************Phase 2*************************")
 
     def MeasureLocalPorosityOfFinalPacking(self):
         pass
@@ -238,14 +244,23 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             velocity_magnitude = (velocity_x * velocity_x + velocity_y * velocity_y + velocity_z * velocity_z)**0.5
             if velocity_magnitude > max_particle_velocity:
                 max_particle_velocity = velocity_magnitude
-        if max_particle_velocity < self.max_particle_velocity_in_phase_2:
+        if max_particle_velocity < self.max_particle_velocity_in_phase_1_2:
             self.is_operations_running = False
+            if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
+                self.generator_process_marker_phase_2 = True
+                print("********************Phase 2*************************")
 
     def CheckWhetherRunningTimeIsLongEnough(self):
         running_time = self.time - self.operation_starting_time
         predicted_particle_falling_time = (2 * self.container_height / 9.81)**0.5
         if running_time > predicted_particle_falling_time:
             self.is_running_time_long_enough = True
+
+    def DeleteOutsideParticles(self):
+        pass
+
+    def WriteOutMdpaFileOfParticles(self):
+        pass
 
 if __name__ == "__main__":
 
