@@ -27,7 +27,10 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
         #define the aim porosity
         self.aim_final_packing_porosity = 0.35
+        self.max_porosity_tolerance = 0.03
         self.aim_container_filling_ratio = 0.8 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
+        self.max_particle_velocity_in_phase_2 = 0.001
+        
         self.container_filling_ratio = 0.0
         self.initial_sphere_volume = 0.0
         self.final_packing_porosity = 0.0
@@ -66,7 +69,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             self.final_packing_bottom_center_point = [0, 0, 0]
             self.final_packing_direction = [0, 1, 0]
 
-        print("********************Stage 1*************************")
+        print("********************Phase 1*************************")
 
     def RunSolutionLoop(self):
 
@@ -91,13 +94,17 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.generator_process_marker_phase_2:
             self.MeasureLocalPorosityOfFinalPacking()
             self.MeasureTotalPorosityOfFinalPacking()
-            if self.final_packing_porosity > (1 - 0.03) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + 0.03) * self.aim_final_packing_porosity:
+            if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
                 self.generator_process_marker_phase_2 = False
                 self.generator_process_marker_phase_3 = True
-                print("********************Stage 3*************************")
+                print("********************Phase 3*************************")
             else:
                 if not self.is_operations_running:
                     self.OperationsOnParticlePacking()
+                else:
+                    self.CheckWhetherRunningTimeIsLongEnough()
+                    if self.is_running_time_long_enough:
+                        self.CheckVelocityAndChangeOperationMarker()
 
         if self.generator_process_marker_phase_3:
             pass
@@ -130,7 +137,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
             self.generator_process_marker_phase_1 = False
             self.generator_process_marker_phase_2 = True
-            print("********************Stage 2*************************")
+            print("********************Phase 2*************************")
 
     def MeasureLocalPorosityOfFinalPacking(self):
         pass
@@ -178,36 +185,37 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         
         print("*******Packing Operations*********")
         
-        if self.final_packing_porosity > (1 + 0.03) * self.aim_final_packing_porosity:
+        if self.final_packing_porosity > (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
 
             print("You can input a number to achieve:")
             print("1. inverte")
             print("2. compressing")
+            print("3. continue")
 
             selected_operation = input("Please input the number of the operation: ")
 
             #inverte operation
             if selected_operation == "1":
                 
-                number_of_operation = input("Please input the amount of operations (the number should be an even):")
-                
-                operation_counter = 0
-                while operation_counter < number_of_operation:
-                    self.spheres_model_part.ProcessInfo[GRAVITY] *= -1
-                    self.is_operations_running = True
-
+                self.spheres_model_part.ProcessInfo[GRAVITY] *= -1
+                self.is_operations_running = True
+                self.operation_starting_time = self.time
+                self.is_running_time_long_enough = False
 
             #compressing operation
             if selected_operation == "2":
                 pass
 
-        if self.final_packing_porosity < (1 - 0.03) * self.aim_final_packing_porosity:
+            if selected_operation == "3":
+                pass
+
+        if self.final_packing_porosity < (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity:
             
             print("Porosity is lower than aim value.")
             print("Some particles will be deleted!")
                 
             delete_particle_count = 0
-            while self.final_packing_porosity < (1 - 0.03) * self.aim_final_packing_porosity:
+            while self.final_packing_porosity < (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity:
 
                 self.RandomDeleteAParticle()
                 delete_particle_count += 1
@@ -215,10 +223,29 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             print("{} particles have been deleted.".format(delete_particle_count))
             self.generator_process_marker_phase_2 = False
             self.generator_process_marker_phase_3 = True
-            print("********************Stage 3*************************")
+            print("********************Phase 3*************************")
 
     def RandomDeleteAParticle(self):
         pass
+
+    def CheckVelocityAndChangeOperationMarker(self):
+        max_particle_velocity = 0.0
+        for element in self.spheres_model_part.Elements:
+            node = element.GetNode(0)
+            velocity_x = node.GetSolutionStepValue(VELOCITY_X)
+            velocity_y = node.GetSolutionStepValue(VELOCITY_Y)
+            velocity_z = node.GetSolutionStepValue(VELOCITY_Z)
+            velocity_magnitude = (velocity_x * velocity_x + velocity_y * velocity_y + velocity_z * velocity_z)**0.5
+            if velocity_magnitude > max_particle_velocity:
+                max_particle_velocity = velocity_magnitude
+        if max_particle_velocity < self.max_particle_velocity_in_phase_2:
+            self.is_operations_running = False
+
+    def CheckWhetherRunningTimeIsLongEnough(self):
+        running_time = self.time - self.operation_starting_time
+        predicted_particle_falling_time = (2 * self.container_height / 9.81)**0.5
+        if running_time > predicted_particle_falling_time:
+            self.is_running_time_long_enough = True
 
 if __name__ == "__main__":
 
