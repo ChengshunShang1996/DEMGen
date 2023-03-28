@@ -10,6 +10,7 @@ from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
+from sys import exit
 
 class ParticlePackingGenerator(DEMAnalysisStage):
 
@@ -29,7 +30,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.aim_final_packing_porosity = 0.5
         self.max_porosity_tolerance = 0.03
         self.aim_container_filling_ratio = 0.5 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
-        self.max_particle_velocity_in_phase_1_2 = 0.001
+        self.max_particle_velocity_in_phase_1_2 = 0.1
         
         self.container_filling_ratio = 0.0
         self.initial_sphere_volume = 0.0
@@ -124,6 +125,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 self.DeleteOutsideParticles()
             if self.is_after_delete_outside_particles:
                 self.WriteOutMdpaFileOfParticles()
+                exit(0)
 
     def GetInitialDemSphereVolume(self):
 
@@ -220,7 +222,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 pass
 
             if selected_operation == "3":
-                pass
+                self.generator_process_marker_phase_2 = False
+                self.generator_process_marker_phase_3 = True
+                print("********************Phase 3*************************")
 
         if self.final_packing_porosity < (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity:
             
@@ -267,8 +271,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.final_packing_shape == "cylinder":
             max_radius = self.final_packing_radius
             center = self.final_packing_bottom_center_point
-            tolerance = 0.01 * self.final_packing_radius
-            self.PreUtilities.MarkToEraseParticlesOutsideRadius(self.spheres_model_part, max_radius, center, tolerance)
+            tolerance = 0.001 * self.final_packing_radius
+            self.PreUtilities.MarkToEraseParticlesOutsideRadiusForGettingCylinder(self.spheres_model_part, max_radius, center, tolerance)
         
         if self.final_packing_shape == "cylinder":
             #for a cylinder, only y direction is important, so x and z are set as very big/small 
@@ -278,6 +282,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             max_y = self.final_packing_bottom_center_point[1] + self.final_packing_height
             min_z = -1e10
             max_z = 1e10
+            tolerance = 0.001 * self.final_packing_height
 
         if self.final_packing_shape == "box":
             min_x = self.final_packing_bottom_center_point[0] - 0.5 * self.final_packing_lenth
@@ -286,18 +291,20 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             max_y = self.final_packing_bottom_center_point[1] + self.final_packing_height
             min_z = self.final_packing_bottom_center_point[2] - 0.5 * self.final_packing_width
             max_z = self.final_packing_bottom_center_point[2] + 0.5 * self.final_packing_width
+            tolerance = 0.001 * self.final_packing_height
         
         self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
     def WriteOutMdpaFileOfParticles(self):
 
-        outName = './G-TriaxialDEM.mdpa'
+        output_file_name = 'G-TriaxialDEM.mdpa'
+        aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
 
         # clean the exsisted file first
-        if os.path.isfile(outName):
-            os.remove(outName)
+        if os.path.isfile(aim_path_and_name):
+            os.remove(aim_path_and_name)
         
-        with open(outName,'a') as f:
+        with open(aim_path_and_name,'a') as f:
             # write the particle information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
             f.write("Begin Nodes\n")
