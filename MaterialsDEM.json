@@ -4,7 +4,7 @@
         "material_id"   : 1,
         "Variables"     : {
             "PARTICLE_DENSITY"    : 2500.0,
-            "YOUNG_MODULUS"       : 100000.0,
+            "YOUNG_MODULUS"       : 10000000.0,
             "POISSON_RATIO"       : 0.2,
             "PARTICLE_SPHERICITY" : 1.0
         }
@@ -23,5 +23,5 @@
             "ROLLING_FRICTION_WITH_WALLS"            : 0.01
         }
     }],
-    "material_assignation_table" : [["RigidFacePart.DEM-FEM-Wall_Rigid_Walls_Auto1","DEM-DefaultMaterial"],["DEMInletPart.Inlet_Particle_injectors_Auto1","DEM-DefaultMaterial"]]
+    "material_assignation_table" : [["RigidFacePart.DEM-FEM-Wall_TOP","DEM-DefaultMaterial"],["RigidFacePart.DEM-FEM-Wall_WALL","DEM-DefaultMaterial"],["DEMInletPart.Inlet_INLET","DEM-DefaultMaterial"]]
 }

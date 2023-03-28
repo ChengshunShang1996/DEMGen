@@ -26,9 +26,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def InitializePackingGenerator(self):
 
         #define the aim porosity
-        self.aim_final_packing_porosity = 0.35
+        self.aim_final_packing_porosity = 0.5
         self.max_porosity_tolerance = 0.03
-        self.aim_container_filling_ratio = 0.8 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
+        self.aim_container_filling_ratio = 0.5 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
         self.max_particle_velocity_in_phase_1_2 = 0.001
         
         self.container_filling_ratio = 0.0
@@ -43,8 +43,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.container_shape = "cylinder"  #input: "cylinder" or "box"  
 
         if self.container_shape == "cylinder":
-            self.container_radius = 0.0   #modify according to your case
-            self.container_height = 0.0   #modify according to your case
+            self.container_radius = 0.025   #modify according to your case
+            self.container_height = 0.1   #modify according to your case
             self.container_volume = math.pi * self.container_radius * self.container_radius * self.container_height
 
         if self.container_shape == "box":
@@ -56,19 +56,27 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.final_packing_shape = "cylinder"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "cylinder":
-            self.final_packing_radius = 0.0   #modify according to your case
-            self.final_packing_height = 0.0   #modify according to your case
+            self.final_packing_radius = 0.025   #modify according to your case
+            self.final_packing_height = 0.05  #modify according to your case
             self.final_packing_volume = math.pi * self.final_packing_radius * self.final_packing_radius * self.final_packing_height
-            self.final_packing_bottom_center_point = [0, 0, 0]
-            self.final_packing_direction = [0, 1, 0]
+            self.final_packing_bottom_center_point = KratosMultiphysics.Array3()
+            self.final_packing_bottom_center_point[0] = self.final_packing_bottom_center_point[1] = self.final_packing_bottom_center_point[2] = 0.0
+            self.final_packing_direction = KratosMultiphysics.Array3()
+            self.final_packing_direction[0] = 0.0
+            self.final_packing_direction[1] = 1.0
+            self.final_packing_direction[2] = 0.0
 
         if self.final_packing_shape == "box":
             self.final_packing_lenth  = 0.0   #modify according to your case
             self.final_packing_width  = 0.0   #modify according to your case
             self.final_packing_height = 0.0   #modify according to your case
             self.final_packing_volume = self.final_packing_lenth * self.final_packing_width * self.final_packing_height
-            self.final_packing_bottom_center_point = [0, 0, 0]
-            self.final_packing_direction = [0, 1, 0]
+            self.final_packing_bottom_center_point = KratosMultiphysics.Array3()
+            self.final_packing_bottom_center_point[0] = self.final_packing_bottom_center_point[1] = self.final_packing_bottom_center_point[2] = 0.0
+            self.final_packing_direction = KratosMultiphysics.Array3()
+            self.final_packing_direction[0] = 0.0
+            self.final_packing_direction[1] = 1.0
+            self.final_packing_direction[2] = 0.0
 
         print("********************Phase 1*************************")
 
@@ -151,8 +159,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def MeasureTotalPorosityOfFinalPacking(self):
         
         selected_element_volume = 0.0
-        for element in self.spheres_model_part.Elements:
-            node = element.GetNode(0)
+        for node in self.spheres_model_part.Nodes:
             r = node.GetSolutionStepValue(RADIUS)
             x = node.X
             y = node.Y
@@ -166,7 +173,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
         return self.final_packing_porosity
 
-    def CheckInsideFinalPackingOrNot(self, x,y,z):
+    def CheckInsideFinalPackingOrNot(self, x, y, z):
 
         #TODO: final_packing_direction should be included
         
@@ -236,8 +243,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
     def CheckVelocityAndChangeOperationMarker(self):
         max_particle_velocity = 0.0
-        for element in self.spheres_model_part.Elements:
-            node = element.GetNode(0)
+        for node in self.spheres_model_part.Nodes:
             velocity_x = node.GetSolutionStepValue(VELOCITY_X)
             velocity_y = node.GetSolutionStepValue(VELOCITY_Y)
             velocity_z = node.GetSolutionStepValue(VELOCITY_Z)
@@ -257,10 +263,77 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             self.is_running_time_long_enough = True
 
     def DeleteOutsideParticles(self):
-        pass
+
+        if self.final_packing_shape == "cylinder":
+            max_radius = self.final_packing_radius
+            center = self.final_packing_bottom_center_point
+            tolerance = 0.01 * self.final_packing_radius
+            self.PreUtilities.MarkToEraseParticlesOutsideRadius(self.spheres_model_part, max_radius, center, tolerance)
+        
+        if self.final_packing_shape == "cylinder":
+            #for a cylinder, only y direction is important, so x and z are set as very big/small 
+            min_x = -1e10
+            max_x = 1e10
+            min_y = self.final_packing_bottom_center_point[1]
+            max_y = self.final_packing_bottom_center_point[1] + self.final_packing_height
+            min_z = -1e10
+            max_z = 1e10
+
+        if self.final_packing_shape == "box":
+            min_x = self.final_packing_bottom_center_point[0] - 0.5 * self.final_packing_lenth
+            max_x = self.final_packing_bottom_center_point[0] + 0.5 * self.final_packing_lenth
+            min_y = self.final_packing_bottom_center_point[1]
+            max_y = self.final_packing_bottom_center_point[1] + self.final_packing_height
+            min_z = self.final_packing_bottom_center_point[2] - 0.5 * self.final_packing_width
+            max_z = self.final_packing_bottom_center_point[2] + 0.5 * self.final_packing_width
+        
+        self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
     def WriteOutMdpaFileOfParticles(self):
-        pass
+
+        outName = './G-TriaxialDEM.mdpa'
+
+        # clean the exsisted file first
+        if os.path.isfile(outName):
+            os.remove(outName)
+        
+        with open(outName,'a') as f:
+            # write the particle information
+            f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
+            f.write("Begin Nodes\n")
+            for node in self.spheres_model_part.Nodes:
+                f.write(str(node.Id) + ' ' + str(node.X) + ' ' + str(node.Y) + ' ' + str(node.Z) + '\n')
+            f.write("End Nodes \n \n")
+
+            f.write("Begin Elements SphericContinuumParticle3D// GUI group identifier: Body \n")
+            for element in self.spheres_model_part.Elements:
+                f.write(str(element.Id) + ' ' + ' 0 ' + str(element.GetNode(0).Id) + '\n')
+            f.write("End Elements \n \n")
+
+            f.write("Begin NodalData RADIUS // GUI group identifier: Body \n")
+            for node in self.spheres_model_part.Nodes:
+                f.write(str(node.Id) + ' ' + ' 0 ' + str(node.GetSolutionStepValue(RADIUS)) + '\n')
+            f.write("End NodalData \n \n")
+
+            f.write("Begin NodalData COHESIVE_GROUP // GUI group identifier: Body \n")
+            for node in self.spheres_model_part.Nodes:
+                f.write(str(node.Id) + ' ' + ' 0 ' + " 1 " + '\n')
+            f.write("End NodalData \n \n")
+
+            f.write("Begin NodalData SKIN_SPHERE \n End NodalData \n \n")
+
+            f.write("Begin SubModelPart DEMParts_Body // Group Body // Subtree DEMParts \n Begin SubModelPartNodes \n")
+            for node in self.spheres_model_part.Nodes:
+                f.write(str(node.Id) + '\n')
+            f.write("End SubModelPartNodes \n Begin SubModelPartElements \n ")
+            for element in self.spheres_model_part.Elements:
+                f.write(str(element.Id) + '\n')
+            f.write("End SubModelPartElements \n")
+            f.write("Begin SubModelPartConditions \n End SubModelPartConditions \n End SubModelPart \n \n")
+
+            f.close()
+
+        print("Successfully write out GID DEM.mdpa file!")
 
 if __name__ == "__main__":
 
