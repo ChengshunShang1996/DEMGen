@@ -60,7 +60,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.final_packing_shape = "cylinder"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "cylinder":
-            self.final_packing_radius = 0.025   #modify according to your case
+            self.final_packing_radius = 0.0125   #modify according to your case
             self.final_packing_height = 0.05  #modify according to your case
             self.final_packing_volume = math.pi * self.final_packing_radius * self.final_packing_radius * self.final_packing_height
             self.final_packing_bottom_center_point = KratosMultiphysics.Array3()
@@ -131,10 +131,11 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             if self.generator_process_marker_phase_3:
                 if not self.is_after_delete_outside_particles:
                     self.DeleteOutsideParticles()
-                if self.is_after_delete_outside_particles:
+                else:
                     self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_3.mdpa')
+                    self.PrintResultsForGid(self.time)
                     exit(0)
-                    
+
         self.final_check_counter += 1
 
     def GetInitialDemSphereVolume(self):
@@ -308,6 +309,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         
         self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
+        self.is_after_delete_outside_particles = True
+
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
         aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
@@ -334,12 +337,14 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 f.write(str(node.Id) + ' ' + ' 0 ' + str(node.GetSolutionStepValue(RADIUS)) + '\n')
             f.write("End NodalData \n \n")
 
-            f.write("Begin NodalData COHESIVE_GROUP // GUI group identifier: Body \n")
-            for node in self.spheres_model_part.Nodes:
-                f.write(str(node.Id) + ' ' + ' 0 ' + " 1 " + '\n')
-            f.write("End NodalData \n \n")
+            if self.is_after_delete_outside_particles:
 
-            f.write("Begin NodalData SKIN_SPHERE \n End NodalData \n \n")
+                f.write("Begin NodalData COHESIVE_GROUP // GUI group identifier: Body \n")
+                for node in self.spheres_model_part.Nodes:
+                    f.write(str(node.Id) + ' ' + ' 0 ' + " 1 " + '\n')
+                f.write("End NodalData \n \n")
+
+                f.write("Begin NodalData SKIN_SPHERE \n End NodalData \n \n")
 
             f.write("Begin SubModelPart DEMParts_Body // Group Body // Subtree DEMParts \n Begin SubModelPartNodes \n")
             for node in self.spheres_model_part.Nodes:
