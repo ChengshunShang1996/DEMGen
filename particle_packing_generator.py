@@ -22,7 +22,6 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         super().Initialize()
         self.InitializePackingGenerator() 
         self.GetInitialDemSphereVolume()
-        self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
 
     def InitializePackingGenerator(self):
 
@@ -40,6 +39,10 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.generator_process_marker_phase_3 = False # Phase 3: Get the final particle packing
         self.is_operations_running = False
         self.is_after_delete_outside_particles = False
+        self.final_check_counter = 0
+
+        self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
+        self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
         
         self.container_shape = "cylinder"  #input: "cylinder" or "box"  
 
@@ -97,36 +100,42 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     
     def FinalizeSolutionStep(self):
         super().FinalizeSolutionStep()
-        
-        if self.generator_process_marker_phase_1:
-            self.CalculateFillingRatioAndSetInletStop()
 
-        #waitting until partciles calm down
-        if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
-            self.CheckVelocityAndChangeOperationMarker()
+        if self.final_check_counter == self.final_check_frequency:
 
-        if self.generator_process_marker_phase_2:
-            self.MeasureLocalPorosityOfFinalPacking()
-            self.MeasureTotalPorosityOfFinalPacking()
-            if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
-                self.generator_process_marker_phase_2 = False
-                self.generator_process_marker_phase_3 = True
-                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
-                print("********************Phase 3*************************")
-            else:
-                if not self.is_operations_running:
-                    self.OperationsOnParticlePacking()
+            self.final_check_counter = 0
+
+            if self.generator_process_marker_phase_1:
+                self.CalculateFillingRatioAndSetInletStop()
+
+            #waitting until partciles calm down
+            if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
+                self.CheckVelocityAndChangeOperationMarker()
+
+            if self.generator_process_marker_phase_2:
+                self.MeasureLocalPorosityOfFinalPacking()
+                self.MeasureTotalPorosityOfFinalPacking()
+                if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
+                    self.generator_process_marker_phase_2 = False
+                    self.generator_process_marker_phase_3 = True
+                    self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
+                    print("********************Phase 3*************************")
                 else:
-                    self.CheckWhetherRunningTimeIsLongEnough()
-                    if self.is_running_time_long_enough:
-                        self.CheckVelocityAndChangeOperationMarker()
+                    if not self.is_operations_running:
+                        self.OperationsOnParticlePacking()
+                    else:
+                        self.CheckWhetherRunningTimeIsLongEnough()
+                        if self.is_running_time_long_enough:
+                            self.CheckVelocityAndChangeOperationMarker()
 
-        if self.generator_process_marker_phase_3:
-            if not self.is_after_delete_outside_particles:
-                self.DeleteOutsideParticles()
-            if self.is_after_delete_outside_particles:
-                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_3.mdpa')
-                exit(0)
+            if self.generator_process_marker_phase_3:
+                if not self.is_after_delete_outside_particles:
+                    self.DeleteOutsideParticles()
+                if self.is_after_delete_outside_particles:
+                    self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_3.mdpa')
+                    exit(0)
+                    
+        self.final_check_counter += 1
 
     def GetInitialDemSphereVolume(self):
 
