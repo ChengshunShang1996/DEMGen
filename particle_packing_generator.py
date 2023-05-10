@@ -111,6 +111,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
                 self.generator_process_marker_phase_2 = False
                 self.generator_process_marker_phase_3 = True
+                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
                 print("********************Phase 3*************************")
             else:
                 if not self.is_operations_running:
@@ -124,7 +125,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             if not self.is_after_delete_outside_particles:
                 self.DeleteOutsideParticles()
             if self.is_after_delete_outside_particles:
-                self.WriteOutMdpaFileOfParticles()
+                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_3.mdpa')
                 exit(0)
 
     def GetInitialDemSphereVolume(self):
@@ -224,6 +225,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             if selected_operation == "3":
                 self.generator_process_marker_phase_2 = False
                 self.generator_process_marker_phase_3 = True
+                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
                 print("********************Phase 3*************************")
 
         if self.final_packing_porosity < (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity:
@@ -240,6 +242,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             print("{} particles have been deleted.".format(delete_particle_count))
             self.generator_process_marker_phase_2 = False
             self.generator_process_marker_phase_3 = True
+            self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
             print("********************Phase 3*************************")
 
     def RandomDeleteAParticle(self):
@@ -258,6 +261,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             self.is_operations_running = False
             if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
                 self.generator_process_marker_phase_2 = True
+                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_1.mdpa')
                 print("********************Phase 2*************************")
 
     def CheckWhetherRunningTimeIsLongEnough(self):
@@ -295,9 +299,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         
         self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
-    def WriteOutMdpaFileOfParticles(self):
+    def WriteOutMdpaFileOfParticles(self, output_file_name):
 
-        output_file_name = 'G-TriaxialDEM.mdpa'
         aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
 
         # clean the exsisted file first
