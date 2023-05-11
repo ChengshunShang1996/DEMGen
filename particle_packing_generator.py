@@ -38,6 +38,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.generator_process_marker_phase_2 = False # Phase 2: Operate on initial particle packing for getting a desired porosity
         self.generator_process_marker_phase_3 = False # Phase 3: Get the final particle packing
         self.is_operations_running = False
+        self.is_compressing = False
         self.is_after_delete_outside_particles = False
         self.final_check_counter = 0
 
@@ -123,6 +124,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 else:
                     if not self.is_operations_running:
                         self.OperationsOnParticlePacking()
+                    elif self.is_compressing:
+                        #self.CheckVelocityAndChangeOperationMarker()
+                        pass
                     else:
                         self.CheckWhetherRunningTimeIsLongEnough()
                         if self.is_running_time_long_enough:
@@ -230,7 +234,15 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
             #compressing operation
             if selected_operation == "2":
-                pass
+                
+                for smp in self.rigid_face_model_part.SubModelParts:
+                    if smp[IDENTIFIER] == 'TOP':
+                        smp[LINEAR_VELOCITY_Y] = -0.05
+                    if smp[IDENTIFIER] == 'BOTTOM':
+                        smp[LINEAR_VELOCITY_Y] = 0.05
+
+                self.is_operations_running = True
+                self.is_compressing = True
 
             if selected_operation == "3":
                 self.generator_process_marker_phase_2 = False
