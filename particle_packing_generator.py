@@ -39,6 +39,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.generator_process_marker_phase_3 = False # Phase 3: Get the final particle packing
         self.is_operations_running = False
         self.is_compressing = False
+        self.is_running_more_time = False
+        self.input_aim_time = 0.0
         self.is_after_delete_outside_particles = False
         self.final_check_counter = 0
 
@@ -127,8 +129,13 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                     elif self.is_compressing:
                         #self.CheckVelocityAndChangeOperationMarker()
                         pass
+                    elif self.is_running_more_time:
+                        self.CheckWhetherRunningTimeIsLongEnough(self.input_aim_time)
+                        if self.is_running_time_long_enough:
+                            self.CheckVelocityAndChangeOperationMarker()
                     else:
-                        self.CheckWhetherRunningTimeIsLongEnough()
+                        predicted_particle_falling_time = (2 * self.container_height / 9.81)**0.5
+                        self.CheckWhetherRunningTimeIsLongEnough(predicted_particle_falling_time)
                         if self.is_running_time_long_enough:
                             self.CheckVelocityAndChangeOperationMarker()
 
@@ -186,7 +193,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 element_volume = 4/3 * math.pi * r * r * r
                 selected_element_volume += element_volume
 
-        self.final_packing_porosity = 1 - (selected_element_volume / self.container_volume)
+        self.final_packing_porosity = 1 - (selected_element_volume / self.final_packing_volume)
+
+        print("Aim porosity is {} and currently porosity is {}".format(self.aim_final_packing_porosity, self.final_packing_porosity))
 
         return self.final_packing_porosity
 
@@ -217,10 +226,18 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         
         if self.final_packing_porosity > (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
 
+            #set the plate v = 0.0
+            for smp in self.rigid_face_model_part.SubModelParts:
+                if smp[IDENTIFIER] == 'TOP':
+                    smp[LINEAR_VELOCITY_Y] = 0.0
+                if smp[IDENTIFIER] == 'BOTTOM':
+                    smp[LINEAR_VELOCITY_Y] = 0.0
+
             print("You can input a number to achieve:")
             print("1. inverte")
             print("2. compressing")
             print("3. continue")
+            print("4. run more time")
 
             selected_operation = input("Please input the number of the operation: ")
 
@@ -250,6 +267,14 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_2.mdpa')
                 print("********************Phase 3*************************")
 
+            if selected_operation == "4":
+                self.is_operations_running = True
+                self.operation_starting_time = self.time
+                self.is_running_time_long_enough = False
+                self.is_running_more_time = True
+                self.input_aim_time = input("Please input the time you would like to run (s): ")
+                
+
         if self.final_packing_porosity < (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity:
             
             print("Porosity is lower than aim value.")
@@ -260,7 +285,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
                 self.RandomDeleteAParticle()
                 delete_particle_count += 1
-                self.MeasureTotalPorosityOfFinalPacking(self)
+                self.MeasureTotalPorosityOfFinalPacking()
             print("{} particles have been deleted.".format(delete_particle_count))
             self.generator_process_marker_phase_2 = False
             self.generator_process_marker_phase_3 = True
@@ -286,10 +311,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_1.mdpa')
                 print("********************Phase 2*************************")
 
-    def CheckWhetherRunningTimeIsLongEnough(self):
+    def CheckWhetherRunningTimeIsLongEnough(self, aim_time):
         running_time = self.time - self.operation_starting_time
-        predicted_particle_falling_time = (2 * self.container_height / 9.81)**0.5
-        if running_time > predicted_particle_falling_time:
+        if running_time > aim_time:
             self.is_running_time_long_enough = True
 
     def DeleteOutsideParticles(self):
