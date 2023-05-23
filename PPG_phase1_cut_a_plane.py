@@ -21,7 +21,6 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def Initialize(self):
         super().Initialize()
         self.InitializePackingGenerator() 
-        self.GetInitialDemSphereVolume()
 
     def InitializePackingGenerator(self):
 
@@ -47,7 +46,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
         
-        self.container_shape = "cylinder"  #input: "cylinder" or "box"  
+        self.container_shape = "box"  #input: "cylinder" or "box"  
 
         if self.container_shape == "cylinder":
             self.container_radius = 0.025   #modify according to your case
@@ -55,16 +54,16 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             self.container_volume = math.pi * self.container_radius * self.container_radius * self.container_height
 
         if self.container_shape == "box":
-            self.container_lenth  = 0.0   #modify according to your case
-            self.container_width  = 0.0   #modify according to your case
-            self.container_height = 0.0   #modify according to your casºe
+            self.container_lenth  = 0.0025   #modify according to your case
+            self.container_width  = 0.0025   #modify according to your case
+            self.container_height = 0.005   #modify according to your cas锟�0锟�2e
             self.container_volume = self.container_lenth * self.container_width * self.container_height
 
-        self.final_packing_shape = "cylinder"  #input: "cylinder" or "box" 
+        self.final_packing_shape = "box"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "cylinder":
-            self.final_packing_radius = 0.0125   #modify according to your case
-            self.final_packing_height = 0.05  #modify according to your case
+            self.final_packing_radius = 0.0025   #modify according to your case
+            self.final_packing_height = 0.0025  #modify according to your case
             self.final_packing_volume = math.pi * self.final_packing_radius * self.final_packing_radius * self.final_packing_height
             self.final_packing_bottom_center_point = KratosMultiphysics.Array3()
             self.final_packing_bottom_center_point[0] = self.final_packing_bottom_center_point[1] = self.final_packing_bottom_center_point[2] = 0.0
@@ -74,9 +73,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             self.final_packing_direction[2] = 0.0
 
         if self.final_packing_shape == "box":
-            self.final_packing_lenth  = 0.0   #modify according to your case
-            self.final_packing_width  = 0.0   #modify according to your case
-            self.final_packing_height = 0.0   #modify according to your case
+            self.final_packing_lenth  = 0.005   #modify according to your case
+            self.final_packing_width  = 0.005  #modify according to your case
+            self.final_packing_height = 0.005   #modify according to your case
             self.final_packing_volume = self.final_packing_lenth * self.final_packing_width * self.final_packing_height
             self.final_packing_bottom_center_point = KratosMultiphysics.Array3()
             self.final_packing_bottom_center_point[0] = self.final_packing_bottom_center_point[1] = self.final_packing_bottom_center_point[2] = 0.0
@@ -107,8 +106,9 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.generator_process_marker_phase_1:
 
             if not self.is_after_delete_outside_particles:
+                self.PrintResultsForGid(self.time)
                 self.DeleteOutsideParticles()
-            else:
+            elif self.time > 1e-5:
                 self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_after_cut.mdpa')
                 self.PrintResultsForGid(self.time)
                 exit(0)
