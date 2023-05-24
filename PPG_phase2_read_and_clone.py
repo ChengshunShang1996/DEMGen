@@ -100,9 +100,9 @@ class read_and_clone():
         temp_cnt_n = 0
         for i in range(0, max_index_x):
 
-            temp_p_pram_list = self.p_pram_list
+            temp_p_pram_list = []
 
-            for p_pram_dict in temp_p_pram_list:
+            for p_pram_dict in self.p_pram_list:
 
                 temp_p_pram_dict = {
                     "id" : 0,
@@ -134,14 +134,17 @@ class read_and_clone():
                     self.max_particle_id += 1
                     self.max_element_id += 1
 
-            temp_cnt_n += 1
+            for temp_p_pram in temp_p_pram_list:
+                self.p_pram_list.append(temp_p_pram)
 
+            temp_cnt_n += 1
+        
         temp_cnt_n = 0
         for i in range(0, max_index_y):
 
-            temp_p_pram_list = self.p_pram_list
+            temp_p_pram_list = []
 
-            for p_pram_dict in temp_p_pram_list:
+            for p_pram_dict in self.p_pram_list:
 
                 temp_p_pram_dict = {
                     "id" : 0,
@@ -172,14 +175,18 @@ class read_and_clone():
 
                     self.max_particle_id += 1
                     self.max_element_id += 1
+
+            for temp_p_pram in temp_p_pram_list:
+                self.p_pram_list.append(temp_p_pram)
+
             temp_cnt_n += 1
 
         temp_cnt_n = 0
         for i in range(0, max_index_z):
 
-            temp_p_pram_list = self.p_pram_list
+            temp_p_pram_list = []
 
-            for p_pram_dict in temp_p_pram_list:
+            for p_pram_dict in self.p_pram_list:
 
                 temp_p_pram_dict = {
                     "id" : 0,
@@ -210,12 +217,16 @@ class read_and_clone():
 
                     self.max_particle_id += 1
                     self.max_element_id += 1
+
+            for temp_p_pram in temp_p_pram_list:
+                self.p_pram_list.append(temp_p_pram)
             
             temp_cnt_n += 1
+            
 
     def WriteOutGIDData(self):
     
-        outName = './DEM_after_clone.mdpa'
+        outName = './inletPG3DEM_OUT.mdpa'
 
         # clean the exsisted file first
         if os.path.isfile(outName):
@@ -285,17 +296,17 @@ class read_and_clone():
 if __name__ == "__main__":
 
     TestDEM = read_and_clone()
-    TestDEM.getParticleDataFromMdpa('G-TriaxialDEM_1.mdpa')
+    TestDEM.getParticleDataFromMdpa('G-TriaxialDEM_after_cut.mdpa')
     meta_block_length_x = 0.003
     meta_block_length_y = 0.003
     meta_block_length_z = 0.003
     meta_block_size = [meta_block_length_x, meta_block_length_y, meta_block_length_z]
     container_x_min = -0.0015
-    container_x_max = 0.01
+    container_x_max = 0.0225
     container_y_min = 0.0
-    container_y_max = 0.01
+    container_y_max = 0.024
     container_z_min = -0.0015
-    container_z_max = 0.01
+    container_z_max = 0.0225
     container_size = [container_x_min, container_x_max, container_y_min, container_y_max, container_z_min, container_z_max]
     TestDEM.clone_meta_blocks(meta_block_size, container_size)
     TestDEM.WriteOutGIDData()
