@@ -28,7 +28,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.aim_final_packing_porosity = 0.5
         self.max_porosity_tolerance = 0.03
         self.aim_container_filling_ratio = 0.5 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
-        self.max_particle_velocity_in_phase_1_2 = 0.1
+        self.max_particle_velocity_in_phase_1_2 = 0.01
         
         self.generator_process_marker_phase_1 = True  # Phase 1: Generate initial particle packing
         self.generator_process_marker_phase_2 = False # Phase 2: Operate on initial particle packing for getting a desired porosity
@@ -65,7 +65,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
             #waitting until partciles calm down
             if (self.generator_process_marker_phase_1 is True) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
-                aim_time = 0.003
+                aim_time = 0.01
                 self.CheckWhetherRunningTimeIsLongEnough(aim_time)
                 if self.is_running_time_long_enough:
                     self.CheckVelocityAndChangeOperationMarker()
