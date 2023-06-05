@@ -18,6 +18,7 @@ class read_and_clone():
         self.p_record_nodes = False
         self.p_record_elements = False
         self.p_record_radius = False
+        self.read_sphere_finish = False
 
         if os.path.isfile(aim_mdpa_file_name):
             
@@ -25,69 +26,60 @@ class read_and_clone():
 
                 for line in mdpa_data:
 
-                    self.p_pram_dict = {
-                    "id" : 0,
-                    "p_x" : 0.0,
-                    "p_y" : 0.0,
-                    "p_z" : 0.0,
-                    "radius" : 0.0,
-                    "p_v_x" : 0.0,
-                    "p_v_y" : 0.0,
-                    "p_v_z" : 0.0,
-                    "p_ele_id": 0,
-                    "p_group_id": 0
-                    }
-                            
-                    values = [str(s) for s in line.split()]
+                    if not self.read_sphere_finish:
+                    
+                        self.p_pram_dict = {
+                        "id" : 0,
+                        "p_x" : 0.0,
+                        "p_y" : 0.0,
+                        "p_z" : 0.0,
+                        "radius" : 0.0,
+                        "p_v_x" : 0.0,
+                        "p_v_y" : 0.0,
+                        "p_v_z" : 0.0,
+                        "p_ele_id": 0,
+                        "p_group_id": 0
+                        }
+                                
+                        values = [str(s) for s in line.split()]
 
-                    if len(values) > 1:
-                        if values[0] == 'Begin' and values[1] == 'Nodes':
-                            self.p_record_nodes = True
-                            continue
-                        elif values[0] == 'End' and values[1] == 'Nodes':
-                            self.p_record_nodes = False
+                        if values[0] == 'Coordinates':
+                                self.p_record_nodes = True
+                                continue
+                        
+                        if values[0] == 'Elements':
+                                self.p_record_elements = True
+                                continue
+                        
+                        if len(values) > 1:
 
-                        if values[0] == 'Begin' and values[1] == 'Elements':
-                            self.p_record_elements = True
-                            continue
-                        elif values[0] == 'End' and values[1] == 'Elements':
-                            self.p_record_elements = False
+                            if values[0] == 'End' and values[1] == 'Coordinates':
+                                self.p_record_nodes = False
 
-                    if len(values) > 2:
-                        if values[0] == 'Begin' and values[2] == 'RADIUS':
-                            self.p_record_radius = True
-                            continue
-                    if len(values) > 1:
-                        if values[0] == 'End' and values[1] == 'NodalData' and self.p_record_radius == True:
-                            self.p_record_radius = False
+                            if values[0] == 'End' and values[1] == 'Elements':
+                                self.p_record_elements = False
+                                self.read_sphere_finish = True
 
-                    if self.p_record_nodes:
-                        self.p_pram_dict["id"] = int(values[0])
-                        self.p_pram_dict["p_x"] = float(values[1])
-                        self.p_pram_dict["p_y"] = float(values[2])
-                        self.p_pram_dict["p_z"] = float(values[3])
-
-                    if self.p_record_elements:
-                        #only modify the values, not add new one
-                        temp_p_pram_dict = next(old_p_pram_dict for old_p_pram_dict in self.p_pram_list if old_p_pram_dict['id'] == int(values[2]))
-                        temp_p_pram_dict["p_ele_id"] = int(values[0])
-
-                    if self.p_record_radius:
-                        #only modify the values, not add new one
-                        temp_p_pram_dict = next(old_p_pram_dict for old_p_pram_dict in self.p_pram_list if old_p_pram_dict['id'] == int(values[0]))
-                        temp_p_pram_dict["radius"] = float(values[2])
-
-                    if not (self.p_record_elements and self.p_record_radius):
                         if self.p_record_nodes:
+                            self.p_pram_dict["id"] = int(values[0])
+                            self.p_pram_dict["p_x"] = float(values[1])
+                            self.p_pram_dict["p_y"] = float(values[2])
+                            self.p_pram_dict["p_z"] = float(values[3])
                             self.p_pram_list.append(self.p_pram_dict)
                             self.p_id = self.p_id + 1
+
+                        if self.p_record_elements:
+                            #only modify the values, not add new one
+                            temp_p_pram_dict = next(old_p_pram_dict for old_p_pram_dict in self.p_pram_list if old_p_pram_dict['id'] == int(values[1]))
+                            temp_p_pram_dict["p_ele_id"] = int(values[0])
+                            temp_p_pram_dict["radius"] = float(values[2])
 
         self.p_pram_list = sorted(self.p_pram_list, key=lambda d: d['id'])
 
         self.max_particle_id = max(self.p_pram_list,key=lambda x: x['id'])['id']
         self.max_element_id = max(self.p_pram_list,key=lambda x: x['p_ele_id'])['p_ele_id']
 
-        print("Read mdpa file finished!\t")
+        print("Read Post file finished!\t")
             
 
     def WriteOutGIDData(self):
@@ -162,5 +154,5 @@ class read_and_clone():
 if __name__ == "__main__":
 
     TestDEM = read_and_clone()
-    TestDEM.getParticleDataFromPost('G-TriaxialDEM_after_cut.mdpa')
+    TestDEM.getParticleDataFromPost('inletPG3_0.001.post.msh')
     TestDEM.WriteOutGIDData()
