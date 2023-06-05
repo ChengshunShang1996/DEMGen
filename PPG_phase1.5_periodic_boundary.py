@@ -25,14 +25,16 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def InitializePackingGenerator(self):
 
         #define the aim porosity
-        self.aim_final_packing_porosity = 0.5
-        self.max_porosity_tolerance = 0.03
-        self.periodic_boundary_move_inwards_velocity = 0.05
+        self.aim_final_packing_porosity = 0.25
+        self.max_porosity_tolerance = 0.003
+        self.periodic_boundary_move_inwards_velocity = self.parameters["BoundingBoxMoveVelocity"].GetDouble()
+        self.max_particle_velocity_expected = 0.1
         
         self.container_filling_ratio = 0.0
         self.initial_sphere_volume = 0.0
         self.final_packing_porosity = 0.0
         self.final_check_counter = 0
+        self.VelosityIsSmallEnough = False
 
         self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
@@ -40,10 +42,10 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.final_packing_shape = "box"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "box":
-            self.final_packing_lenth  = 0.003   #modify according to your case
-            self.final_packing_width  = 0.003   #modify according to your case
-            self.final_packing_height = 0.003   #modify according to your case
-            self.final_packing_volume = self.final_packing_lenth * self.final_packing_width * self.final_packing_height
+            self.final_packing_lenth_ini  = 0.003   #modify according to your case
+            self.final_packing_width_ini  = 0.003   #modify according to your case
+            self.final_packing_height_ini = 0.003   #modify according to your case
+            self.final_packing_volume = self.final_packing_lenth_ini * self.final_packing_width_ini * self.final_packing_height_ini
             self.final_packing_direction = KratosMultiphysics.Array3()
             self.final_packing_direction[0] = 0.0
             self.final_packing_direction[1] = 1.0
@@ -69,16 +71,32 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.final_check_counter == self.final_check_frequency:
 
             self.final_check_counter = 0
-
+            if self.parameters["BoundingBoxMoveOption"].GetBool():
+                self.UpdateFinalPackingVolume()
             self.MeasureTotalPorosityOfFinalPacking()
             if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
-                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_after_compressing.mdpa')
-                self.PrintResultsForGid(self.time)
-                exit(0)
+                self.parameters["BoundingBoxMoveOption"].SetBool(False)
+                self.CheckWhetherVelosityIsSmallEnough()
+                if self.VelosityIsSmallEnough:
+                    self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_after_compressing.mdpa')
+                    self.PrintResultsForGid(self.time)
+                    exit(0)
 
         self.final_check_counter += 1
 
-        self.UpdatePeriodicBoundaryPositionAndFinalPackingVolume()
+    def CheckWhetherVelosityIsSmallEnough(self):
+
+        max_particle_velocity = 0.0
+        for node in self.spheres_model_part.Nodes:
+            velocity_x = node.GetSolutionStepValue(VELOCITY_X)
+            velocity_y = node.GetSolutionStepValue(VELOCITY_Y)
+            velocity_z = node.GetSolutionStepValue(VELOCITY_Z)
+            velocity_magnitude = (velocity_x * velocity_x + velocity_y * velocity_y + velocity_z * velocity_z)**0.5
+            if velocity_magnitude > max_particle_velocity:
+                max_particle_velocity = velocity_magnitude
+        if max_particle_velocity < self.max_particle_velocity_expected:
+            self.VelosityIsSmallEnough = False
+
 
     def MeasureTotalPorosityOfFinalPacking(self):
         
@@ -94,29 +112,12 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
         return self.final_packing_porosity
 
-
-    def UpdatePeriodicBoundaryPositionAndFinalPackingVolume(self):
-
-        BoundingBoxMinX_updated = self.parameters["BoundingBoxMinX"].GetDouble() + self.periodic_boundary_move_inwards_velocity * self.time
-        BoundingBoxMinY_updated = self.parameters["BoundingBoxMinY"].GetDouble() + self.periodic_boundary_move_inwards_velocity * self.time
-        BoundingBoxMinZ_updated = self.parameters["BoundingBoxMinZ"].GetDouble() + self.periodic_boundary_move_inwards_velocity * self.time
-        BoundingBoxMaxX_updated = self.parameters["BoundingBoxMaxX"].GetDouble() - self.periodic_boundary_move_inwards_velocity * self.time
-        BoundingBoxMaxY_updated = self.parameters["BoundingBoxMaxY"].GetDouble() - self.periodic_boundary_move_inwards_velocity * self.time
-        BoundingBoxMaxZ_updated = self.parameters["BoundingBoxMaxZ"].GetDouble() - self.periodic_boundary_move_inwards_velocity * self.time
-
-        if "PeriodicDomainOption" in self.parameters.keys():
-            if self.parameters["PeriodicDomainOption"].GetBool():
-                self.search_strategy = OMP_DEMSearch(BoundingBoxMinX_updated,
-                                                     BoundingBoxMinY_updated,
-                                                     BoundingBoxMinZ_updated,
-                                                     BoundingBoxMaxX_updated,
-                                                     BoundingBoxMaxY_updated,
-                                                     BoundingBoxMaxZ_updated)
-                
-        self.final_packing_lenth  -= 2 * self.periodic_boundary_move_inwards_velocity * self.time
-        self.final_packing_width  -= 2 * self.periodic_boundary_move_inwards_velocity * self.time
-        self.final_packing_height -= 2 * self.periodic_boundary_move_inwards_velocity * self.time
-        self.final_packing_volume = self.final_packing_lenth * self.final_packing_width * self.final_packing_height
+    def UpdateFinalPackingVolume(self):
+         
+        final_packing_lenth  = self.final_packing_lenth_ini - 2 * self.periodic_boundary_move_inwards_velocity * self.time
+        final_packing_width  = self.final_packing_width_ini - 2 * self.periodic_boundary_move_inwards_velocity * self.time
+        final_packing_height = self.final_packing_height_ini - 2 * self.periodic_boundary_move_inwards_velocity * self.time
+        self.final_packing_volume = final_packing_lenth * final_packing_width * final_packing_height
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
@@ -171,5 +172,6 @@ if __name__ == "__main__":
     with open("ProjectParametersDEM.json", 'r') as parameter_file:
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
-    model = KratosMultiphysics.Model()
-    ParticlePackingGenerator(model, parameters).Run()
+        model = KratosMultiphysics.Model()
+        run_dem = ParticlePackingGenerator(model, parameters)
+        run_dem.Run()
