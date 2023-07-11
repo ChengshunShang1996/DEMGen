@@ -13,6 +13,7 @@ import math
 from sys import exit
 import matplotlib.pyplot as plt
 import time
+import numpy as np
 
 class ParticlePackingGenerator(DEMAnalysisStage):
 
@@ -112,22 +113,23 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     
     def FinalizeSolutionStep(self):
         super().FinalizeSolutionStep()
-        self.MeasureLocalPorosityOfFinalPacking()
+        #self.MeasureLocalPorosityOfFinalPacking()
+        self.MeasureLocalPorosityWithDifferentRadius()
         #self.MeasureTotalPorosityOfFinalPacking()
 
     def MeasureLocalPorosityOfFinalPacking(self):
         
         print("start measurement")
-        radius = 0.002
-        distance_between_two_measure_sphere = 0.001
+        radius = 0.001
+        distance_between_two_measure_sphere = 0.0005
         center_x_ini = 0.0005
         center_y_ini = 0.002
         center_z_ini = 0.0005
-        self.container_x_min = -0.0015
+        self.container_x_min = -0.0013499998999967166
         self.container_x_max = 0.0225
         self.container_y_min = 0.0
         self.container_y_max = 0.024
-        self.container_z_min = -0.0015
+        self.container_z_min = -0.0013499998999967166
         self.container_z_max = 0.0225
 
         if center_x_ini - radius < self.container_x_min or center_x_ini + radius > self.container_x_max:
@@ -195,9 +197,76 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         plt.colorbar()
         plt.show()
         
-        with open("porosity_r2mm.txt", "w") as f_w:
+        with open("porosity_r1mm.txt", "w") as f_w:
             for i in range(len(measure_x_list)):
                 f_w.write(str(measure_x_list[i]) + ' '+ str(measure_y_list[i]) + ' '+ str(measured_porosity[i]) + '\n')
+
+        exit(0)
+
+    def MeasureLocalPorosityWithDifferentRadius(self):
+        
+        print("start measurement")
+        radius = 0.0005
+        radius_increasement = 0.0002
+        center_x_ini = 0.012 - 0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+        center_y_ini = 0.012
+        center_z_ini = 0.012 - 0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+        distance_between_two_measure_sphere = 0.0002
+        self.container_x_min = -0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+        self.container_x_max = 0.024 - 0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+        self.container_y_min = 0.0
+        self.container_y_max = 0.024
+        self.container_z_min = -0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+        self.container_z_max = 0.024 - 0.5 * (0.003 - 2 * 0.001 * 0.11800010000236323)
+
+        inside_of_container = True
+        n_R = 0
+        measure_R_list = []
+        measured_porosity_mean = []
+        measured_porosity_max = []
+        measured_porosity_min = []
+
+        while inside_of_container:
+
+            radius += n_R * radius_increasement
+            measured_porosity = []
+            for i in [-1,0,1]:
+                center_x = center_x_ini + i * distance_between_two_measure_sphere
+                center_y = center_y_ini
+                center_z = center_z_ini
+
+                if center_x - radius < self.container_x_min or center_x + radius > self.container_x_max:
+                    print("The measure sphere is out of the boundary. Please redefine the initial center coordinate x.")
+                    inside_of_container = False
+                elif center_y - radius < self.container_y_min or center_y + radius > self.container_y_max:
+                    print("The measure sphere is out of the boundary. Please redefine the initial center coordinate y.")
+                    inside_of_container = False
+                elif center_z - radius < self.container_z_min or center_z + radius > self.container_z_max:
+                    print("The measure sphere is out of the boundary. Please redefine the initial center coordinate z.")
+                    inside_of_container = False
+                else:
+                    measured_porosity.append(self.MeasureSphereForGettingPackingProperties(radius, center_x, center_y, center_z, 'porosity'))
+
+            
+            if inside_of_container:
+                measure_R_list.append(radius)
+                sum_poro = 0.0
+                for poro in measured_porosity:
+                    sum_poro += poro
+                mean_poro = sum_poro / 3.0
+                measured_porosity_mean.append(mean_poro)
+                measured_porosity_max.append(max(measured_porosity) - mean_poro)
+                measured_porosity_min.append(mean_poro - min(measured_porosity))
+                n_R += 1
+                print(n_R)
+
+        plt.errorbar(measure_R_list, measured_porosity_mean, yerr=(measured_porosity_min, measured_porosity_max) )
+        #plt.legend()
+        plt.show()
+        
+        with open("porosity_diff_radius.txt", "w") as f_w:
+            for i in range(len(measure_R_list)):
+                f_w.write(str(measure_R_list[i]) + ' '+ str(measured_porosity_mean[i]) + ' '+ str(measured_porosity_max[i]) + ' '+ str(measured_porosity_min[i]) + '\n')
 
         exit(0)
 
