@@ -116,6 +116,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         #self.MeasureLocalPorosityOfFinalPacking()
         self.MeasureLocalPorosityWithDifferentRadius()
         #self.MeasureTotalPorosityOfFinalPacking()
+        #self.MeasurePSD()
 
     def MeasureLocalPorosityOfFinalPacking(self):
         
@@ -288,6 +289,42 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         print("Aim porosity is {} and currently porosity is {}".format(self.aim_final_packing_porosity, self.final_packing_porosity))
 
         return self.final_packing_porosity
+    
+    def MeasurePSD(self):
+
+        particle_sizes = [0.00015, 0.00018, 0.0002, 0.00022, 0.00025, 0.000275, 0.0003, 0.00035]
+        frequencies = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        for node in self.spheres_model_part.Nodes:
+            r = node.GetSolutionStepValue(RADIUS)
+            if 2.0* r <= particle_sizes[0]:
+                frequencies[0] += 1.0
+            if 2.0* r <= particle_sizes[1]:
+                frequencies[1] += 1.0
+            if 2.0* r <= particle_sizes[2]:
+                frequencies[2] += 1.0
+            if 2.0* r <= particle_sizes[3]:
+                frequencies[3] += 1.0
+            if 2.0* r <= particle_sizes[4]:
+                frequencies[4] += 1.0
+            if 2.0* r <= particle_sizes[5]:
+                frequencies[5] += 1.0
+            if 2.0* r <= particle_sizes[6]:
+                frequencies[6] += 1.0
+            if 2.0* r <= particle_sizes[7]:
+                frequencies[7] += 1.0
+
+        fre_sum = 0.0
+        for i in range(len(frequencies)):
+            fre_sum += frequencies[i]
+        print(fre_sum)
+        for i in range(len(frequencies)):
+            frequencies[i] = (frequencies[i] / fre_sum) * 100.0
+
+        with open("PSD.txt", "w") as f_w:
+            for i in range(len(particle_sizes)):
+                f_w.write(str(particle_sizes[i]) + ' '+ str(frequencies[i]) + '\n')
+
+        exit(0)
 
 if __name__ == "__main__":
 
