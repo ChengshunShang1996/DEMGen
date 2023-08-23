@@ -11,8 +11,9 @@ class creat_fem_and_inlet_mesh_files():
     def __init__(self) -> None:  
         self.fem_points_list = []
         self.fem_elements_list = []
+        self.inlet_points_list = []
 
-    def initialize(self, RVE_size):
+    def initialize(self, RVE_size, particle_radius_max):
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
@@ -22,6 +23,7 @@ class creat_fem_and_inlet_mesh_files():
         #------------------for creating FEM boundary mesh (start)---------------------------
         for i in range(1, 9):
 
+            #here, Y direction is the default Gravity direction (Height direction)
             fem_point_dict = {
                     "id" : 0,
                     "p_x" : 0.0,
@@ -32,50 +34,50 @@ class creat_fem_and_inlet_mesh_files():
             if i == 1:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = -0.5 * RVE_length_y
-                fem_point_dict["p_z"] = 0.0
+                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 2:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = -0.5 * RVE_length_y
-                fem_point_dict["p_z"] = 0.0
+                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 3:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.5 * RVE_length_y
-                fem_point_dict["p_z"] = 0.0
+                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 4:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.5 * RVE_length_y
-                fem_point_dict["p_z"] = 0.0
+                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 5:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = -0.5 * RVE_length_y
-                fem_point_dict["p_z"] = RVE_length_z * 2
+                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 6:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = -0.5 * RVE_length_y
-                fem_point_dict["p_z"] = RVE_length_z * 2
+                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 7:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.5 * RVE_length_y
-                fem_point_dict["p_z"] = RVE_length_z * 2
+                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 8:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.5 * RVE_length_y
-                fem_point_dict["p_z"] = RVE_length_z * 2
+                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
         
         for i in range(1,7):
@@ -133,8 +135,47 @@ class creat_fem_and_inlet_mesh_files():
         #------------------for creating FEM boundary mesh (end)---------------------------
 
         #---------------------for creating inlet mesh (start)-----------------------------
-        
+        row_i = 0 # in X direction
+        column_i = 0 # in Z direction
+        row_z_max = -0.5 * RVE_length_z + 2 * particle_radius_max
+        row_end = False
+        column_end = False
+        id_max = 8
 
+        while not (row_end is True and column_end is True):
+             
+            column_i = 0
+            column_x_max = -0.5 * RVE_length_x + 2 * particle_radius_max
+            column_end = False
+
+            while not (column_end is True): # the end of one row is column_end
+
+                inlet_point_dict = {
+                    "id" : 0,
+                    "p_x" : 0.0,
+                    "p_y" : 0.0,
+                    "p_z" : 0.0
+                    }
+                
+                inlet_point_dict["id"] = id_max + 1
+                inlet_point_dict["p_x"] = column_x_max 
+                inlet_point_dict["p_y"] = RVE_length_y - 2 * particle_radius_max
+                inlet_point_dict["p_z"] = row_z_max
+                self.inlet_points_list.append(inlet_point_dict)
+                print('add {}'.format(id_max))
+                id_max += 1
+
+                column_x_max += 2 * column_i * particle_radius_max
+                if (column_x_max + 2 * particle_radius_max) > 0.5 * RVE_length_x:
+                    column_end = True
+                
+                column_i += 1
+            
+            row_z_max += 2 * row_i * particle_radius_max
+            if (row_z_max + 2 * particle_radius_max) > 0.5 * RVE_length_z:
+                row_end = True
+            
+            row_i += 1
 
         #---------------------for creating inlet mesh (end)-----------------------------
         
@@ -261,17 +302,70 @@ class creat_fem_and_inlet_mesh_files():
             f.write("End SubModelPartConditions \n")
             f.write("End SubModelPart \n")
 
-    def creatInletMeshFile(self, problem_name):
-        pass
+    def creatInletMeshFile(self, problem_name, inlet_properties):
+        
+        aim_file_name = problem_name + 'DEM_inlet.mdpa'
+        aim_path_and_name = os.path.join(os.getcwd(), aim_file_name)
+
+        # clean the exsisted file first
+        if os.path.isfile(aim_path_and_name):
+            os.remove(aim_path_and_name)
+        
+        with open(aim_path_and_name,'a') as f:
+            # write the inlet information
+            f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
+            
+            f.write("Begin Nodes\n")
+            for inlet_point_dict in self.inlet_points_list:
+                f.write(str(inlet_point_dict["id"]) + ' ' + str(inlet_point_dict["p_x"]) + ' ' + str(inlet_point_dict["p_y"]) + ' ' + str(inlet_point_dict["p_z"]) + '\n')
+            f.write("End Nodes \n \n")
+
+            f.write("Begin SubModelPart Inlet_INLET // Group INLET // Subtree Inlet\n")
+            f.write("Begin SubModelPartData\n")
+            f.write("RIGID_BODY_MOTION " + str(inlet_properties["RIGID_BODY_MOTION"]) + '\n')
+            f.write("IDENTIFIER Inlet_INLET \n")
+            f.write("INJECTOR_ELEMENT_TYPE " + str(inlet_properties["INJECTOR_ELEMENT_TYPE"]) + '\n')
+            f.write("ELEMENT_TYPE " + str(inlet_properties["ELEMENT_TYPE"]) + '\n')
+            f.write("CONTAINS_CLUSTERS " + str(inlet_properties["CONTAINS_CLUSTERS"]) + '\n')
+            f.write("VELOCITY [3] " + str(inlet_properties["VELOCITY"]) + '\n')
+            f.write("MAX_RAND_DEVIATION_ANGLE " + str(inlet_properties["MAX_RAND_DEVIATION_ANGLE"]) + '\n')
+            f.write("INLET_NUMBER_OF_PARTICLES " + str(inlet_properties["INLET_NUMBER_OF_PARTICLES"]) + '\n')
+            f.write("IMPOSED_MASS_FLOW_OPTION " + str(inlet_properties["IMPOSED_MASS_FLOW_OPTION"]) + '\n')
+            f.write("INLET_START_TIME " + str(inlet_properties["INLET_START_TIME"]) + '\n')
+            f.write("INLET_STOP_TIME " + str(inlet_properties["INLET_STOP_TIME"]) + '\n')
+            f.write("RADIUS " + str(inlet_properties["RADIUS"]) + '\n')
+            f.write("PROBABILITY_DISTRIBUTION " + str(inlet_properties["PROBABILITY_DISTRIBUTION"]) + '\n')
+            f.write("STANDARD_DEVIATION " + str(inlet_properties["STANDARD_DEVIATION"]) + '\n')
+            f.write("End SubModelPartData \n")
+            f.write("Begin SubModelPartNodes\n")
+            for inlet_point_dict in self.inlet_points_list:
+                f.write(' ' + str(inlet_point_dict["id"])  + '\n')
+            f.write("End SubModelPartNodes \n")
+            f.write("End SubModelPart \n \n")
 
 if __name__ == "__main__":
 
     TestDEM = creat_fem_and_inlet_mesh_files()
     problem_name = 'inletPG'
-    RVE_length_x = 0.003
-    RVE_length_y = 0.003
-    RVE_length_z = 0.003
+    RVE_length_x = 0.3
+    RVE_length_y = 0.3
+    RVE_length_z = 0.3
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    particle_radius_max = 0.001
-    TestDEM.initialize(RVE_size)
+    particle_radius_max = 0.01
+    inlet_properties = {}
+    inlet_properties["RIGID_BODY_MOTION"] = 0
+    inlet_properties["INJECTOR_ELEMENT_TYPE"] = "SphericParticle3D"
+    inlet_properties["ELEMENT_TYPE"] = "SphericParticle3D"
+    inlet_properties["CONTAINS_CLUSTERS"] = 0
+    inlet_properties["VELOCITY"] = (0.0, -0.55, 0.0)
+    inlet_properties["MAX_RAND_DEVIATION_ANGLE"] = 0.01
+    inlet_properties["INLET_NUMBER_OF_PARTICLES"] = 50000000
+    inlet_properties["IMPOSED_MASS_FLOW_OPTION"] = 0
+    inlet_properties["INLET_START_TIME"] = 0.0
+    inlet_properties["INLET_STOP_TIME"] = 100.0
+    inlet_properties["RADIUS"] = 0.00018
+    inlet_properties["PROBABILITY_DISTRIBUTION"] = "discrete"
+    inlet_properties["STANDARD_DEVIATION"] = 0.0
+    TestDEM.initialize(RVE_size, particle_radius_max)
     TestDEM.creatFemMeshFile(problem_name)
+    TestDEM.creatInletMeshFile(problem_name, inlet_properties)
