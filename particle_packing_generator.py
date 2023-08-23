@@ -57,7 +57,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         if self.container_shape == "box":
             self.container_lenth  = 0.0   #modify according to your case
             self.container_width  = 0.0   #modify according to your case
-            self.container_height = 0.0   #modify according to your casºe
+            self.container_height = 0.0   #modify according to your case
             self.container_volume = self.container_lenth * self.container_width * self.container_height
 
         self.final_packing_shape = "cylinder"  #input: "cylinder" or "box" 
