@@ -24,11 +24,16 @@ class creat_fem_and_inlet_mesh_files():
         else:
             os.makedirs(mesher_cases_folder_name)
 
-    def initialize(self, RVE_size, particle_radius_max):
+        new_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
+        os.mkdir(aim_path)
+
+    def initialize(self, RVE_size, particle_radius_max, mesher_cnt):
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
         RVE_length_z = RVE_size[2]
+        self.mesher_cnt = mesher_cnt
         
         #we need creat a cuboid which has a height of two times of the RVE 
         #------------------for creating FEM boundary mesh (start)---------------------------
@@ -187,8 +192,9 @@ class creat_fem_and_inlet_mesh_files():
 
     def creatFemMeshFile(self, problem_name):
         
+        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_FEM_boundary.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -306,11 +312,13 @@ class creat_fem_and_inlet_mesh_files():
             f.write(" 3 \n 4 \n 5 \n 6\n")
             f.write("End SubModelPartConditions \n")
             f.write("End SubModelPart \n")
+        f.close()
 
     def creatInletMeshFile(self, problem_name, inlet_properties):
         
+        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_inlet.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -347,11 +355,13 @@ class creat_fem_and_inlet_mesh_files():
                 f.write(' ' + str(inlet_point_dict["id"])  + '\n')
             f.write("End SubModelPartNodes \n")
             f.write("End SubModelPart \n \n")
+        f.close()
 
     def creatDemMeshFile(self, problem_name):
 
+        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -360,6 +370,7 @@ class creat_fem_and_inlet_mesh_files():
         with open(aim_path_and_name,'a') as f:
             # write the inlet information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
+        f.close()
 
 if __name__ == "__main__":
 
@@ -384,7 +395,8 @@ if __name__ == "__main__":
     inlet_properties["RADIUS"] = 0.00018
     inlet_properties["PROBABILITY_DISTRIBUTION"] = "discrete"
     inlet_properties["STANDARD_DEVIATION"] = 0.0
-    TestDEM.initialize(RVE_size, particle_radius_max)
+    mesher_cnt = 1
+    TestDEM.initialize(RVE_size, particle_radius_max, mesher_cnt)
     TestDEM.creatFemMeshFile(problem_name)
     TestDEM.creatInletMeshFile(problem_name, inlet_properties)
     TestDEM.creatDemMeshFile(problem_name)
