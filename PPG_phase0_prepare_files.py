@@ -188,7 +188,19 @@ class creat_fem_and_inlet_mesh_files():
             row_z_max += 2 * particle_radius_max
 
         #---------------------for creating inlet mesh (end)-----------------------------
+
+        self.copy_seed_files_to_aim_folders()
+    
+    def copy_seed_files_to_aim_folders(self):
         
+        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_path = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name)
+
+        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json']
+        for seed_file_name in seed_file_name_list:
+            seed_file_path_and_name = os.path.join(os.getcwd(), 'seed_files', seed_file_name)
+            aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
     def creatFemMeshFile(self, problem_name):
         
