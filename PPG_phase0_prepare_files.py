@@ -13,20 +13,6 @@ class creat_fem_and_inlet_mesh_files():
         self.fem_points_list = []
         self.fem_elements_list = []
         self.inlet_points_list = []
-        self.clear_old_and_creat_new_mesher_cases_folder()
-
-    def clear_old_and_creat_new_mesher_cases_folder(self):
-        mesher_cases_folder_name = 'generated_mesher_cases'
-        
-        if os.path.exists(mesher_cases_folder_name):
-            shutil.rmtree(mesher_cases_folder_name, ignore_errors=True)
-            os.makedirs(mesher_cases_folder_name)
-        else:
-            os.makedirs(mesher_cases_folder_name)
-
-        new_folder_name = "mesher_case_" + str(self.mesher_cnt)
-        aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
-        os.mkdir(aim_path)
 
     def initialize(self, RVE_size, particle_radius_max, mesher_cnt):
 
@@ -189,7 +175,21 @@ class creat_fem_and_inlet_mesh_files():
 
         #---------------------for creating inlet mesh (end)-----------------------------
 
+        self.clear_old_and_creat_new_mesher_cases_folder()
         self.copy_seed_files_to_aim_folders()
+    
+    def clear_old_and_creat_new_mesher_cases_folder(self):
+        mesher_cases_folder_name = 'generated_mesher_cases'
+        
+        if os.path.exists(mesher_cases_folder_name):
+            shutil.rmtree(mesher_cases_folder_name, ignore_errors=True)
+            os.makedirs(mesher_cases_folder_name)
+        else:
+            os.makedirs(mesher_cases_folder_name)
+
+        new_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_path = os.path.join(os.getcwd(),'generated_mesher_cases', new_folder_name)
+        os.makedirs(aim_path)
     
     def copy_seed_files_to_aim_folders(self):
         
@@ -388,9 +388,9 @@ if __name__ == "__main__":
 
     TestDEM = creat_fem_and_inlet_mesh_files()
     problem_name = 'inletPG'
-    RVE_length_x = 0.003
-    RVE_length_y = 0.003
-    RVE_length_z = 0.003
+    RVE_length_x = 0.01
+    RVE_length_y = 0.01
+    RVE_length_z = 0.01
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
     particle_radius_max = 0.000175
     inlet_properties = {}
