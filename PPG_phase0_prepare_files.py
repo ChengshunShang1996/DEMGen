@@ -343,6 +343,19 @@ class creat_fem_and_inlet_mesh_files():
             f.write("End SubModelPartNodes \n")
             f.write("End SubModelPart \n \n")
 
+    def creatDemMeshFile(self, problem_name):
+
+        aim_file_name = problem_name + 'DEM.mdpa'
+        aim_path_and_name = os.path.join(os.getcwd(), aim_file_name)
+
+        # clean the exsisted file first
+        if os.path.isfile(aim_path_and_name):
+            os.remove(aim_path_and_name)
+        
+        with open(aim_path_and_name,'a') as f:
+            # write the inlet information
+            f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
+
 if __name__ == "__main__":
 
     TestDEM = creat_fem_and_inlet_mesh_files()
@@ -369,3 +382,4 @@ if __name__ == "__main__":
     TestDEM.initialize(RVE_size, particle_radius_max)
     TestDEM.creatFemMeshFile(problem_name)
     TestDEM.creatInletMeshFile(problem_name, inlet_properties)
+    TestDEM.creatDemMeshFile(problem_name)
