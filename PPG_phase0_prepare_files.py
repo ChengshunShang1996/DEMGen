@@ -5,6 +5,7 @@
 #/////////////////////////////////////////////////
 
 import os
+import shutil
 
 class creat_fem_and_inlet_mesh_files():
 
@@ -12,6 +13,16 @@ class creat_fem_and_inlet_mesh_files():
         self.fem_points_list = []
         self.fem_elements_list = []
         self.inlet_points_list = []
+        self.clear_old_and_creat_new_mesher_cases_folder()
+
+    def clear_old_and_creat_new_mesher_cases_folder(self):
+        mesher_cases_folder_name = 'generated_mesher_cases'
+        
+        if os.path.exists(mesher_cases_folder_name):
+            shutil.rmtree(mesher_cases_folder_name, ignore_errors=True)
+            os.makedirs(mesher_cases_folder_name)
+        else:
+            os.makedirs(mesher_cases_folder_name)
 
     def initialize(self, RVE_size, particle_radius_max):
 
@@ -135,8 +146,6 @@ class creat_fem_and_inlet_mesh_files():
         #------------------for creating FEM boundary mesh (end)---------------------------
 
         #---------------------for creating inlet mesh (start)-----------------------------
-        row_i = 0 # in X direction
-        column_i = 0 # in Z direction
         row_z_max = -0.5 * RVE_length_z + 2 * particle_radius_max
         row_end = False
         column_end = False
@@ -144,7 +153,6 @@ class creat_fem_and_inlet_mesh_files():
 
         while not (row_end is True and column_end is True):
              
-            column_i = 0
             column_x_max = -0.5 * RVE_length_x + 2 * particle_radius_max
             column_end = False
 
@@ -159,23 +167,20 @@ class creat_fem_and_inlet_mesh_files():
                 
                 inlet_point_dict["id"] = id_max + 1
                 inlet_point_dict["p_x"] = column_x_max 
-                inlet_point_dict["p_y"] = RVE_length_y - 2 * particle_radius_max
+                inlet_point_dict["p_y"] = 2 * RVE_length_y - 2 * particle_radius_max
                 inlet_point_dict["p_z"] = row_z_max
                 self.inlet_points_list.append(inlet_point_dict)
-                print('add {}'.format(id_max))
                 id_max += 1
 
-                column_x_max += 2 * column_i * particle_radius_max
                 if (column_x_max + 2 * particle_radius_max) > 0.5 * RVE_length_x:
                     column_end = True
-                
-                column_i += 1
+
+                column_x_max += 2 * particle_radius_max
             
-            row_z_max += 2 * row_i * particle_radius_max
             if (row_z_max + 2 * particle_radius_max) > 0.5 * RVE_length_z:
                 row_end = True
             
-            row_i += 1
+            row_z_max += 2 * particle_radius_max
 
         #---------------------for creating inlet mesh (end)-----------------------------
         
@@ -201,21 +206,21 @@ class creat_fem_and_inlet_mesh_files():
             f.write("Begin Conditions RigidFace3D4N// GUI group identifier: TOP \n")
             for fem_element_dict in self.fem_elements_list:
                 if fem_element_dict["id"] == 2:
-                    f.write(str(fem_element_dict["id"]) + ' ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
                     break
             f.write("End Conditions \n \n")
 
             f.write("Begin Conditions RigidFace3D4N// GUI group identifier: BOTTOM \n")
             for fem_element_dict in self.fem_elements_list:
                 if fem_element_dict["id"] == 1:
-                    f.write(str(fem_element_dict["id"]) + ' ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
                     break
             f.write("End Conditions \n \n")
 
             f.write("Begin Conditions RigidFace3D4N// GUI group identifier: WALL \n")
             for fem_element_dict in self.fem_elements_list:
                 if fem_element_dict["id"] != 1 and fem_element_dict["id"] != 2:
-                    f.write(str(fem_element_dict["id"]) + ' ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
             f.write("End Conditions \n \n")
 
             f.write("Begin SubModelPart DEM-FEM-Wall_TOP // DEM-FEM-Wall - group identifier: TOP \n \
@@ -360,11 +365,11 @@ if __name__ == "__main__":
 
     TestDEM = creat_fem_and_inlet_mesh_files()
     problem_name = 'inletPG'
-    RVE_length_x = 0.3
-    RVE_length_y = 0.3
-    RVE_length_z = 0.3
+    RVE_length_x = 0.003
+    RVE_length_y = 0.003
+    RVE_length_z = 0.003
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    particle_radius_max = 0.01
+    particle_radius_max = 0.000175
     inlet_properties = {}
     inlet_properties["RIGID_BODY_MOTION"] = 0
     inlet_properties["INJECTOR_ELEMENT_TYPE"] = "SphericParticle3D"

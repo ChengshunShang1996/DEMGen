@@ -1,1 +1,0 @@
-This fold is used for store generated cases.
