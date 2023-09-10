@@ -163,12 +163,12 @@ class creat_fem_and_inlet_mesh_files():
                 self.inlet_points_list.append(inlet_point_dict)
                 id_max += 1
 
-                if (column_x_max + 2 * particle_radius_max) > 0.5 * RVE_length_x:
+                if (column_x_max + 3 * particle_radius_max) > 0.5 * RVE_length_x:
                     column_end = True
 
                 column_x_max += 2 * particle_radius_max
             
-            if (row_z_max + 2 * particle_radius_max) > 0.5 * RVE_length_z:
+            if (row_z_max + 3 * particle_radius_max) > 0.5 * RVE_length_z:
                 row_end = True
             
             row_z_max += 2 * particle_radius_max
@@ -329,7 +329,7 @@ class creat_fem_and_inlet_mesh_files():
     def creatInletMeshFile(self, problem_name, inlet_properties):
         
         aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
-        aim_file_name = problem_name + 'DEM_inlet.mdpa'
+        aim_file_name = problem_name + 'DEM_Inlet.mdpa'
         aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
@@ -388,11 +388,11 @@ if __name__ == "__main__":
 
     TestDEM = creat_fem_and_inlet_mesh_files()
     problem_name = 'inletPG'
-    RVE_length_x = 0.01
-    RVE_length_y = 0.01
-    RVE_length_z = 0.01
+    RVE_length_x = 0.016
+    RVE_length_y = 0.048
+    RVE_length_z = 0.0128
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    particle_radius_max = 0.000175
+    particle_radius_max = 0.00048
     inlet_properties = {}
     inlet_properties["RIGID_BODY_MOTION"] = 0
     inlet_properties["INJECTOR_ELEMENT_TYPE"] = "SphericParticle3D"
@@ -404,8 +404,9 @@ if __name__ == "__main__":
     inlet_properties["IMPOSED_MASS_FLOW_OPTION"] = 0
     inlet_properties["INLET_START_TIME"] = 0.0
     inlet_properties["INLET_STOP_TIME"] = 100.0
-    inlet_properties["RADIUS"] = 0.00018
-    inlet_properties["PROBABILITY_DISTRIBUTION"] = "discrete"
+    inlet_properties["RADIUS"] = 0.0004
+    #inlet_properties["PROBABILITY_DISTRIBUTION"] = "discrete"
+    inlet_properties["PROBABILITY_DISTRIBUTION"] = "piecewise_linear"
     inlet_properties["STANDARD_DEVIATION"] = 0.0
     mesher_cnt = 1
     TestDEM.initialize(RVE_size, particle_radius_max, mesher_cnt)
