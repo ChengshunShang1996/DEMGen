@@ -7,7 +7,7 @@
 import os
 import shutil
 
-class creat_fem_and_inlet_mesh_files():
+class CreatFemAndInletMeshFiles():
 
     def __init__(self) -> None:  
         self.fem_points_list = []
@@ -386,7 +386,7 @@ class creat_fem_and_inlet_mesh_files():
 
 if __name__ == "__main__":
 
-    TestDEM = creat_fem_and_inlet_mesh_files()
+    TestDEM = CreatFemAndInletMeshFiles()
     problem_name = 'inletPG'
     RVE_length_x = 0.016
     RVE_length_y = 0.048
