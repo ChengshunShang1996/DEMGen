@@ -14,7 +14,7 @@ from sys import exit
 import numpy as np
 from stl import mesh
 
-class ParticlePackingGenerator(DEMAnalysisStage):
+class ExtractSamplesFromAPacking(DEMAnalysisStage):
 
     def __init__(self, model, parameters):
         super().__init__(model, parameters)
@@ -324,4 +324,4 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
     model = KratosMultiphysics.Model()
-    ParticlePackingGenerator(model, parameters).Run()
+    ExtractSamplesFromAPacking(model, parameters).Run()

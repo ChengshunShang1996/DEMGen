@@ -12,7 +12,7 @@ from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
 from sys import exit
 
-class ParticlePackingGenerator(DEMAnalysisStage):
+class ApplyPeriodicBoundaryForCompression(DEMAnalysisStage):
 
     def __init__(self, model, parameters):
         super().__init__(model, parameters)
@@ -173,5 +173,4 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
         model = KratosMultiphysics.Model()
-        run_dem = ParticlePackingGenerator(model, parameters)
-        run_dem.Run()
+        ApplyPeriodicBoundaryForCompression(model, parameters).Run()

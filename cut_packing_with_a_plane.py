@@ -12,7 +12,7 @@ from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
 from sys import exit
 
-class ParticlePackingGenerator(DEMAnalysisStage):
+class CutPackingWithAPlane(DEMAnalysisStage):
 
     def __init__(self, model, parameters):
         super().__init__(model, parameters)
@@ -219,4 +219,4 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
     model = KratosMultiphysics.Model()
-    ParticlePackingGenerator(model, parameters).Run()
+    CutPackingWithAPlane(model, parameters).Run()

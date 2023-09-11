@@ -12,7 +12,7 @@ from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
 from sys import exit
 
-class ParticlePackingGenerator(DEMAnalysisStage):
+class GenerateInitialPacking(DEMAnalysisStage):
 
     def __init__(self, model, parameters):
         super().__init__(model, parameters)
@@ -21,6 +21,7 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def Initialize(self):
         super().Initialize()
         self.InitializePackingGenerator() 
+        self.GetInitialDemSphereVolume()
 
     def InitializePackingGenerator(self):
 
@@ -28,19 +29,20 @@ class ParticlePackingGenerator(DEMAnalysisStage):
         self.aim_final_packing_porosity = 0.5
         self.max_porosity_tolerance = 0.03
         self.aim_container_filling_ratio = 0.5 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
-        self.max_particle_velocity_in_phase_1_2 = 0.01
+        self.max_particle_velocity_in_phase_1_2 = 0.1
         
-        self.generator_process_marker_phase_1 = True  # Phase 1: Generate initial particle packing
-        self.generator_process_marker_phase_2 = False # Phase 2: Operate on initial particle packing for getting a desired porosity
-        self.generator_process_marker_phase_3 = False # Phase 3: Get the final particle packing
-        self.final_check_counter = 0
-        self.is_running_time_long_enough = False
-        self.operation_starting_time = self.time
+        self.container_filling_ratio = 0.0
+        self.initial_sphere_volume = 0.0
 
         self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
+        
+        self.container_lenth  = 0.0   #modify according to your case
+        self.container_width  = 0.0   #modify according to your case
+        self.container_height = 0.0   #modify according to your case
+        self.container_volume = self.container_lenth * self.container_width * self.container_height
 
-        print("********************Phase 1*************************")
+        print("********************Initialization finish*************************")
 
     def RunSolutionLoop(self):
 
@@ -63,21 +65,64 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
             self.final_check_counter = 0
 
-            #waitting until partciles calm down
-            if (self.generator_process_marker_phase_1 is True) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
-                aim_time = 0.01
-                self.CheckWhetherRunningTimeIsLongEnough(aim_time)
-                if self.is_running_time_long_enough:
-                    self.CheckVelocityAndChangeOperationMarker()
+            if self.generator_process_marker_phase_1:
+                self.CalculateFillingRatioAndSetInletStop()
 
-            if self.generator_process_marker_phase_2:
-                aim_time = 0.0001
-                self.CheckWhetherRunningTimeIsLongEnough(aim_time)
-                if self.is_running_time_long_enough:
-                    self.PrintResultsForGid(self.time)
-                    exit(0)
+            #waitting until partciles calm down
+            if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
+                self.CheckVelocityAndChangeOperationMarker()
 
         self.final_check_counter += 1
+
+    def GetInitialDemSphereVolume(self):
+
+        for element in self.spheres_model_part.Elements:
+            r = element.GetNode(0).GetSolutionStepValue(RADIUS)
+            element_volume = 4/3 * math.pi * r * r * r
+            self.initial_sphere_volume += element_volume
+
+    def CalculateFillingRatioAndSetInletStop(self):
+        
+        #calculte container filling ratio
+        total_element_volume = 0.0
+        for element in self.spheres_model_part.Elements:
+            r = element.GetNode(0).GetSolutionStepValue(RADIUS)
+            element_volume = 4/3 * math.pi * r * r * r
+            total_element_volume += element_volume
+
+        generated_element_volume = total_element_volume - self.initial_sphere_volume
+        self.container_filling_ratio = generated_element_volume / self.container_volume
+
+        #set Inlet stop time
+        if self.container_filling_ratio > self.aim_container_filling_ratio:
+
+            for submp in self.dem_inlet_model_part.SubModelParts:
+                if submp.Has(INLET_STOP_TIME):
+                    submp[INLET_STOP_TIME] = self.time + self.dt
+
+            self.generator_process_marker_phase_1 = False
+
+    def MeasureLocalPorosityOfFinalPacking(self):
+        pass
+
+    def MeasureTotalPorosityOfFinalPacking(self):
+        
+        selected_element_volume = 0.0
+        for node in self.spheres_model_part.Nodes:
+            r = node.GetSolutionStepValue(RADIUS)
+            x = node.X
+            y = node.Y
+            z = node.Z
+            is_inside_the_final_packing = self.CheckInsideFinalPackingOrNot(x,y,z)
+            if is_inside_the_final_packing:
+                element_volume = 4/3 * math.pi * r * r * r
+                selected_element_volume += element_volume
+
+        self.final_packing_porosity = 1 - (selected_element_volume / self.final_packing_volume)
+
+        print("Aim porosity is {} and currently porosity is {}".format(self.aim_final_packing_porosity, self.final_packing_porosity))
+
+        return self.final_packing_porosity
 
     def CheckVelocityAndChangeOperationMarker(self):
         max_particle_velocity = 0.0
@@ -89,12 +134,11 @@ class ParticlePackingGenerator(DEMAnalysisStage):
             if velocity_magnitude > max_particle_velocity:
                 max_particle_velocity = velocity_magnitude
         if max_particle_velocity < self.max_particle_velocity_in_phase_1_2:
-            self.generator_process_marker_phase_1 = False
-            self.generator_process_marker_phase_2 = True
-            self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_1.mdpa')
-            print("********************Phase 2*************************")
-            self.operation_starting_time = self.time
-            self.is_running_time_long_enough = False
+            self.is_operations_running = False
+            if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
+                self.generator_process_marker_phase_2 = True
+                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_1.mdpa')
+                print("********************Phase 2*************************")
 
     def CheckWhetherRunningTimeIsLongEnough(self, aim_time):
         running_time = self.time - self.operation_starting_time
@@ -127,7 +171,6 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 f.write(str(node.Id) + ' ' + ' 0 ' + str(node.GetSolutionStepValue(RADIUS)) + '\n')
             f.write("End NodalData \n \n")
 
-            '''
             if self.is_after_delete_outside_particles:
 
                 f.write("Begin NodalData COHESIVE_GROUP // GUI group identifier: Body \n")
@@ -136,7 +179,6 @@ class ParticlePackingGenerator(DEMAnalysisStage):
                 f.write("End NodalData \n \n")
 
                 f.write("Begin NodalData SKIN_SPHERE \n End NodalData \n \n")
-            '''
 
             f.write("Begin SubModelPart DEMParts_Body // Group Body // Subtree DEMParts \n Begin SubModelPartNodes \n")
             for node in self.spheres_model_part.Nodes:
@@ -157,4 +199,4 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
     model = KratosMultiphysics.Model()
-    ParticlePackingGenerator(model, parameters).Run()
+    GenerateInitialPacking(model, parameters).Run()

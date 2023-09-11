@@ -6,13 +6,13 @@
 
 import os
 
-class read_and_clone():
+class ReadPostFileAndWriteOutMdpa():
 
     def __init__(self) -> None:
         
         self.p_pram_list = []
 
-    def getParticleDataFromPost(self, aim_mdpa_file_name):
+    def GetParticleDataFromPost(self, aim_mdpa_file_name):
         
         self.p_id = 1
         self.p_record_nodes = False
@@ -153,6 +153,6 @@ class read_and_clone():
 
 if __name__ == "__main__":
 
-    TestDEM = read_and_clone()
-    TestDEM.getParticleDataFromPost('inletPG3_0.001.post.msh')
+    TestDEM = ReadPostFileAndWriteOutMdpa()
+    TestDEM.GetParticleDataFromPost('inletPG3_0.001.post.msh')
     TestDEM.WriteOutGIDData()

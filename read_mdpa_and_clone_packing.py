@@ -6,13 +6,13 @@
 
 import os
 
-class read_and_clone():
+class ReadMdpaAndClonePacking():
 
     def __init__(self) -> None:
         
         self.p_pram_list = []
 
-    def getParticleDataFromMdpa(self, aim_mdpa_file_name):
+    def GetParticleDataFromMdpa(self, aim_mdpa_file_name):
         
         self.p_id = 1
         self.p_record_nodes = False
@@ -89,7 +89,7 @@ class read_and_clone():
 
         print("Read mdpa file finished!\t")
     
-    def clone_meta_blocks(self, meta_block_size, container_size):
+    def CloneMetaBlocks(self, meta_block_size, container_size):
 
         add_p_num = 0
         
@@ -295,8 +295,8 @@ class read_and_clone():
 
 if __name__ == "__main__":
 
-    TestDEM = read_and_clone()
-    TestDEM.getParticleDataFromMdpa('G-TriaxialDEM_after_cut.mdpa')
+    TestDEM = ReadMdpaAndClonePacking()
+    TestDEM.GetParticleDataFromMdpa('G-TriaxialDEM_after_cut.mdpa')
     meta_block_length_x = 0.003
     meta_block_length_y = 0.003
     meta_block_length_z = 0.003
@@ -308,5 +308,5 @@ if __name__ == "__main__":
     container_z_min = -0.0015
     container_z_max = 0.0225
     container_size = [container_x_min, container_x_max, container_y_min, container_y_max, container_z_min, container_z_max]
-    TestDEM.clone_meta_blocks(meta_block_size, container_size)
+    TestDEM.CloneMetaBlocks(meta_block_size, container_size)
     TestDEM.WriteOutGIDData()
