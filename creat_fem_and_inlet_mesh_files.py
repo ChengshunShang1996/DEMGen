@@ -388,11 +388,11 @@ if __name__ == "__main__":
 
     TestDEM = CreatFemAndInletMeshFiles()
     problem_name = 'inletPG'
-    RVE_length_x = 0.016
-    RVE_length_y = 0.048
-    RVE_length_z = 0.0128
+    RVE_length_x = 0.015
+    RVE_length_y = 0.015
+    RVE_length_z = 0.007
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    particle_radius_max = 0.00048
+    particle_radius_max = 0.000175
     inlet_properties = {}
     inlet_properties["RIGID_BODY_MOTION"] = 0
     inlet_properties["INJECTOR_ELEMENT_TYPE"] = "SphericParticle3D"
