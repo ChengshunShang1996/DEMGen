@@ -26,7 +26,7 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
 
     def InitializePackingGenerator(self):
         
-        self.final_packing_shape = "cylinder"  #input: "cylinder" or "box" 
+        self.final_packing_shape = "rabbit"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "cylinder":
             self.final_packing_radius = 0.0025   #modify according to your case
@@ -49,6 +49,27 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
             self.final_packing_center_point[2] = 0.0
             self.final_packing_direction_theta = 0.0  #Unit: degree
 
+        if self.final_packing_shape == "rabbit":
+            self.mesh_data = []
+            vertices = np.empty((3, 3))
+            i = 0
+            # Read the mesh file line by line
+            with open('ball.stl', 'r') as file:
+                for line in file:
+                    line = line.strip()
+                    if line.startswith("vertex"):
+                        # Parse and split the vertex line
+                        x, y, z = line.split()[1:]
+                        vertices[i][0] = float(x)
+                        vertices[i][1] = float(y)
+                        vertices[i][2] = float(z)
+                        i += 1
+                    elif line.startswith("endloop"):
+                        # End of a subarray, append it to the main list
+                        self.mesh_data.append(vertices)
+                        vertices = np.empty((3, 3))
+                        i = 0
+
         print("********************Finish initialization*************************")
 
     def RunSolutionLoop(self):
@@ -68,6 +89,7 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
     def FinalizeSolutionStep(self):
         super().FinalizeSolutionStep()
 
+        '''
         for i in range(10):
             p_pram_list = []
             theta  = self.final_packing_direction_theta + i * 10
@@ -75,9 +97,9 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
             porosity_measured = self.MeasureTotalPorosityOfFinalPacking(p_pram_list)
             output_file_name = "DEM_" + str(theta) + '_'+ str(round(porosity_measured,2)) +".mdpa"
             self.WriteOutMdpaFileOfParticles(p_pram_list, output_file_name)
-        
-        #p_pram_list = self.extract_sample_from_the_packing(0.0)
-        #self.WriteOutMdpaFileOfParticles(p_pram_list, "myrabbit.mdpa")          
+        '''
+        p_pram_list = self.extract_sample_from_the_packing(0.0)
+        self.WriteOutMdpaFileOfParticles(p_pram_list, "myrabbit.mdpa")          
         exit(0)
 
     def extract_sample_from_the_packing(self, theta):
@@ -135,7 +157,7 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
                     "p_group_id": 0
                     }
                 sphere_center = np.array([x, y, z])
-                if self.is_sphere_inside_rabbit_stl('original.stl', sphere_center, r):
+                if self.is_sphere_inside_rabbit_stl(sphere_center, r):
                     p_pram_dict["id"] = temp_cnt
                     p_pram_dict["p_x"] = x
                     p_pram_dict["p_y"] = y
@@ -145,8 +167,8 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
                     p_pram_list.append(p_pram_dict)
                     print("add " + str(temp_cnt))
                     temp_cnt += 1
-                if temp_cnt > 1000:
-                    break
+                #if temp_cnt > 1000:
+                #    break
             return p_pram_list
 
     def MeasureTotalPorosityOfFinalPacking(self, p_pram_list):
@@ -199,9 +221,14 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
     def ray_intersects_triangle(self, ray_origin, ray_direction, triangle):
         E1 = triangle[1] - triangle[0]
         E2 = triangle[2] - triangle[0]
+        #print(triangle[0])
+        #print(triangle[1])
+        #print(triangle[2])
+        #print(E1)
+        #print(E2)
         p = np.cross(ray_direction, E2)
         det = np.dot(E1, p)
-        epsilon = 1e-6
+        epsilon = 1e-10
 
         # The ray intersects the triangle parallel or back
         if abs(det) < epsilon:
@@ -211,12 +238,12 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
         t = ray_origin - triangle[0]
 
         u = np.dot(t, p) * inv_det
-        if u < 0 or u > 1:
+        if u < 0.0 or u > 1.0:
             return False
 
         q = np.cross(t, E1)
         v = np.dot(ray_direction, q) * inv_det
-        if v < 0 or u + v > 1:
+        if v < 0.0 or u + v > 1.0:
             return False
 
         t = np.dot(E2, q) * inv_det
@@ -225,26 +252,32 @@ class ExtractSamplesFromAPacking(DEMAnalysisStage):
 
         return False
 
-    def is_sphere_inside_rabbit_stl(self, stl_file_path, sphere_center, sphere_radius):
+    def is_sphere_inside_rabbit_stl(self, sphere_center, sphere_radius):
         # Load STL file
-        mesh_data = mesh.Mesh.from_file(stl_file_path)
+        #mesh_data = mesh.Mesh.from_file(stl_file_path)
 
         # Check if the sphere is completely contained within the STL mesh
         inter_cnt = 0
-        for triangle in mesh_data.vectors:
+        surface_cnt = 0
+        #for triangle in mesh_data.vectors:
+        for triangle in self.mesh_data:
             #for i in range(3):
                 #vertex = triangle[i]
             #triangle_center = np.mean(triangle, axis=0)
             ray_origin = sphere_center
-            ray_direction = np.array([1, 0, 0])
+            ray_direction = np.array([1.0, 0.0, 0.0])
 
             # Adjust ray direction and length to account for sphere radius
-            #ray_direction_normalized = ray_direction / np.linalg.norm(ray_direction)
+            ray_direction_normalized = ray_direction / np.linalg.norm(ray_direction)
             #ray_direction_scaled = ray_direction_normalized * (np.linalg.norm(ray_direction) + sphere_radius)
 
-            if self.ray_intersects_triangle(ray_origin, ray_direction, triangle):
+            if self.ray_intersects_triangle(ray_origin, ray_direction_normalized, triangle):
                 inter_cnt += 1
-                
+                #print(ray_origin)
+                #print(ray_direction_normalized)
+                #print(triangle)
+                #print(self.ray_intersects_triangle(ray_origin, ray_direction_normalized, triangle))
+            surface_cnt += 1    
         if inter_cnt % 2 == 0:  
             return False
         else:
@@ -325,3 +358,26 @@ if __name__ == "__main__":
 
     model = KratosMultiphysics.Model()
     ExtractSamplesFromAPacking(model, parameters).Run()
+
+    '''
+    TestFun = ExtractSamplesFromAPacking(model, parameters)
+    TestFun.InitializePackingGenerator()
+    ray_origin = np.array([-1.0, 0.0, 0.0])
+    ray_direction = np.array([1.0, 0.0, 0.0])
+
+    triangle = np.array([[ 0.00173205081, -0.001,  0.0],
+                        [ 0.002, -1.2246468e-19,  0.0],
+                        [ 0.00164024054, -0.00031979321, -0.00109879173]])
+    print(ray_origin)
+    print(ray_direction)
+    print(triangle)
+    Checker = TestFun.ray_intersects_triangle(ray_origin, ray_direction, triangle)
+    print(Checker)
+    print('--------------------------------')
+    
+    r = 1e-5
+    sphere_center = np.array([-1.0, 0.0, 0.0])
+    Checker2 = TestFun.is_sphere_inside_rabbit_stl(sphere_center, r)
+    print(Checker2)
+    '''
+

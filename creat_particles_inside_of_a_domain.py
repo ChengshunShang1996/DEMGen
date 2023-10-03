@@ -41,7 +41,7 @@ class CreatParticlesInsideOfADomain():
 
         is_first_particle = True
         particle_cnt = 1
-        while particle_cnt <= 10000:
+        while particle_cnt <= 12026:
 
             p_parameters_dict = {
                     "id" : 0,
@@ -62,9 +62,10 @@ class CreatParticlesInsideOfADomain():
             r = self.Fast_Filling_Creator.GetRandomParticleRadius(creator_destructor)
 
             if is_first_particle:
-                x = random.uniform(self.x_min, self.x_max)
-                y = random.uniform(self.y_min, self.y_max)
-                z = random.uniform(self.z_min, self.z_max)
+                radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble()
+                x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
+                y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
+                z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
                 p_parameters_dict["id"] = particle_cnt
                 p_parameters_dict["p_x"] = x
                 p_parameters_dict["p_y"] = y
@@ -79,9 +80,10 @@ class CreatParticlesInsideOfADomain():
                 IsOverlaped = True
                 loop_cnt = 0
                 while IsOverlaped:
-                    self.x = random.uniform(self.x_min, self.x_max)
-                    self.y = random.uniform(self.y_min, self.y_max)
-                    self.z = random.uniform(self.z_min, self.z_max)
+                    radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble()
+                    self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
+                    self.y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
+                    self.z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
                     for particle in self.particle_list:
                         IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
                         if IsOverlaped:
@@ -103,7 +105,7 @@ class CreatParticlesInsideOfADomain():
         
     def WriteOutGIDData(self):
     
-        outName = 'fast_filling_particles.mdpa'
+        outName = 'inletPG3DEM.mdpa'
 
         # clean the exsisted file first
         if os.path.isfile(outName):
