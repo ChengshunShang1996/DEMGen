@@ -20,28 +20,33 @@ class CreatParticlesInsideOfADomain():
         
         self.particle_list = []
 
-    def initialize(self, RVE_size):
+    def initialize(self, RVE_size, domain_scale_multiplier):
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
         RVE_length_z = RVE_size[2]
 
         #two times of the RVE size
-        self.x_min = -1 * RVE_length_x
-        self.x_max = RVE_length_x
-        self.y_min = -1 * RVE_length_y
-        self.y_max = RVE_length_y
-        self.z_min = -1 * RVE_length_z
-        self.z_max = RVE_length_z
+
+        self.x_min = -0.5 * domain_scale_multiplier * RVE_length_x
+        self.x_max = 0.5 * domain_scale_multiplier * RVE_length_x
+        self.y_min = -0.5 * domain_scale_multiplier * RVE_length_y
+        self.y_max = 0.5 * domain_scale_multiplier * RVE_length_y
+        self.z_min = -0.5 * domain_scale_multiplier * RVE_length_z
+        self.z_max = 0.5 * domain_scale_multiplier * RVE_length_z
 
         parameters_file = open("creat_particles_input_parameters.json", 'r')
         self.parameters = Parameters(parameters_file.read())
+        original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
+        scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
+        self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
     def CreatParticles(self):
 
         is_first_particle = True
         particle_cnt = 1
-        while particle_cnt <= 12026:
+        aim_particle_number = self.parameters["aim_particle_number"].GetInt()
+        while particle_cnt <= aim_particle_number:
 
             p_parameters_dict = {
                     "id" : 0,
@@ -180,7 +185,8 @@ if __name__ == "__main__":
     RVE_length_y = 0.005
     RVE_length_z = 0.005
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    TestDEM.initialize(RVE_size)
+    domain_scale_multiplier = 1
+    TestDEM.initialize(RVE_size, domain_scale_multiplier)
     TestDEM.CreatParticles()
     TestDEM.WriteOutGIDData()
 

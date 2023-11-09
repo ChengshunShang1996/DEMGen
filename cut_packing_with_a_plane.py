@@ -181,7 +181,7 @@ class CutPackingWithAPlane(DEMAnalysisStage):
                 f.write(str(node.Id) + ' ' + str(node.X) + ' ' + str(node.Y) + ' ' + str(node.Z) + '\n')
             f.write("End Nodes \n \n")
 
-            f.write("Begin Elements SphericContinuumParticle3D// GUI group identifier: Body \n")
+            f.write("Begin Elements SphericParticle3D// GUI group identifier: Body \n")
             for element in self.spheres_model_part.Elements:
                 f.write(str(element.Id) + ' ' + ' 0 ' + str(element.GetNode(0).Id) + '\n')
             f.write("End Elements \n \n")
@@ -191,6 +191,7 @@ class CutPackingWithAPlane(DEMAnalysisStage):
                 f.write(str(node.Id) + ' ' + ' 0 ' + str(node.GetSolutionStepValue(RADIUS)) + '\n')
             f.write("End NodalData \n \n")
 
+            '''
             if self.is_after_delete_outside_particles:
 
                 f.write("Begin NodalData COHESIVE_GROUP // GUI group identifier: Body \n")
@@ -199,6 +200,7 @@ class CutPackingWithAPlane(DEMAnalysisStage):
                 f.write("End NodalData \n \n")
 
                 f.write("Begin NodalData SKIN_SPHERE \n End NodalData \n \n")
+            '''
 
             f.write("Begin SubModelPart DEMParts_Body // Group Body // Subtree DEMParts \n Begin SubModelPartNodes \n")
             for node in self.spheres_model_part.Nodes:
