@@ -30,8 +30,8 @@ class CreatParticlesInsideOfADomain():
 
         self.x_min = -0.5 * domain_scale_multiplier * RVE_length_x
         self.x_max = 0.5 * domain_scale_multiplier * RVE_length_x
-        self.y_min = -0.5 * domain_scale_multiplier * RVE_length_y
-        self.y_max = 0.5 * domain_scale_multiplier * RVE_length_y
+        self.y_min = 0.0
+        self.y_max = RVE_length_y
         self.z_min = -0.5 * domain_scale_multiplier * RVE_length_z
         self.z_max = 0.5 * domain_scale_multiplier * RVE_length_z
 
@@ -71,16 +71,17 @@ class CreatParticlesInsideOfADomain():
                 x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                 y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                 z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
-                p_parameters_dict["id"] = particle_cnt
-                p_parameters_dict["p_x"] = x
-                p_parameters_dict["p_y"] = y
-                p_parameters_dict["p_z"] = z
-                p_parameters_dict["radius"] = r
-                p_parameters_dict["p_ele_id"] = particle_cnt
-                self.particle_list.append(p_parameters_dict)
-                print("Added particle number = {}".format(particle_cnt))
-                particle_cnt += 1
-                is_first_particle = False
+                if (x**2 + z **2) <= (0.025 - radius_max)**2:
+                    p_parameters_dict["id"] = particle_cnt
+                    p_parameters_dict["p_x"] = x
+                    p_parameters_dict["p_y"] = y
+                    p_parameters_dict["p_z"] = z
+                    p_parameters_dict["radius"] = r
+                    p_parameters_dict["p_ele_id"] = particle_cnt
+                    self.particle_list.append(p_parameters_dict)
+                    print("Added particle number = {}".format(particle_cnt))
+                    particle_cnt += 1
+                    is_first_particle = False
             else:
                 IsOverlaped = True
                 loop_cnt = 0
@@ -89,12 +90,13 @@ class CreatParticlesInsideOfADomain():
                     self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                     self.y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                     self.z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
-                    for particle in self.particle_list:
-                        IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                        if IsOverlaped:
-                            break
+                    if (self.x**2 + self.z **2) <= (0.025 - radius_max)**2:
+                        for particle in self.particle_list:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
                     loop_cnt += 1
-                    if loop_cnt > 10000:
+                    if loop_cnt > 1000:
                         print("Too much loop for one particle!")
                         exit(0)
                     
@@ -110,7 +112,7 @@ class CreatParticlesInsideOfADomain():
         
     def WriteOutGIDData(self):
     
-        outName = 'inletPGDEM.mdpa'
+        outName = 'inletPG3DEM.mdpa'
 
         # clean the exsisted file first
         if os.path.isfile(outName):
@@ -181,11 +183,11 @@ class CreatParticlesInsideOfADomain():
 if __name__ == "__main__":
 
     TestDEM = CreatParticlesInsideOfADomain()
-    RVE_length_x = 0.005
-    RVE_length_y = 0.005
-    RVE_length_z = 0.005
+    RVE_length_x = 0.05
+    RVE_length_y = 0.1
+    RVE_length_z = 0.05
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    domain_scale_multiplier = 1.5
+    domain_scale_multiplier = 1
     TestDEM.initialize(RVE_size, domain_scale_multiplier)
     TestDEM.CreatParticles()
     TestDEM.WriteOutGIDData()
