@@ -17,10 +17,12 @@ import seaborn as sns
 class CreatParticlesInsideOfADomain():
 
     def __init__(self) -> None:  
-        
-        self.particle_list = []
+
+        pass
 
     def initialize(self, RVE_size, domain_scale_multiplier):
+
+        self.particle_list = []
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
@@ -78,7 +80,7 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                print("Added particle number = {}".format(particle_cnt))
+                #print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
                 is_first_particle = False
             else:
@@ -105,12 +107,10 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                print("Added particle number = {}".format(particle_cnt))
+                #print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         
-    def WriteOutGIDData(self):
-    
-        outName = 'inletPGDEM.mdpa'
+    def WriteOutGIDData(self, outName = 'inletPGDEM.mdpa'):
 
         # clean the exsisted file first
         if os.path.isfile(outName):

@@ -3,9 +3,9 @@
         "material_name" : "DEM-DefaultMaterial",
         "material_id"   : 1,
         "Variables"     : {
-            "PARTICLE_DENSITY"    : 2500.0,
-            "YOUNG_MODULUS"       : 10000000.0,
-            "POISSON_RATIO"       : 0.25,
+            "PARTICLE_DENSITY"    : 2605.0,
+            "YOUNG_MODULUS"       : 7e10,
+            "POISSON_RATIO"       : 0.3,
             "PARTICLE_SPHERICITY" : 1.0
         }
     }],
@@ -18,10 +18,11 @@
             "STATIC_FRICTION"                        : 0.5,
             "DYNAMIC_FRICTION"                       : 0.4,
             "FRICTION_DECAY"                         : 500,
-            "COEFFICIENT_OF_RESTITUTION"             : 0.2,
+            "COEFFICIENT_OF_RESTITUTION"             : 0.03,
             "ROLLING_FRICTION"                       : 0.01,
             "ROLLING_FRICTION_WITH_WALLS"            : 0.01
         }
     }],
-    "material_assignation_table" : [["RigidFacePart","DEM-DefaultMaterial"],["DEMInletPart.Inlet_INLET","DEM-DefaultMaterial"]]
+    "material_assignation_table" : [["SpheresPart.DEMParts_Body","DEM-DefaultMaterial"]]
 }
+

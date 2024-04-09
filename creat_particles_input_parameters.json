@@ -2,7 +2,7 @@
     "random_variable_settings" : {
         "possible_values" : [0.000075,0.00009,0.0001,0.00011,0.000125,0.0001375,0.00015,0.000175],
         "relative_frequencies" : [0.20754,0.15525,0.13346,0.13821,0.1751,0.09922,0.05418,0.03704],
-        "radius_scale_multiplier": 1.0,
+        "radius_scale_multiplier": 0.5,
         "do_use_seed" : false,
         "seed" : 1,
         "relative_closeness_tolerance" : 1e-8
