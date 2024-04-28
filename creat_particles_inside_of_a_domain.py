@@ -69,7 +69,7 @@ class CreatParticlesInsideOfADomain():
             r = self.Fast_Filling_Creator.GetRandomParticleRadius(creator_destructor)
 
             if is_first_particle:
-                radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble()
+                radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                 x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                 y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                 z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
@@ -87,7 +87,7 @@ class CreatParticlesInsideOfADomain():
                 IsOverlaped = True
                 loop_cnt = 0
                 while IsOverlaped:
-                    radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble()
+                    radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                     self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                     self.y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                     self.z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     RVE_length_y = 0.005
     RVE_length_z = 0.005
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    domain_scale_multiplier = 1.5
+    domain_scale_multiplier = 1.0
     TestDEM.initialize(RVE_size, domain_scale_multiplier)
     TestDEM.CreatParticles()
     TestDEM.WriteOutGIDData()
