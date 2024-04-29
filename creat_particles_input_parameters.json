@@ -14,5 +14,6 @@
     "STANDARD_DEVIATION" : 0.0,
     "SEED" : 1,
     "NAME" : "Happy",
-    "aim_particle_number": 12513
+    "aim_particle_number": 12513,
+    "UsingPeriodicBoundary": true
 }
