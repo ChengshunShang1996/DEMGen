@@ -128,8 +128,8 @@ No liability and warranty are provided.
 [demapp_link]:          https://github.com/KratosMultiphysics/Kratos/tree/master/applications/DEMApplication
 [kratos_link]:          https://github.com/KratosMultiphysics/Kratos
 [json_link]:            https://www.json.org/
-[contribute_link]:      https://github.com/rlrangel/DEMLab/blob/master/CONTRIBUTING.md
-[citation_link]:        https://github.com/rlrangel/DEMLab/blob/master/CITATION.cff
+[contribute_link]:      https://github.com/ChengshunShang1996/DEMGen/blob/main/CONTRIBUTING.md
+[citation_link]:        https://github.com/ChengshunShang1996/DEMGen/blob/main/CITATION.cff
 [cimne_website]:        https://www.cimne.com/
 [upc_website]:          https://camins.upc.edu/
 [bsd_license_link]:     https://choosealicense.com/licenses/bsd-2-clause/
