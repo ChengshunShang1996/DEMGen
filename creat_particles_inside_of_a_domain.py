@@ -170,7 +170,7 @@ class CreatParticlesInsideOfADomain():
                         self.particle_list_front.append(p_parameters_dict)
                     elif self.z >= self.z_max - radius_max:
                         self.particle_list_behind.append(p_parameters_dict)
-                print("Added particle number = {}".format(particle_cnt))
+                #print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         
     def WriteOutGIDData(self, outName = 'inletPGDEM.mdpa'):
