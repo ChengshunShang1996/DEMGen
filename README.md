@@ -1,4 +1,4 @@
-# DEMGen: Particle Packing Generator for Discrete Element Method (DEM)
+# DEMGen: Particle Packing Generator for Discrete Element Method
 
 <p align=center><img height="75.0%" width="75.0%" src="docs/images/logo.png"></p>
 
@@ -128,10 +128,8 @@ No liability and warranty are provided.
 [demapp_link]:          https://github.com/KratosMultiphysics/Kratos/tree/master/applications/DEMApplication
 [kratos_link]:          https://github.com/KratosMultiphysics/Kratos
 [json_link]:            https://www.json.org/
-[modelparts_link]:      https://github.com/rlrangel/DEMLab/blob/master/docs/help/ModelParts_template.txt
 [contribute_link]:      https://github.com/rlrangel/DEMLab/blob/master/CONTRIBUTING.md
 [citation_link]:        https://github.com/rlrangel/DEMLab/blob/master/CITATION.cff
-[zenodo_link]:          https://zenodo.org/doi/10.5281/zenodo.6509865
 [cimne_website]:        https://www.cimne.com/
 [upc_website]:          https://camins.upc.edu/
 [bsd_license_link]:     https://choosealicense.com/licenses/bsd-2-clause/
