@@ -42,11 +42,13 @@ The main characteristics of this method are:
 - Other physical interactions (e.g. thermal) may also be related to the overlap between particles.
 - The shape of the particles is kept unchanged during and after contacts. 
 
-## Implementation Details
+## DEMGen Dependencies
 
-DEMLab is fully written in the [MATLAB][matlab_website] programming language, and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility.
+DEMGen is fully written in the [Python][python_website] programming language, and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility.
 
-For large-scale problems, it is recommended to check the [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework.
+Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.0][python310_website] is recommended, as other versions haven't been tested.
+
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. By including the [external_libraries][web] to your 
 
 ## Instructions
 
@@ -56,13 +58,7 @@ There are three types of files that may be used as input for the program:
 
 * **Parameters (_.json_)**: 
 
-This [JSON][json_link] file is necessary for running a simulation and must always be accompanied by a _Model_ _Parts_ file.
-The name of the _Model_ _Parts_ file must be indicated in the Input Group ["ProblemData"][problem_data_link] of this file.
-
-It contains all the parameters and options for the analysis and outputs, as well as the conditions applied to the model.
-
-A tutorial explaining each input field of this file can be found on its [Wiki page][wiki_parameters_link].
-Moreover, a [template][parameters_link] of this file, with all the possible input options, is available.
+This [JSON][json_link] file is necessary for running a simulation and must always be
 
 * **Results (_.txt_)**: 
 
@@ -94,6 +90,7 @@ and each example has its _Project_ _Parameters_ and _Model_ _Parts_ files, as we
 
 ## Documentation
 
+In progress...
 
 ## How to Contribute
 
@@ -121,7 +118,7 @@ Polytechnic University of Catalonia ([UPC BarcelonaTech][upc_website])
 
 ## License
 
-DEMLab is licensed under the [BSD license][bsd_license_link],
+DEMGen is licensed under the [BSD license][bsd_license_link],
 which allows the program to be freely used by anyone for modification, private use, commercial use, and distribution, only requiring the preservation of copyright and license notices.
 No liability and warranty are provided.
 
@@ -133,3 +130,5 @@ No liability and warranty are provided.
 [cimne_website]:        https://www.cimne.com/
 [upc_website]:          https://camins.upc.edu/
 [bsd_license_link]:     https://choosealicense.com/licenses/bsd-2-clause/
+[python_website]:       https://www.python.org/
+[python310_website]:    https://www.python.org/downloads/release/python-3100/
