@@ -1,4 +1,4 @@
-# DEMGen: Particle Packing Generator for Discrete Element Method
+# DEMGen: A Standard Particle Packing Generator for Discrete Element Method
 
 <p align=center><img height="80.0%" width="80.0%" src="docs/images/LOGO1.png"></p>
 
