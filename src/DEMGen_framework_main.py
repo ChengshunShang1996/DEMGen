@@ -8,9 +8,3 @@ __status__      = "development"
 __date__        = "June 21, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
-
-class RegularArrangementMethod():
-
-    def __init__(self) -> None:
-
-        pass

@@ -85,7 +85,7 @@ class DEMGenMainFramework():
     ####################detail functions################################################
     def choose_file(self):
 
-        print(f'Please select a parameter.json file for starting:\n')
+        print(f'Please select a parameter.json file for starting:')
 
         root = Tk()
         root.withdraw()
@@ -94,6 +94,8 @@ class DEMGenMainFramework():
             filetypes=[("JSON files", "*.json")], 
             title="Select Parameters.json file"
         )
+
+        print("Parameter file selected.")
         
         return file_path
 
@@ -105,7 +107,7 @@ class DEMGenMainFramework():
 
         directory = os.path.dirname(file_path)
         os.chdir(directory)
-        print(f"Current working directory: {os.getcwd()}")
+        print(f"Set current working directory: {os.getcwd()}")
 
     def read_json(self, file_path):
 
