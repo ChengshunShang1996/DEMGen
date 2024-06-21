@@ -18,7 +18,6 @@ from tkinter.filedialog import askopenfilename
 from src.data_processing.pre_processing import *
 from src.data_processing.post_processing import *
 #from src.dynamic_methods import *
-#from src.utilities import *
 
 class DEMGenMainFramework():
 
@@ -26,6 +25,10 @@ class DEMGenMainFramework():
         
         print('-'*76 + '\n')
 
+    ####################main processes#############################################
+    def Initilization(self):
+        
+        #read parameter.json file
         file_path = self.choose_file()
         
         if file_path:
@@ -35,12 +38,54 @@ class DEMGenMainFramework():
             print("No file selected")
             exit(0)
 
-    def Initilization(self):
-        pass
-    
+        #
+
+    def Run(self):
+        
+        #particle packing generation
+        if self.parameters["generator_name"] == "gravitational_deposition_method":
+
+            from dynamic_methods import gravitational_deposition_method
+            MyDEM = gravitational_deposition_method.GravitationalDepositionMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
+
+        elif self.parameters["generator_name"] == "isotropic_compression_method":
+            
+            pass
+
+        elif self.parameters["generator_name"] == "radius_expansion_method":
+            
+            pass
+
+        else:
+            print("No generator name given")
+            exit(0)
+
+        #what we get from above processes is a .mdpa file of DEM particles
+
+        #particle packing characterization
+        #this is not related to 
+        if self.parameters["packing_charcterization_option"] is True:
+            
+            if self.parameters["regular_shape_option"] is True:
+
+                pass
+
+            else:
+
+                pass
+        else:
+            print("No packing analysis has been done because [packing_charcterization_option] is set as [False]")
+
+
+    def Finilization(self):
+        
+        print("Successfully finish!")
+
+    ####################detail functions################################################
     def choose_file(self):
 
-        print(f'Please select a Parameter.json file for starting:\n')
+        print(f'Please select a parameter.json file for starting:\n')
 
         root = Tk()
         root.withdraw()
@@ -54,6 +99,10 @@ class DEMGenMainFramework():
 
     def set_working_directory(self, file_path):
 
+        self.ini_path = os.getcwd()
+        if self.ini_path.endswith('src'):
+            self.ini_path = os.path.dirname(self.ini_path)
+
         directory = os.path.dirname(file_path)
         os.chdir(directory)
         print(f"Current working directory: {os.getcwd()}")
@@ -64,14 +113,11 @@ class DEMGenMainFramework():
             parameters = json.load(file)
         return parameters
 
-    def Run(self):
-        pass
-
-    def Finilization(self):
-        pass
-
 
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
+    TestDEM.Initilization()
+    TestDEM.Run()
+    TestDEM.Finilization()
     

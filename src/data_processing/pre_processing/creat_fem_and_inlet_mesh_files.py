@@ -14,12 +14,13 @@ class CreatFemAndInletMeshFiles():
         self.fem_elements_list = []
         self.inlet_points_list = []
 
-    def initialize(self, RVE_size, particle_radius_max, mesher_cnt):
+    def Initialize(self, RVE_size, particle_radius_max, mesher_cnt, ini_path):
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
         RVE_length_z = RVE_size[2]
         self.mesher_cnt = mesher_cnt
+        self.ini_path = ini_path
         
         #we need creat a cuboid which has a height of two times of the RVE 
         #------------------for creating FEM boundary mesh (start)---------------------------
@@ -198,11 +199,11 @@ class CreatFemAndInletMeshFiles():
 
         seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json']
         for seed_file_name in seed_file_name_list:
-            seed_file_path_and_name = os.path.join(os.getcwd(), 'seed_files', seed_file_name)
+            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'seed_files_for_gravitational_method', seed_file_name)
             aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
-    def creatFemMeshFile(self, problem_name):
+    def CreatFemMeshFile(self, problem_name):
         
         aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_FEM_boundary.mdpa'
@@ -326,7 +327,7 @@ class CreatFemAndInletMeshFiles():
             f.write("End SubModelPart \n")
         f.close()
 
-    def creatInletMeshFile(self, problem_name, inlet_properties):
+    def CreatInletMeshFile(self, problem_name, inlet_properties):
         
         aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_Inlet.mdpa'
@@ -369,7 +370,7 @@ class CreatFemAndInletMeshFiles():
             f.write("End SubModelPart \n \n")
         f.close()
 
-    def creatDemMeshFile(self, problem_name):
+    def CreatDemMeshFile(self, problem_name):
 
         aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM.mdpa'
@@ -409,7 +410,7 @@ if __name__ == "__main__":
     inlet_properties["PROBABILITY_DISTRIBUTION"] = "piecewise_linear"
     inlet_properties["STANDARD_DEVIATION"] = 0.0
     mesher_cnt = 1
-    TestDEM.initialize(RVE_size, particle_radius_max, mesher_cnt)
-    TestDEM.creatFemMeshFile(problem_name)
-    TestDEM.creatInletMeshFile(problem_name, inlet_properties)
-    TestDEM.creatDemMeshFile(problem_name)
+    TestDEM.Initialize(RVE_size, particle_radius_max, mesher_cnt)
+    TestDEM.CreatFemMeshFile(problem_name)
+    TestDEM.CreatInletMeshFile(problem_name, inlet_properties)
+    TestDEM.CreatDemMeshFile(problem_name)
