@@ -4,13 +4,14 @@
 #// Date: March 2023
 #/////////////////////////////////////////////////
 
+import math
+
 import KratosMultiphysics
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
-import math
-from sys import exit
+
 
 class GenerateInitialPacking(DEMAnalysisStage):
 

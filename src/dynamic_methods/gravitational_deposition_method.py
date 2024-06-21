@@ -9,6 +9,9 @@ __date__        = "June 21, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
+import os
+import glob
+import time
 
 from data_processing.pre_processing import creat_fem_and_inlet_mesh_files
 
@@ -26,15 +29,38 @@ class GravitationalDepositionMethod():
     def CreatInitialCases(self):
         CreatIniCases = creat_fem_and_inlet_mesh_files.CreatFemAndInletMeshFiles()
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
-        CreatIniCases.Initialize(RVE_size, self.parameters["particle_radius_max"], self.parameters["packing_num"], self.ini_path)
+        packing_num = self.parameters["packing_num"]
         problem_name = self.parameters["problem_name"]
-        CreatIniCases.CreatFemMeshFile(problem_name)
-        CreatIniCases.CreatInletMeshFile(problem_name, self.parameters["inlet_properties"])
-        CreatIniCases.CreatDemMeshFile(problem_name)
+        
+        packing_cnt = 1
+        while packing_cnt <= packing_num:
+            CreatIniCases.Initialize(RVE_size, self.parameters["particle_radius_max"], packing_cnt, self.ini_path)
+            CreatIniCases.CreatFemMeshFile(problem_name)
+            CreatIniCases.CreatInletMeshFile(problem_name, self.parameters["inlet_properties"])
+            CreatIniCases.CreatDemMeshFile(problem_name)
+            packing_cnt += 1
 
     def RunDEM(self):
 
-        pass
+        packing_num = self.parameters["packing_num"]
+        packing_cnt = 1
+        current_path = os.getcwd()
+        while packing_cnt <= packing_num:
+            aim_folder_name = "case_" + str(packing_cnt)
+            aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
+            os.chdir(aim_path)
+            os.system("python gravitational_deposition_method_run.py")
+            packing_cnt += 1
+
+        file_num = 0
+        time_count = 0
+        while file_num != self.parameters["packing_num"]:
+            aim_path_and_folder = os.path.join(current_path,'generated_cases')
+            file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
+            time.sleep(30)
+            print('-----Waiting for DEM cases -----')
+            time_count += 0.5
+            print('-------Cost {} min(s)-------'.format(time_count)) 
 
     def Run(self, parameters, ini_path):
 

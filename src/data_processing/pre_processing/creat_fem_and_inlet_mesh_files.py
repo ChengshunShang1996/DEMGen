@@ -9,12 +9,15 @@ import shutil
 
 class CreatFemAndInletMeshFiles():
 
-    def __init__(self) -> None:  
+    def __init__(self) -> None: 
+
+        self.clear_old_cases_folder()
+
+    def Initialize(self, RVE_size, particle_radius_max, mesher_cnt, ini_path):
+
         self.fem_points_list = []
         self.fem_elements_list = []
         self.inlet_points_list = []
-
-    def Initialize(self, RVE_size, particle_radius_max, mesher_cnt, ini_path):
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
@@ -176,38 +179,45 @@ class CreatFemAndInletMeshFiles():
 
         #---------------------for creating inlet mesh (end)-----------------------------
 
-        self.clear_old_and_creat_new_mesher_cases_folder()
+        self.creat_new_cases_folder()
         self.copy_seed_files_to_aim_folders()
     
-    def clear_old_and_creat_new_mesher_cases_folder(self):
-        mesher_cases_folder_name = 'generated_mesher_cases'
-        
-        if os.path.exists(mesher_cases_folder_name):
-            shutil.rmtree(mesher_cases_folder_name, ignore_errors=True)
-            os.makedirs(mesher_cases_folder_name)
-        else:
-            os.makedirs(mesher_cases_folder_name)
+    def clear_old_cases_folder(self):
 
-        new_folder_name = "mesher_case_" + str(self.mesher_cnt)
-        aim_path = os.path.join(os.getcwd(),'generated_mesher_cases', new_folder_name)
+        cases_folder_name = 'generated_cases'
+        
+        if os.path.exists(cases_folder_name):
+            shutil.rmtree(cases_folder_name, ignore_errors=True)
+            os.makedirs(cases_folder_name)
+        else:
+            os.makedirs(cases_folder_name)
+
+    def creat_new_cases_folder(self):
+
+        new_folder_name = "case_" + str(self.mesher_cnt)
+        aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
         os.makedirs(aim_path)
     
     def copy_seed_files_to_aim_folders(self):
         
-        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
-        aim_path = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name)
+        aim_folder_name = "case_" + str(self.mesher_cnt)
+        aim_path = os.path.join(os.getcwd(), "generated_cases", aim_folder_name)
 
         seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json']
         for seed_file_name in seed_file_name_list:
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'seed_files_for_gravitational_method', seed_file_name)
+            seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
             aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
+        seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'gravitational_deposition_method_run.py')
+        aim_file_path_and_name = os.path.join(aim_path, 'gravitational_deposition_method_run.py')
+        shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
     def CreatFemMeshFile(self, problem_name):
         
-        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_folder_name = "case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_FEM_boundary.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -329,9 +339,9 @@ class CreatFemAndInletMeshFiles():
 
     def CreatInletMeshFile(self, problem_name, inlet_properties):
         
-        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_folder_name = "case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_Inlet.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -372,9 +382,9 @@ class CreatFemAndInletMeshFiles():
 
     def CreatDemMeshFile(self, problem_name):
 
-        aim_folder_name = "mesher_case_" + str(self.mesher_cnt)
+        aim_folder_name = "case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM.mdpa'
-        aim_path_and_name = os.path.join(os.getcwd(), "generated_mesher_cases", aim_folder_name, aim_file_name)
+        aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
