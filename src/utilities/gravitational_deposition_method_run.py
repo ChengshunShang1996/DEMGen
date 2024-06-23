@@ -11,6 +11,8 @@ from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStag
 from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 import math
 from sys import exit
+import shutil
+import re
 
 class GravationalDepositionMethodRun(DEMAnalysisStage):
 
@@ -28,7 +30,7 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
         #define the aim porosity
         self.aim_final_packing_porosity = 0.3
         self.max_porosity_tolerance = 0.03
-        self.aim_container_filling_ratio = 0.5 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
+        self.aim_container_filling_ratio = 0.6 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
         self.max_particle_velocity_in_phase_1_2 = 0.01
         
         self.container_filling_ratio = 0.0
@@ -43,11 +45,12 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
         self.input_aim_time = 0.0
         self.is_after_delete_outside_particles = False
         self.final_check_counter = 0
+        self.is_last_operations = False
 
         self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
         
-        self.container_shape = "box"  #input: "cylinder" or "box"  
+        self.container_shape = "box"  #input: "cylinder" or "box", 'box' in default
 
         if self.container_shape == "cylinder":
             self.container_radius = 0.025   #modify according to your case
@@ -55,11 +58,13 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
             self.container_volume = math.pi * self.container_radius * self.container_radius * self.container_height
 
         if self.container_shape == "box":
-            self.container_lenth  = 0.005   #modify according to your case
-            self.container_width  = 0.005   #modify according to your case
-            self.container_height = 0.01   #modify according to your case
+            self.container_lenth  = self.parameters["BoundingBoxMaxX"].GetDouble() - self.parameters["BoundingBoxMinX"].GetDouble()
+            self.container_width  = self.parameters["BoundingBoxMaxZ"].GetDouble() - self.parameters["BoundingBoxMinZ"].GetDouble()
+            self.container_height = self.parameters["BoundingBoxMaxY"].GetDouble() - self.parameters["BoundingBoxMinY"].GetDouble()
             self.container_volume = self.container_lenth * self.container_width * self.container_height
 
+        #not so important now
+        '''
         self.final_packing_shape = "box"  #input: "cylinder" or "box" 
 
         if self.final_packing_shape == "cylinder":
@@ -86,6 +91,7 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
             self.final_packing_direction[2] = 0.0
 
         print("********************Phase 1*************************")
+        '''
 
     def RunSolutionLoop(self):
 
@@ -115,6 +121,8 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
             if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
                 self.CheckVelocityAndChangeOperationMarker()
 
+            #not so important now
+            '''
             if self.generator_process_marker_phase_2:
                 self.MeasureLocalPorosityOfFinalPacking()
                 self.MeasureTotalPorosityOfFinalPacking()
@@ -146,8 +154,17 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
                     self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_3.mdpa')
                     self.PrintResultsForGid(self.time)
                     exit(0)
-
+            '''
         self.final_check_counter += 1
+
+        if self.is_last_operations:
+            
+            self.CheckWhetherRunningTimeIsLongEnough(self.parameters["NeighbourSearchFrequency"].GetInt() * self.dt)
+
+            if self.is_running_time_long_enough:
+                self.WriteOutMdpaFileOfParticles('inletPGDEM.mdpa')
+                self.copy_files_and_run_show_results()
+                exit(0)
 
     def GetInitialDemSphereVolume(self):
 
@@ -311,8 +328,12 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
             self.is_operations_running = False
             if (self.generator_process_marker_phase_1 is False) and (self.generator_process_marker_phase_2 is False) and (self.generator_process_marker_phase_3 is False):
                 self.generator_process_marker_phase_2 = True
-                self.WriteOutMdpaFileOfParticles('G-TriaxialDEM_1.mdpa')
-                print("********************Phase 2*************************")
+                self.DeleteOutsideParticles()
+                self.operation_starting_time = self.time
+                self.is_last_operations = True
+                self.is_running_time_long_enough = False
+                #TODO: only Phase One is active here
+                #print("********************Phase 2*************************")
 
     def CheckWhetherRunningTimeIsLongEnough(self, aim_time):
         running_time = self.time - self.operation_starting_time
@@ -321,6 +342,7 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
 
     def DeleteOutsideParticles(self):
 
+        '''
         if self.final_packing_shape == "cylinder":
             max_radius = self.final_packing_radius
             center = self.final_packing_bottom_center_point
@@ -349,10 +371,21 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
         self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
         self.is_after_delete_outside_particles = True
+        '''
+        min_x = self.parameters["BoundingBoxMinX"].GetDouble()
+        max_x = self.parameters["BoundingBoxMaxX"].GetDouble()
+        min_y = self.parameters["BoundingBoxMinY"].GetDouble()
+        max_y = self.parameters["BoundingBoxMaxY"].GetDouble()
+        min_z = self.parameters["BoundingBoxMinZ"].GetDouble()
+        max_z = self.parameters["BoundingBoxMaxZ"].GetDouble()
+        tolerance = 0.001 * (max_y - min_y)
+
+        self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
-        aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
+        self.clear_old_and_creat_new_show_packing_case_folder()
+        aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
 
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
@@ -397,6 +430,59 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
             f.close()
 
         print("Successfully write out GID DEM.mdpa file!")
+
+    def copy_files_and_run_show_results(self):
+
+        self.copy_seed_files_to_aim_folders()
+
+        aim_path = os.path.join(os.getcwd(),'show_packing')
+        os.chdir(aim_path)
+        os.system("python show_packing.py")
+
+    def clear_old_and_creat_new_show_packing_case_folder(self):
+
+        aim_path = os.path.join(os.getcwd(),'show_packing')
+
+        if os.path.exists(aim_path):
+            shutil.rmtree(aim_path, ignore_errors=True)
+            os.makedirs(aim_path)
+        else:
+            os.makedirs(aim_path)
+    
+    def copy_seed_files_to_aim_folders(self):
+        
+        aim_path = os.path.join(os.getcwd(), 'show_packing')
+
+        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json', 'inletPGDEM_FEM_boundary.mdpa', 'show_packing.py']
+        for seed_file_name in seed_file_name_list:
+            seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
+            aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+
+            if seed_file_name == 'ProjectParametersDEM.json':
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "dem_inlet_option" in line:
+                                line = line.replace("true", 'false')
+                            elif "FinalTime" in line:
+                                line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
+                            elif "GraphExportFreq" in line:
+                                line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
+                            elif "VelTrapGraphExportFreq" in line:
+                                line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
+                            elif "OutputTimeStep" in line:
+                                line = "    \"OutputTimeStep\"                 : " + str(self.dt) + ', \n'
+                            f_material_w.write(line)
+            
+            elif seed_file_name == 'MaterialsDEM.json':
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "material_assignation_table" in line:
+                                line = '\"material_assignation_table\" : [[\"RigidFacePart\",\"DEM-DefaultMaterial\"],[\"SpheresPart\",\"DEM-DefaultMaterial\"]] \n'
+                            f_material_w.write(line)
+            else:
+                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
 if __name__ == "__main__":
 

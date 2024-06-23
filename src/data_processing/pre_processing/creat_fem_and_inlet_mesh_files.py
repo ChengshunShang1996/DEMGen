@@ -40,49 +40,49 @@ class CreatFemAndInletMeshFiles():
             if i == 1:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_y"] = -0.5 * RVE_length_y
                 fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 2:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_y"] = -0.5 * RVE_length_y
                 fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 3:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_y"] = -0.5 * RVE_length_y
                 fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 4:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = 0.0
+                fem_point_dict["p_y"] = -0.5 * RVE_length_y
                 fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 5:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_y"] = 1.5 * RVE_length_y
                 fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 6:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_y"] = 1.5 * RVE_length_y
                 fem_point_dict["p_z"] = -0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 7:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = 0.5 * RVE_length_x
-                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_y"] = 1.5 * RVE_length_y
                 fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
             elif i == 8:
                 fem_point_dict["id"] = i
                 fem_point_dict["p_x"] = -0.5 * RVE_length_x
-                fem_point_dict["p_y"] = RVE_length_y * 2
+                fem_point_dict["p_y"] = 1.5 * RVE_length_y
                 fem_point_dict["p_z"] = 0.5 * RVE_length_z
                 self.fem_points_list.append(fem_point_dict)
         
@@ -162,7 +162,7 @@ class CreatFemAndInletMeshFiles():
                 
                 inlet_point_dict["id"] = id_max + 1
                 inlet_point_dict["p_x"] = column_x_max 
-                inlet_point_dict["p_y"] = 2 * RVE_length_y - 2 * particle_radius_max
+                inlet_point_dict["p_y"] = 1.5 * RVE_length_y - 2 * particle_radius_max
                 inlet_point_dict["p_z"] = row_z_max
                 self.inlet_points_list.append(inlet_point_dict)
                 id_max += 1
@@ -211,6 +211,10 @@ class CreatFemAndInletMeshFiles():
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'gravitational_deposition_method_run.py')
         aim_file_path_and_name = os.path.join(aim_path, 'gravitational_deposition_method_run.py')
+        shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
+        seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
+        aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
     def CreatFemMeshFile(self, problem_name):
@@ -363,7 +367,7 @@ class CreatFemAndInletMeshFiles():
             f.write("INJECTOR_ELEMENT_TYPE " + str(inlet_properties["INJECTOR_ELEMENT_TYPE"]) + '\n')
             f.write("ELEMENT_TYPE " + str(inlet_properties["ELEMENT_TYPE"]) + '\n')
             f.write("CONTAINS_CLUSTERS " + str(inlet_properties["CONTAINS_CLUSTERS"]) + '\n')
-            f.write("VELOCITY [3] " + str(inlet_properties["VELOCITY"]) + '\n')
+            f.write("VELOCITY [3] (" + str(inlet_properties["VELOCITY"][0]) + ', ' + str(inlet_properties["VELOCITY"][1]) + ', ' + str(inlet_properties["VELOCITY"][2]) + ')\n')
             f.write("MAX_RAND_DEVIATION_ANGLE " + str(inlet_properties["MAX_RAND_DEVIATION_ANGLE"]) + '\n')
             f.write("INLET_NUMBER_OF_PARTICLES " + str(inlet_properties["INLET_NUMBER_OF_PARTICLES"]) + '\n')
             f.write("IMPOSED_MASS_FLOW_OPTION " + str(inlet_properties["IMPOSED_MASS_FLOW_OPTION"]) + '\n')

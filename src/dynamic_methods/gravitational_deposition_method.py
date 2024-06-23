@@ -52,6 +52,7 @@ class GravitationalDepositionMethod():
             os.system("python gravitational_deposition_method_run.py")
             packing_cnt += 1
 
+        '''
         file_num = 0
         time_count = 0
         while file_num != self.parameters["packing_num"]:
@@ -61,6 +62,7 @@ class GravitationalDepositionMethod():
             print('-----Waiting for DEM cases -----')
             time_count += 0.5
             print('-------Cost {} min(s)-------'.format(time_count)) 
+        '''
 
     def Run(self, parameters, ini_path):
 
