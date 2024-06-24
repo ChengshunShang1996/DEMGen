@@ -372,12 +372,12 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
 
         self.is_after_delete_outside_particles = True
         '''
-        min_x = self.parameters["BoundingBoxMinX"].GetDouble()
-        max_x = self.parameters["BoundingBoxMaxX"].GetDouble()
-        min_y = self.parameters["BoundingBoxMinY"].GetDouble()
-        max_y = self.parameters["BoundingBoxMaxY"].GetDouble()
-        min_z = self.parameters["BoundingBoxMinZ"].GetDouble()
-        max_z = self.parameters["BoundingBoxMaxZ"].GetDouble()
+        min_x = self.parameters["BoundingBoxMinX"].GetDouble() * 1.2
+        max_x = self.parameters["BoundingBoxMaxX"].GetDouble() * 1.2
+        min_y = self.parameters["BoundingBoxMinY"].GetDouble() * 1.2
+        max_y = self.parameters["BoundingBoxMaxY"].GetDouble() / 3.0
+        min_z = self.parameters["BoundingBoxMinZ"].GetDouble() * 1.2
+        max_z = self.parameters["BoundingBoxMaxZ"].GetDouble() * 1.2
         tolerance = 0.001 * (max_y - min_y)
 
         self.PreUtilities.MarkToEraseParticlesOutsideBoundary(self.spheres_model_part, min_x, max_x, min_y, max_y, min_z, max_z, tolerance)

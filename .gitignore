@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 #my folders
-/example/test_gravitational_deposition_method/generated_cases
+/example/test_gravitational_deposition_method/generated_cases/

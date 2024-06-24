@@ -1,7 +1,7 @@
 {
     "Dimension"                      : 3,
-    "PeriodicDomainOption"           : false,
-    "BoundingBoxOption"              : false,
+    "PeriodicDomainOption"           : true,
+    "BoundingBoxOption"              : true,
     "AutomaticBoundingBoxOption"     : false,
     "BoundingBoxEnlargementFactor"   : 1.1,
     "BoundingBoxStartTime"           : 0.0,
@@ -46,7 +46,7 @@
     "ElementType"                    : "SphericPartDEMElement3D",
     "TranslationalIntegrationScheme" : "Symplectic_Euler",
     "RotationalIntegrationScheme"    : "Direct_Integration",
-    "MaxTimeStep"                    : 1e-6,
+    "MaxTimeStep"                    : 2e-7,
     "FinalTime"                      : 100,
     "NeighbourSearchFrequency"       : 50,
     "SearchTolerance"                : 0.00001,

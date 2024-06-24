@@ -27,6 +27,7 @@ class GravitationalDepositionMethod():
         self.ini_path = ini_path
 
     def CreatInitialCases(self):
+
         CreatIniCases = creat_fem_and_inlet_mesh_files.CreatFemAndInletMeshFiles()
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         packing_num = self.parameters["packing_num"]
@@ -35,7 +36,7 @@ class GravitationalDepositionMethod():
         packing_cnt = 1
         while packing_cnt <= packing_num:
             CreatIniCases.Initialize(RVE_size, self.parameters["particle_radius_max"], packing_cnt, self.ini_path)
-            CreatIniCases.CreatFemMeshFile(problem_name)
+            CreatIniCases.CreatFemMeshFile(problem_name, self.parameters["periodic_boundary_option"])
             CreatIniCases.CreatInletMeshFile(problem_name, self.parameters["inlet_properties"])
             CreatIniCases.CreatDemMeshFile(problem_name)
             packing_cnt += 1

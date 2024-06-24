@@ -180,7 +180,7 @@ class CreatFemAndInletMeshFiles():
         #---------------------for creating inlet mesh (end)-----------------------------
 
         self.creat_new_cases_folder()
-        self.copy_seed_files_to_aim_folders()
+        self.copy_seed_files_to_aim_folders(RVE_length_y)
     
     def clear_old_cases_folder(self):
 
@@ -198,7 +198,7 @@ class CreatFemAndInletMeshFiles():
         aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
         os.makedirs(aim_path)
     
-    def copy_seed_files_to_aim_folders(self):
+    def copy_seed_files_to_aim_folders(self, RVE_length_y):
         
         aim_folder_name = "case_" + str(self.mesher_cnt)
         aim_path = os.path.join(os.getcwd(), "generated_cases", aim_folder_name)
@@ -207,7 +207,16 @@ class CreatFemAndInletMeshFiles():
         for seed_file_name in seed_file_name_list:
             seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
             aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
+            if seed_file_name == 'ProjectParametersDEM.json':
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "BoundingBoxMaxY" in line:
+                                line = "    \"BoundingBoxMaxY\"                : " + str(RVE_length_y * 1.5) + ', \n'
+                            f_material_w.write(line)
+            else:
+                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'gravitational_deposition_method_run.py')
         aim_file_path_and_name = os.path.join(aim_path, 'gravitational_deposition_method_run.py')
@@ -217,7 +226,7 @@ class CreatFemAndInletMeshFiles():
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
-    def CreatFemMeshFile(self, problem_name):
+    def CreatFemMeshFile(self, problem_name, is_using_periodic_boundary):
         
         aim_folder_name = "case_" + str(self.mesher_cnt)
         aim_file_name = problem_name + 'DEM_FEM_boundary.mdpa'
@@ -227,119 +236,167 @@ class CreatFemAndInletMeshFiles():
         if os.path.isfile(aim_path_and_name):
             os.remove(aim_path_and_name)
         
-        with open(aim_path_and_name,'a') as f:
-            # write the FEM information
-            f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
-            
-            f.write("Begin Nodes\n")
-            for fem_point_dict in self.fem_points_list:
-                f.write(str(fem_point_dict["id"]) + ' ' + str(fem_point_dict["p_x"]) + ' ' + str(fem_point_dict["p_y"]) + ' ' + str(fem_point_dict["p_z"]) + '\n')
-            f.write("End Nodes \n \n")
+        if not is_using_periodic_boundary:
+            with open(aim_path_and_name,'a') as f:
+                # write the FEM information
+                f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
+                
+                f.write("Begin Nodes\n")
+                for fem_point_dict in self.fem_points_list:
+                    f.write(str(fem_point_dict["id"]) + ' ' + str(fem_point_dict["p_x"]) + ' ' + str(fem_point_dict["p_y"]) + ' ' + str(fem_point_dict["p_z"]) + '\n')
+                f.write("End Nodes \n \n")
 
-            f.write("Begin Conditions RigidFace3D4N// GUI group identifier: TOP \n")
-            for fem_element_dict in self.fem_elements_list:
-                if fem_element_dict["id"] == 2:
-                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
-                    break
-            f.write("End Conditions \n \n")
+                f.write("Begin Conditions RigidFace3D4N// GUI group identifier: TOP \n")
+                for fem_element_dict in self.fem_elements_list:
+                    if fem_element_dict["id"] == 2:
+                        f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                        break
+                f.write("End Conditions \n \n")
 
-            f.write("Begin Conditions RigidFace3D4N// GUI group identifier: BOTTOM \n")
-            for fem_element_dict in self.fem_elements_list:
-                if fem_element_dict["id"] == 1:
-                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
-                    break
-            f.write("End Conditions \n \n")
+                f.write("Begin Conditions RigidFace3D4N// GUI group identifier: BOTTOM \n")
+                for fem_element_dict in self.fem_elements_list:
+                    if fem_element_dict["id"] == 1:
+                        f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                        break
+                f.write("End Conditions \n \n")
 
-            f.write("Begin Conditions RigidFace3D4N// GUI group identifier: WALL \n")
-            for fem_element_dict in self.fem_elements_list:
-                if fem_element_dict["id"] != 1 and fem_element_dict["id"] != 2:
-                    f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
-            f.write("End Conditions \n \n")
+                f.write("Begin Conditions RigidFace3D4N// GUI group identifier: WALL \n")
+                for fem_element_dict in self.fem_elements_list:
+                    if fem_element_dict["id"] != 1 and fem_element_dict["id"] != 2:
+                        f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                f.write("End Conditions \n \n")
 
-            f.write("Begin SubModelPart DEM-FEM-Wall_TOP // DEM-FEM-Wall - group identifier: TOP \n \
-                    Begin SubModelPartData // DEM-FEM-Wall. Group name: TOP \n \
-                        LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
-                        VELOCITY_PERIOD 0.0 \n \
-                        ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
-                        ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
-                        ANGULAR_VELOCITY_PERIOD 0.0 \n \
-                        VELOCITY_START_TIME 0.0 \n \
-                        VELOCITY_STOP_TIME 100.0 \n \
-                        ANGULAR_VELOCITY_START_TIME 0.0 \n \
-                        ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
-                        FIXED_MESH_OPTION 0 \n \
-                        RIGID_BODY_MOTION 1 \n \
-                        FREE_BODY_MOTION 0 \n \
-                        IS_GHOST 0 \n \
-                        IDENTIFIER TOP \n \
-                        FORCE_INTEGRATION_GROUP 0 \n \
-                    End SubModelPartData \n ")
-            
-            f.write("Begin SubModelPartNodes \n")
-            f.write(" 5 \n 6 \n 7 \n 8\n")
-            f.write("End SubModelPartNodes \n")
+                f.write("Begin SubModelPart DEM-FEM-Wall_TOP // DEM-FEM-Wall - group identifier: TOP \n \
+                        Begin SubModelPartData // DEM-FEM-Wall. Group name: TOP \n \
+                            LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
+                            VELOCITY_PERIOD 0.0 \n \
+                            ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
+                            ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
+                            ANGULAR_VELOCITY_PERIOD 0.0 \n \
+                            VELOCITY_START_TIME 0.0 \n \
+                            VELOCITY_STOP_TIME 100.0 \n \
+                            ANGULAR_VELOCITY_START_TIME 0.0 \n \
+                            ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
+                            FIXED_MESH_OPTION 0 \n \
+                            RIGID_BODY_MOTION 1 \n \
+                            FREE_BODY_MOTION 0 \n \
+                            IS_GHOST 0 \n \
+                            IDENTIFIER TOP \n \
+                            FORCE_INTEGRATION_GROUP 0 \n \
+                        End SubModelPartData \n ")
+                
+                f.write("Begin SubModelPartNodes \n")
+                f.write(" 5 \n 6 \n 7 \n 8\n")
+                f.write("End SubModelPartNodes \n")
 
-            f.write("Begin SubModelPartConditions \n")
-            f.write(" 2 \n")
-            f.write("End SubModelPartConditions \n")
-            f.write("End SubModelPart \n \n")
+                f.write("Begin SubModelPartConditions \n")
+                f.write(" 2 \n")
+                f.write("End SubModelPartConditions \n")
+                f.write("End SubModelPart \n \n")
 
-            f.write("Begin SubModelPart DEM-FEM-Wall_BOTTOM // DEM-FEM-Wall - group identifier: BOTTOM \n \
-                    Begin SubModelPartData // DEM-FEM-Wall. Group name: BOTTOM \n \
-                        LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
-                        VELOCITY_PERIOD 0.0 \n \
-                        ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
-                        ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
-                        ANGULAR_VELOCITY_PERIOD 0.0 \n \
-                        VELOCITY_START_TIME 0.0 \n \
-                        VELOCITY_STOP_TIME 100.0 \n \
-                        ANGULAR_VELOCITY_START_TIME 0.0 \n \
-                        ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
-                        FIXED_MESH_OPTION 0 \n \
-                        RIGID_BODY_MOTION 1 \n \
-                        FREE_BODY_MOTION 0 \n \
-                        IS_GHOST 0 \n \
-                        IDENTIFIER BOTTOM \n \
-                        FORCE_INTEGRATION_GROUP 0 \n \
-                    End SubModelPartData \n ")
-            
-            f.write("Begin SubModelPartNodes \n")
-            f.write(" 1 \n 2 \n 3 \n 4\n")
-            f.write("End SubModelPartNodes \n")
+                f.write("Begin SubModelPart DEM-FEM-Wall_BOTTOM // DEM-FEM-Wall - group identifier: BOTTOM \n \
+                        Begin SubModelPartData // DEM-FEM-Wall. Group name: BOTTOM \n \
+                            LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
+                            VELOCITY_PERIOD 0.0 \n \
+                            ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
+                            ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
+                            ANGULAR_VELOCITY_PERIOD 0.0 \n \
+                            VELOCITY_START_TIME 0.0 \n \
+                            VELOCITY_STOP_TIME 100.0 \n \
+                            ANGULAR_VELOCITY_START_TIME 0.0 \n \
+                            ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
+                            FIXED_MESH_OPTION 0 \n \
+                            RIGID_BODY_MOTION 1 \n \
+                            FREE_BODY_MOTION 0 \n \
+                            IS_GHOST 0 \n \
+                            IDENTIFIER BOTTOM \n \
+                            FORCE_INTEGRATION_GROUP 0 \n \
+                        End SubModelPartData \n ")
+                
+                f.write("Begin SubModelPartNodes \n")
+                f.write(" 1 \n 2 \n 3 \n 4\n")
+                f.write("End SubModelPartNodes \n")
 
-            f.write("Begin SubModelPartConditions \n")
-            f.write(" 1 \n")
-            f.write("End SubModelPartConditions \n")
-            f.write("End SubModelPart \n \n")
+                f.write("Begin SubModelPartConditions \n")
+                f.write(" 1 \n")
+                f.write("End SubModelPartConditions \n")
+                f.write("End SubModelPart \n \n")
 
-            f.write("Begin SubModelPart DEM-FEM-Wall_WALL // DEM-FEM-Wall - group identifier: WALL \n \
-                    Begin SubModelPartData // DEM-FEM-Wall. Group name: WALL \n \
-                        LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
-                        VELOCITY_PERIOD 0.0 \n \
-                        ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
-                        ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
-                        ANGULAR_VELOCITY_PERIOD 0.0 \n \
-                        VELOCITY_START_TIME 0.0 \n \
-                        VELOCITY_STOP_TIME 100.0 \n \
-                        ANGULAR_VELOCITY_START_TIME 0.0 \n \
-                        ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
-                        FIXED_MESH_OPTION 0 \n \
-                        RIGID_BODY_MOTION 1 \n \
-                        FREE_BODY_MOTION 0 \n \
-                        IS_GHOST 0 \n \
-                        IDENTIFIER WALL \n \
-                        FORCE_INTEGRATION_GROUP 0 \n \
-                    End SubModelPartData \n ")
-            
-            f.write("Begin SubModelPartNodes \n")
-            f.write(" 1 \n 2 \n 3 \n 4\n 5 \n 6 \n 7 \n 8\n")
-            f.write("End SubModelPartNodes \n")
+                f.write("Begin SubModelPart DEM-FEM-Wall_WALL // DEM-FEM-Wall - group identifier: WALL \n \
+                        Begin SubModelPartData // DEM-FEM-Wall. Group name: WALL \n \
+                            LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
+                            VELOCITY_PERIOD 0.0 \n \
+                            ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
+                            ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
+                            ANGULAR_VELOCITY_PERIOD 0.0 \n \
+                            VELOCITY_START_TIME 0.0 \n \
+                            VELOCITY_STOP_TIME 100.0 \n \
+                            ANGULAR_VELOCITY_START_TIME 0.0 \n \
+                            ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
+                            FIXED_MESH_OPTION 0 \n \
+                            RIGID_BODY_MOTION 1 \n \
+                            FREE_BODY_MOTION 0 \n \
+                            IS_GHOST 0 \n \
+                            IDENTIFIER WALL \n \
+                            FORCE_INTEGRATION_GROUP 0 \n \
+                        End SubModelPartData \n ")
+                
+                f.write("Begin SubModelPartNodes \n")
+                f.write(" 1 \n 2 \n 3 \n 4\n 5 \n 6 \n 7 \n 8\n")
+                f.write("End SubModelPartNodes \n")
 
-            f.write("Begin SubModelPartConditions \n")
-            f.write(" 3 \n 4 \n 5 \n 6\n")
-            f.write("End SubModelPartConditions \n")
-            f.write("End SubModelPart \n")
-        f.close()
+                f.write("Begin SubModelPartConditions \n")
+                f.write(" 3 \n 4 \n 5 \n 6\n")
+                f.write("End SubModelPartConditions \n")
+                f.write("End SubModelPart \n")
+            f.close()
+
+        else:
+
+            with open(aim_path_and_name,'a') as f:
+                # write the FEM information
+                f.write("Begin ModelPartData \n //  VARIABLE_NAME value \nEnd ModelPartData \n \nBegin Properties 0 \nEnd Properties \n \n")
+                
+                f.write("Begin Nodes\n")
+                for fem_point_dict in self.fem_points_list:
+                    f.write(str(fem_point_dict["id"]) + ' ' + str(fem_point_dict["p_x"]) + ' ' + str(fem_point_dict["p_y"]) + ' ' + str(fem_point_dict["p_z"]) + '\n')
+                f.write("End Nodes \n \n")
+
+                f.write("Begin Conditions RigidFace3D4N// GUI group identifier: BOTTOM \n")
+                for fem_element_dict in self.fem_elements_list:
+                    if fem_element_dict["id"] == 1:
+                        f.write(str(fem_element_dict["id"]) + ' 0 ' + str(fem_element_dict["p_1_id"]) + ' ' + str(fem_element_dict["p_2_id"]) + ' ' + str(fem_element_dict["p_3_id"]) + ' ' + str(fem_element_dict["p_4_id"]) + '\n')
+                        break
+                f.write("End Conditions \n \n")
+
+                f.write("Begin SubModelPart DEM-FEM-Wall_BOTTOM // DEM-FEM-Wall - group identifier: BOTTOM \n \
+                        Begin SubModelPartData // DEM-FEM-Wall. Group name: BOTTOM \n \
+                            LINEAR_VELOCITY [3] (0.0, 0.0, 0.0) \n \
+                            VELOCITY_PERIOD 0.0 \n \
+                            ANGULAR_VELOCITY [3] (0.0,0.0,0.0) \n \
+                            ROTATION_CENTER [3] (0.0,0.0,0.0) \n \
+                            ANGULAR_VELOCITY_PERIOD 0.0 \n \
+                            VELOCITY_START_TIME 0.0 \n \
+                            VELOCITY_STOP_TIME 100.0 \n \
+                            ANGULAR_VELOCITY_START_TIME 0.0 \n \
+                            ANGULAR_VELOCITY_STOP_TIME 100.0 \n \
+                            FIXED_MESH_OPTION 0 \n \
+                            RIGID_BODY_MOTION 1 \n \
+                            FREE_BODY_MOTION 0 \n \
+                            IS_GHOST 0 \n \
+                            IDENTIFIER BOTTOM \n \
+                            FORCE_INTEGRATION_GROUP 0 \n \
+                        End SubModelPartData \n ")
+                
+                f.write("Begin SubModelPartNodes \n")
+                f.write(" 1 \n 2 \n 3 \n 4\n")
+                f.write("End SubModelPartNodes \n")
+
+                f.write("Begin SubModelPartConditions \n")
+                f.write(" 1 \n")
+                f.write("End SubModelPartConditions \n")
+                f.write("End SubModelPart \n \n")
+            f.close()
 
     def CreatInletMeshFile(self, problem_name, inlet_properties):
         
