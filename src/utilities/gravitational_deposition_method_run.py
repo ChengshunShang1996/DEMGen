@@ -30,7 +30,7 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
         #define the aim porosity
         self.aim_final_packing_porosity = 0.3
         self.max_porosity_tolerance = 0.03
-        self.aim_container_filling_ratio = 0.6 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
+        self.aim_container_filling_ratio = 0.4 #this means the inlet will stop when the generated particel's volume occupies [aim_container_filling_ratio * container_volume]
         self.max_particle_velocity_in_phase_1_2 = 0.01
         
         self.container_filling_ratio = 0.0
