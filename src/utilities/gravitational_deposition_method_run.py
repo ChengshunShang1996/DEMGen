@@ -466,7 +466,7 @@ class GravationalDepositionMethodRun(DEMAnalysisStage):
                                 line = line.replace("true", 'false')
                             elif "FinalTime" in line:
                                 line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
-                            elif "GraphExportFreq" in line:
+                            elif "\"GraphExportFreq\"" in line:
                                 line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
                             elif "VelTrapGraphExportFreq" in line:
                                 line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
