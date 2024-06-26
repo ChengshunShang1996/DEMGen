@@ -102,17 +102,17 @@ To cite this repository, you can use the metadata from [this file][citation_link
 
 ## Authorship
 
-- **Chengshun Shang** (<cshang@cimne.upc.edu>)
+- **Chengshun Shang** <sup>1,2</sup> (<cshang@cimne.upc.edu>)
 
-International Center for Numerical Methods in Engineering ([CIMNE][cimne_website]) 
-and
-Polytechnic University of Catalonia ([UPC BarcelonaTech][upc_website])
+<sup>1</sup> International Center for Numerical Methods in Engineering ([CIMNE][cimne_website])
+
+<sup>2</sup> Universitat Politècnica de Catalunya ([UPC BarcelonaTech][upc_website])
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://github.com/ChengshunShang1996/DEMGen/tree/main/docs/images/cimne_logo.png" width="350"/>
+<img src="./docs/images/cimne_logo.png" height="100"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://github.com/ChengshunShang1996/DEMGen/tree/main/docs/images/upc_logo.png" width="350"/> 
+<img src="./docs/images/upc_logo.png" height="120"/> 
 </p>
 
 
