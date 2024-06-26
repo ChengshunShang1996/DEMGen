@@ -89,6 +89,8 @@ and each example has its _Project_ _Parameters_ and _Model_ _Parts_ files, as we
 
 * **Gravitational deposition method**
 
+Generated with rigid walls as boundary conditions.
+
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_packing.png" height="250"/>
