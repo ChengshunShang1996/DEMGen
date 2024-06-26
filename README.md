@@ -35,22 +35,20 @@ This code aims to achieve a standard particle packing generation framework for g
 
 ## Main Features
 
-This program deals with the classical **soft-sphere approach** of the DEM.
-The main characteristics of this method are:
+This program can be used for DEM particle packing generation. From this point of view, it can be treated as a pre-processing tool for any 3D DEM code. Meanwhile, it can be used for quantitative packing characterization, allowing users to have a deep insight into the material properties from the view of geometry components. The main characteristics of this framework are:
 
-- It is assumed that the contact between the particles occurs through a small overlap between them.
-- Each contact is evaluated through several time steps in an explicit integration scheme.
-- Contact models relate the amount of overlap between neighboring particles to the forces between them.
-- Other physical interactions (e.g. thermal) may also be related to the overlap between particles.
-- The shape of the particles is kept unchanged during and after contact. 
+- It provides a standard framework for particle packing generation.
+- Both dynamic methods and constructive methods are available for particle packing generation (The constructive method is limited to regular arrangement up to now).
+- The periodic boundary is available for boundary conditions, allowing users to clone a small RVE packing to a large one.
+- Providing a series of tools for packing characterization.
 
 ## DEMGen Dependencies
 
-DEMGen is fully written in the Pythonpython_website programming language and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility.
+DEMGen is fully written in the [Python][python_website] programming language and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility. Due to the nature of Python, this program can be run on different platforms (Windows or Linux)
 
 Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.0][python310_website] is recommended, as other versions haven't been tested.
 
-For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. By including the [external_libraries][web] to your 
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here.    
 
 ## Instructions
 
