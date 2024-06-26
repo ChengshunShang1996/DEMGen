@@ -110,9 +110,9 @@ Polytechnic University of Catalonia ([UPC BarcelonaTech][upc_website])
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://github.com/rlrangel/DEMLab/blob/master/docs/images/logos/logo_cimne.png" width="350"/>
+<img src="https://github.com/ChengshunShang1996/DEMGen/tree/main/docs/images/cimne_logo.png" width="350"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://github.com/rlrangel/DEMLab/blob/master/docs/images/logos/logo_upc.png" width="350"/> 
+<img src="https://github.com/ChengshunShang1996/DEMGen/tree/main/docs/images/upc_logo.png" width="350"/> 
 </p>
 
 
