@@ -14,7 +14,7 @@
 
 
 
-For generating a particle packing with aim porosity.
+This code aims to achieve a standard particle packing generation framework for granular materials. This code not only allows users to generate a series of random packings that fulfill their requirements (such as particle size distribution, porosity, and stress) but also provides a series of tools for particle packing characterization of internally or externally generated packings.
 
 
 ## Table of Contents
