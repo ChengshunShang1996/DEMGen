@@ -10,8 +10,6 @@ __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
 import os
-import glob
-import time
 
 from data_processing.pre_processing import creat_fem_and_inlet_mesh_files
 

@@ -40,7 +40,7 @@
     "VirtualMassCoefficient"         : 1.0,
     "RollingFrictionOption"          : false,
     "GlobalDamping"                  : 0.0,
-    "ContactMeshOption"              : false,
+    "ContactMeshOption"              : true,
     "OutputFileType"                 : "Ascii",
     "Multifile"                      : "multiple_files",
     "ElementType"                    : "SphericPartDEMElement3D",

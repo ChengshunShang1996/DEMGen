@@ -26,10 +26,11 @@ class DEMGenMainFramework():
         print('-'*76 + '\n')
 
     ####################main processes#############################################
-    def Initilization(self):
+    def Initilization(self, aim_path):
         
         #read parameter.json file
-        file_path = self.choose_file()
+        #file_path = self.choose_file()
+        file_path = aim_path
         
         if file_path:
             self.set_working_directory(file_path)
@@ -120,7 +121,8 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    TestDEM.Initilization()
+    aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\example\\test_gravitational_deposition_method\\ParametersDEMGen.json'
+    TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
     TestDEM.Finilization()
