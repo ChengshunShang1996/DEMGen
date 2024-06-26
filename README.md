@@ -82,10 +82,7 @@ To load and show the results from previously run simulations, launch MATLAB and 
 
 ## Examples
 
-Sample models are available inside the folder [*examples*][examples_link].
-
-They are separated into different sub-folders according to their analysis type,
-and each example has its _Project_ _Parameters_ and _Model_ _Parts_ files, as well as some results in the output sub-folders.
+Examples are available inside the folder [examples][examples_link].
 
 * **Gravitational deposition method**
 
@@ -149,3 +146,4 @@ No liability and warranty are provided.
 [bsd_license_link]:     https://choosealicense.com/licenses/bsd-2-clause/
 [python_website]:       https://www.python.org/
 [python310_website]:    https://www.python.org/downloads/release/python-3100/
+[examples_link]:       ./example/
