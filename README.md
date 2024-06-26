@@ -87,6 +87,22 @@ Sample models are available inside the folder [*examples*][examples_link].
 They are separated into different sub-folders according to their analysis type,
 and each example has its _Project_ _Parameters_ and _Model_ _Parts_ files, as well as some results in the output sub-folders.
 
+* **Gravitational deposition method**
+
+<p float="left">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_packing.png" height="250"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_force_chains.png" height="250"/> 
+</p>
+
+Final packing.
+
+<p float="center">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_final.png" height="225"/>
+</p>
+
 ## Documentation
 
 In progress...
