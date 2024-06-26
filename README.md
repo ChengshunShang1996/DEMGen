@@ -19,11 +19,13 @@ This code aims to achieve a standard particle packing generation framework for g
 
 ## Table of Contents
 - [Main Features](#main-features)
-- [Implementation Details](#implementation-details)
+- [DEMGen Dependencies](#demgen-dependencies)
 - [Instructions](#instructions)
-    - [Input Files](#input-files)
+    - [Input and Output Files](#input-and-output-files)
     - [Running Simulations](#running-simulations)
-    - [Plotting Results](#loading-results)
+        - [Packing Generation](#packing-generation)
+        - [Packing Characterization](#packing-characterization)
+    - [Checking Results](#checking-results)
 - [Examples](#examples)
 - [Documentation](#documentation)
 - [How to Contribute](#how-to-contribute)
@@ -40,11 +42,11 @@ The main characteristics of this method are:
 - Each contact is evaluated through several time steps in an explicit integration scheme.
 - Contact models relate the amount of overlap between neighboring particles to the forces between them.
 - Other physical interactions (e.g. thermal) may also be related to the overlap between particles.
-- The shape of the particles is kept unchanged during and after contacts. 
+- The shape of the particles is kept unchanged during and after contact. 
 
 ## DEMGen Dependencies
 
-DEMGen is fully written in the [Python][python_website] programming language, and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility.
+DEMGen is fully written in the Pythonpython_website programming language and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility.
 
 Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.0][python310_website] is recommended, as other versions haven't been tested.
 
@@ -52,7 +54,7 @@ For the dynamic generation methods, DEM calculations are required. The [DEM Appl
 
 ## Instructions
 
-### Input Files
+### Input and Output Files
 
 There are three types of files that may be used as input for the program:
 
@@ -63,23 +65,22 @@ This [JSON][json_link] file is necessary for running a simulation and must alway
 * **Results (_.txt_)**: 
 
 This binary file stores the results of a simulation.
-It is generated only if requested in the Input Group ["Output"][output_link] of the _Project_ _Parameters_ file.
-
-It can be loaded to show the results of previously run simulations, or used to restart a simulation from a saved stage.
 
 ### Running Simulations
 
 To run a simulation, launch MATLAB and execute the script file [*main.m*][main_file_link] located inside the folder [*src*][src_folder_link].
 
-### Loading Results
+#### Packing Generation
+
+steps
+
+#### Packing Characterization
+
+In progress...
+
+### Checking Results
 
 To load and show the results from previously run simulations, launch MATLAB and execute the script file [*main.m*][main_file_link] located inside the folder [*src*][src_folder_link].
-
-A dialog box will pop up to select an appropriate _Results_ _Storage_ file.
-Multiple _Results_ _Storage_ files can be selected to load and show results sequentially, as long as they are located in the same directory.
-
-To restart a simulation from the stored results, place its _Results_ _Storage_ file in the same directory of the _Project_ _Parameters_ file and run the simulation.
-The name of the _Results_ _Storage_ file must be the same of the simulation name indicated in the _Project_ _Parameters_ file.
 
 ## Examples
 
