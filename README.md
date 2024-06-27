@@ -56,7 +56,7 @@ For the dynamic generation methods, DEM calculations are required. The [DEM Appl
 
 * **Input Parameters (_.json_)**: 
 
-This [JSON][json_link] file is used as input for the program. For generating particle packings, at least one input file is needed: [ParametersDEMGen.json][ParametersDEMGen_link]. For dynamic generation methods, both [MaterialsDEM.json][MaterialsDEM_link] and [ProjectParametersDEM.json][ProjectParametersDEM_link] are needed for running Kratos DEM cases.
+This [JSON][json_link] file is used as input for the program. For generating particle packings, at least one input file is needed: [ParametersDEMGen.json][ParametersDEMGen_link]. For dynamic generation methods, both [MaterialsDEM.json][MaterialsDEM_link] and [ProjectParametersDEM.json][ProjectParametersDEM_link] are needed as the Kratos DEM simulation will be run.
 
 * **Output Results (_.mdpa_)**: 
 
