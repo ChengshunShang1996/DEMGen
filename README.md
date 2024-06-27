@@ -54,25 +54,23 @@ For the dynamic generation methods, DEM calculations are required. The [DEM Appl
 
 ### Input and Output Files
 
-There are three types of files that may be used as input for the program:
+* **Input Parameters (_.json_)**: 
 
-* **Parameters (_.json_)**: 
+This [JSON][json_link] file is used as input for the program. For generating particle packings, at least one input file is needed: [ParametersDEMGen.json][ParametersDEMGen_link]. For dynamic generation methods, both [MaterialsDEM.json][MaterialsDEM_link] and [ProjectParametersDEM.json][ProjectParametersDEM_link] are needed for running Kratos DEM cases.
 
-This [JSON][json_link] file is necessary for running a simulation and must always be
+* **Output Results (_.mdpa_)**: 
 
-* **Results (_.txt_)**: 
-
-This binary file stores the results of a simulation.
+This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usually, you can find the generated packing in the folder "./generated_cases/cases_$number$/show_packing/" of the working path. Both [Paraview][paraview_link] and [GiD][gid_link] can be used to display the results.
 
 ### Running Simulations
 
-To run a simulation, launch MATLAB and execute the script file [*main.m*][main_file_link] located inside the folder [*src*][src_folder_link].
+To run a simulation, launch the [DEMGen_framework_main.py][DEMGen_framework_main] inside the folder [./src][src_folder].
 
-#### Packing Generation
+* #### Packing Generation
 
-steps
+In progress...
 
-#### Packing Characterization
+* #### Packing Characterization
 
 In progress...
 
@@ -171,4 +169,12 @@ No liability and warranty are provided.
 [bsd_license_link]:     https://choosealicense.com/licenses/bsd-2-clause/
 [python_website]:       https://www.python.org/
 [python310_website]:    https://www.python.org/downloads/release/python-3100/
-[examples_link]:       ./example/
+[examples_link]:        ./example/
+[DEMGen_framework_main]: ./src/DEMGen_framework_main.py
+[src_folder]:           .src/ 
+[ParametersDEMGen_link]: ./example/test_gravitational_deposition_method/ParametersDEMGen.json
+[MaterialsDEM_link]:    ./example/test_gravitational_deposition_method/MaterialsDEM.json
+[ProjectParametersDEM_link]: ./example/test_gravitational_deposition_method/ProjectParametersDEM.json
+[mdpa_link]:            https://github.com/KratosMultiphysics/Kratos/wiki/Input-data
+[paraview_link]:        https://www.paraview.org/         
+[gid_link]:             https://www.gidsimulation.com/
