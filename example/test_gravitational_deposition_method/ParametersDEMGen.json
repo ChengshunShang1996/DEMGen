@@ -6,7 +6,7 @@
     "domain_length_y": 0.004,
     "domain_length_z": 0.004,
     "particle_radius_max": 0.0003,
-    "periodic_boundary_option": false,
+    "periodic_boundary_option": true,
     "inlet_properties":{
         "RIGID_BODY_MOTION"        : 0,
         "INJECTOR_ELEMENT_TYPE"    : "SphericParticle3D",

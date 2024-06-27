@@ -104,11 +104,28 @@ Final packing.
 
 Generated with periodic boundaries.
 
-PIC
+<p float="left">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_packing_periodic.png" height="225"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_force_chains_periodic.png" height="225"/> 
+</p>
 
 Final packing.
 
-PIC
+<p float="center">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_final_periodic.png" height="225"/>
+</p>
+
+By comparing the results of the two conditions, we could find that using periodic boundaries can help us get a particle packing with more homogeneous force chains.
+
+<p float="left">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_force_chains_1.png" height="225"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_g/g_force_chains_2.png" height="225"/> 
+</p>
 
 ## Documentation
 
