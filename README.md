@@ -66,11 +66,11 @@ This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usu
 
 To run a simulation, launch the [DEMGen_framework_main.py][DEMGen_framework_main] inside the folder [./src][src_folder].
 
-* #### Packing Generation
+#### Packing Generation
 
 In progress...
 
-* #### Packing Characterization
+#### Packing Characterization
 
 In progress...
 
