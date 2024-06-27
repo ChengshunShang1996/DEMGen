@@ -84,7 +84,7 @@ To load and show the results from previously run simulations, launch MATLAB and 
 
 Examples are available inside the folder [examples][examples_link].
 
-* **Gravitational deposition method**
+* **Case: test_gravitational_deposition_method**
 
 Generated with rigid walls as boundary conditions.
 
@@ -101,6 +101,14 @@ Final packing.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final.png" height="225"/>
 </p>
+
+Generated with periodic boundaries.
+
+PIC
+
+Final packing.
+
+PIC
 
 ## Documentation
 
