@@ -1,4 +1,4 @@
-# DEMGen: A Standard Particle Packing Generator for Discrete Element Method
+# DEMGen: A Standard Particle Packing Generator for the Discrete Element Method
 
 <p align=center><img height="80.0%" width="80.0%" src="docs/images/LOGO1.png"></p>
 
@@ -143,7 +143,7 @@ To cite this repository, you can use the metadata from [this file][citation_link
 
 <sup>1</sup> International Center for Numerical Methods in Engineering ([CIMNE][cimne_website])
 
-<sup>2</sup> Universitat Politècnica de Catalunya ([UPC BarcelonaTech][upc_website])
+<sup>2</sup> Universitat Politècnica de Catalunya ([UPC][upc_website])
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
