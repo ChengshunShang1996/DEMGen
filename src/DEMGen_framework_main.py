@@ -15,8 +15,8 @@ import json
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-from src.data_processing.pre_processing import *
-from src.data_processing.post_processing import *
+from data_processing.pre_processing import *
+from data_processing.post_processing import *
 #from src.dynamic_methods import *
 
 class DEMGenMainFramework():
