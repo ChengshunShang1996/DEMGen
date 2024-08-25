@@ -1,0 +1,28 @@
+{
+    "problem_name"   : "inletPG",
+    "generator_name" : "isotropic_compression_method",
+    "packing_num"    : 1,
+    "domain_length_x": 0.004,
+    "domain_length_y": 0.004,
+    "domain_length_z": 0.004,
+    "particle_radius_max": 0.0003,
+    "periodic_boundary_option": true,
+    "inlet_properties":{
+        "RIGID_BODY_MOTION"        : 0,
+        "INJECTOR_ELEMENT_TYPE"    : "SphericParticle3D",
+        "ELEMENT_TYPE"             : "SphericParticle3D",
+        "CONTAINS_CLUSTERS"        : 0,
+        "VELOCITY"                 : [0.0, -0.25, 0.0],
+        "MAX_RAND_DEVIATION_ANGLE" : 0.01,
+        "INLET_NUMBER_OF_PARTICLES": 50000000,
+        "IMPOSED_MASS_FLOW_OPTION" : 0,
+        "INLET_START_TIME"         : 0.0,
+        "INLET_STOP_TIME"          : 100,
+        "RADIUS"                   : 0.0003,
+        "PROBABILITY_DISTRIBUTION" : "discrete",
+        "STANDARD_DEVIATION"       : 0.0
+    },
+    "packing_charcterization_option" : false,
+    "regular_shape_option"           : true,
+    "packing_charcterization_setting": {}
+}

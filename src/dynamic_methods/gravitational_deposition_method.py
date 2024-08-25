@@ -11,18 +11,14 @@ __license__     = "BSD 2-Clause License"
 
 import os
 
+from dynamic_methods.dynamic_method import DynamicMethod
 from data_processing.pre_processing import creat_fem_and_inlet_mesh_files
 
-class GravitationalDepositionMethod():
+class GravitationalDepositionMethod(DynamicMethod):
 
     def __init__(self) -> None:
 
         pass
-
-    def Initialization(self, parameters, ini_path):
-
-        self.parameters = parameters
-        self.ini_path = ini_path
 
     def CreatInitialCases(self):
 
@@ -62,9 +58,3 @@ class GravitationalDepositionMethod():
             time_count += 0.5
             print('-------Cost {} min(s)-------'.format(time_count)) 
         '''
-
-    def Run(self, parameters, ini_path):
-
-        self.Initialization(parameters, ini_path)
-        self.CreatInitialCases()
-        self.RunDEM()

@@ -52,7 +52,9 @@ class DEMGenMainFramework():
 
         elif self.parameters["generator_name"] == "isotropic_compression_method":
             
-            pass
+            from dynamic_methods import isotropic_compression_method
+            MyDEM = isotropic_compression_method.IsotropicCompressionMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
 
         elif self.parameters["generator_name"] == "radius_expansion_method":
             
@@ -121,7 +123,7 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\example\\test_gravitational_deposition_method\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_gravitational_deposition_method\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
