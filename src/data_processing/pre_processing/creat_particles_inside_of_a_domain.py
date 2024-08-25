@@ -5,14 +5,9 @@
 #/////////////////////////////////////////////////
 
 import os
-import shutil
 import random
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
-
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 
 class CreatParticlesInsideOfADomain():
 
@@ -170,10 +165,10 @@ class CreatParticlesInsideOfADomain():
                         self.particle_list_front.append(p_parameters_dict)
                     elif self.z >= self.z_max - radius_max:
                         self.particle_list_behind.append(p_parameters_dict)
-                #print("Added particle number = {}".format(particle_cnt))
+                print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         
-    def WriteOutGIDData(self, outName = 'inletPGDEM.mdpa'):
+    def WriteOutGIDData(self, outName = 'inletPGDEM_ini.mdpa'):
 
         # clean the exsisted file first
         if os.path.isfile(outName):
