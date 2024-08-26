@@ -1,17 +1,11 @@
 #/////////////////////////////////////////////////
-__author__      = "Chengshun Shang (CIMNE)"
-__copyright__   = "Copyright (C) 2023-present by Chengshun Shang"
-__version__     = "0.0.1"
-__maintainer__  = "Chengshun Shang"
-__email__       = "cshang@cimne.upc.edu"
-__status__      = "development"
-__date__        = "August 2, 2023"
-__license__     = "BSD 2-Clause License"
+#// Main author: Chengshun Shang (CIMNE)
+#// Email: chengshun.shang1996@gmail.com
+#// Date: August 2023
 #/////////////////////////////////////////////////
 
 import os
 import random
-import shutil
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
 
@@ -19,9 +13,9 @@ class CreatParticlesInsideOfADomain():
 
     def __init__(self) -> None:  
 
-        self.clear_old_cases_folder()
+        pass
 
-    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path):
+    def initialize(self, RVE_size, domain_scale_multiplier):
 
         self.particle_list = []
         self.particle_list_left = []
@@ -44,66 +38,12 @@ class CreatParticlesInsideOfADomain():
         self.z_min = -0.5 * domain_scale_multiplier * RVE_length_z
         self.z_max = 0.5 * domain_scale_multiplier * RVE_length_z
 
-        parameters_file = open("ParametersDEMGen.json", 'r')
-        self.parameters_all = Parameters(parameters_file.read())
-        self.parameters = self.parameters_all["random_particle_generation_parameters"]
+        parameters_file = open("creat_particles_input_parameters.json", 'r')
+        self.parameters = Parameters(parameters_file.read())
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
-        self.packing_cnt = packing_cnt
-        self.ini_path = ini_path
-
-        self.creat_new_cases_folder()
-        self.copy_seed_files_to_aim_folders()
-
-    def clear_old_cases_folder(self):
-
-        cases_folder_name = 'generated_cases'
-        
-        if os.path.exists(cases_folder_name):
-            shutil.rmtree(cases_folder_name, ignore_errors=True)
-            os.makedirs(cases_folder_name)
-        else:
-            os.makedirs(cases_folder_name)
-
-    def creat_new_cases_folder(self):
-
-        new_folder_name = "case_" + str(self.packing_cnt)
-        aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
-        os.makedirs(aim_path)
-    
-    def copy_seed_files_to_aim_folders(self):
-        
-        aim_folder_name = "case_" + str(self.packing_cnt)
-        aim_path = os.path.join(os.getcwd(), "generated_cases", aim_folder_name)
-
-        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json']
-        for seed_file_name in seed_file_name_list:
-            seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
-            aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        if self.parameters_all["generator_name"].GetString() == "isotropic_compression_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'isotropic_compression_method_run.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'isotropic_compression_method_run.py')
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-            seed_file_name_list = ['inletPGDEM_FEM_boundary.mdpa']
-            for seed_file_name in seed_file_name_list:
-                seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities','rem_seed_files', seed_file_name)
-                aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v2.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v2.py')
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
-        aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
-        shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-    
     def CreatParticles(self):
 
         is_first_particle = True
@@ -131,7 +71,7 @@ class CreatParticlesInsideOfADomain():
 
             if is_first_particle:
                 radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-                if self.parameters_all["periodic_boundary_option"].GetBool():
+                if self.parameters["UsingPeriodicBoundary"].GetBool():
                     x = random.uniform(self.x_min , self.x_max)
                     y = random.uniform(self.y_min , self.y_max)
                     z = random.uniform(self.z_min , self.z_max)
@@ -154,7 +94,7 @@ class CreatParticlesInsideOfADomain():
                 loop_cnt = 0
                 while IsOverlaped:
                     radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-                    if self.parameters_all["periodic_boundary_option"].GetBool():
+                    if self.parameters["UsingPeriodicBoundary"].GetBool():
                         self.x = random.uniform(self.x_min, self.x_max)
                         self.y = random.uniform(self.y_min, self.y_max)
                         self.z = random.uniform(self.z_min, self.z_max)
@@ -167,39 +107,31 @@ class CreatParticlesInsideOfADomain():
                         real_RVE_y_length = self.y_max - self.y_min
                         real_RVE_z_length = self.z_max - self.z_min
 
+                        for particle in self.particle_list_left:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
+                        for particle in self.particle_list_right:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
                         
-                        if not IsOverlaped:
-                            for particle in self.particle_list_left:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_right:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        
-                        if not IsOverlaped:
-                            for particle in self.particle_list_top:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_bottom:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                                
-                        if not IsOverlaped:
-                            for particle in self.particle_list_front:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_behind:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
+                        for particle in self.particle_list_top:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
+                        for particle in self.particle_list_bottom:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
+                        for particle in self.particle_list_front:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
+                        for particle in self.particle_list_behind:
+                            IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            if IsOverlaped:
+                                break
                     else:
                         self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                         self.y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
@@ -220,7 +152,7 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                if self.parameters_all["periodic_boundary_option"].GetBool():
+                if self.parameters["UsingPeriodicBoundary"].GetBool():
                     if self.x <= self.x_min + radius_max:
                         self.particle_list_left.append(p_parameters_dict)
                     elif self.x >= self.x_max - radius_max:
@@ -236,15 +168,13 @@ class CreatParticlesInsideOfADomain():
                 print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         
-    def WriteOutGIDData(self, aim_folder_name, aim_file_name):
-
-        aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
+    def WriteOutGIDData(self, outName = 'inletPGDEM_ini.mdpa'):
 
         # clean the exsisted file first
-        if os.path.isfile(aim_path_and_name):
-            os.remove(aim_path_and_name)
+        if os.path.isfile(outName):
+            os.remove(outName)
         
-        with open(aim_path_and_name,'a') as f:
+        with open(outName,'a') as f:
             # write the particle information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
             f.write("Begin Nodes\n")
@@ -302,4 +232,19 @@ class CreatParticlesInsideOfADomain():
 
             f.close()
 
-        print("Successfully write out file {}-{}!".format(aim_folder_name, aim_file_name))
+        print("Successfully write out GID DEM.mdpa file!")
+
+
+
+if __name__ == "__main__":
+
+    TestDEM = CreatParticlesInsideOfADomain()
+    RVE_length_x = 0.005
+    RVE_length_y = 0.005
+    RVE_length_z = 0.005
+    RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
+    domain_scale_multiplier = 1.0
+    TestDEM.initialize(RVE_size, domain_scale_multiplier)
+    TestDEM.CreatParticles()
+    TestDEM.WriteOutGIDData()
+

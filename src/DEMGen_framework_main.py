@@ -123,7 +123,7 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_gravitational_deposition_method\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_isotropic_compression_method\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()

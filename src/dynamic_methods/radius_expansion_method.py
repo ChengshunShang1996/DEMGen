@@ -19,11 +19,6 @@ class RadiusExpansionMethod():
 
         pass
 
-    def Initialization(self, parameters, ini_path):
-
-        self.parameters = parameters
-        self.ini_path = ini_path
-
     def CreatInitialCases(self):
 
         CreatIniCases = creat_fem_and_inlet_mesh_files.CreatFemAndInletMeshFiles()
@@ -50,9 +45,3 @@ class RadiusExpansionMethod():
             os.chdir(aim_path)
             os.system("python gravitational_deposition_method_run.py")
             packing_cnt += 1
-
-    def Run(self, parameters, ini_path):
-
-        self.Initialization(parameters, ini_path)
-        self.CreatInitialCases()
-        self.RunDEM()
