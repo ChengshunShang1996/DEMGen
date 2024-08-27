@@ -25,6 +25,7 @@ class CreatParticlesInsideOfADomain():
         self.particle_list_bottom = []
         self.particle_list_front = []
         self.particle_list_behind = []'''
+        self.particle_list_side = []
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
@@ -45,7 +46,7 @@ class CreatParticlesInsideOfADomain():
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
-    def CreatParticles(self):
+    def CreateParticles(self):
 
         is_first_particle = True
         particle_cnt = 1
@@ -93,8 +94,8 @@ class CreatParticlesInsideOfADomain():
             else:
                 IsOverlaped = True
                 loop_cnt = 0
+                radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                 while IsOverlaped:
-                    radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                     if self.parameters["UsingPeriodicBoundary"].GetBool():
                         self.x = random.uniform(self.x_min, self.x_max)
                         self.y = random.uniform(self.y_min, self.y_max)
@@ -108,108 +109,121 @@ class CreatParticlesInsideOfADomain():
                         real_RVE_y_length = self.y_max - self.y_min
                         real_RVE_z_length = self.z_max - self.z_min
 
+                        x_plus = self.x + real_RVE_x_length
+                        x_minus = self.x - real_RVE_x_length
+                        y_plus = self.y + real_RVE_y_length
+                        y_minus = self.y - real_RVE_y_length
+                        z_plus = self.z + real_RVE_z_length
+                        z_minus = self.z - real_RVE_z_length
+
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, self.y, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, y_plus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, y_minus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, self.y, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, y_plus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, y_minus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
                         
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_minus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, y_minus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, y_minus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_minus, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_minus, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_plus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, y_plus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, y_plus, self.z, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_plus, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_plus, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
 
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, self.y, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_plus, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_minus, z_plus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
                         if not IsOverlaped:
-                            for particle in self.particle_list:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                            for particle in self.particle_list_side:
+                                p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_plus, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_plus, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
+                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, y_minus, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
                     else:
@@ -232,20 +246,19 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                '''
                 if self.parameters["UsingPeriodicBoundary"].GetBool():
-                    if self.x <= self.x_min + radius_max:
-                        self.particle_list_left.append(p_parameters_dict)
-                    elif self.x >= self.x_max - radius_max:
-                        self.particle_list_right.append(p_parameters_dict)
-                    elif self.y <= self.y_min + radius_max:
-                        self.particle_list_top.append(p_parameters_dict)
-                    elif self.y >= self.y_max - radius_max:
-                        self.particle_list_bottom.append(p_parameters_dict)
-                    elif self.z <= self.z_min + radius_max:
-                        self.particle_list_front.append(p_parameters_dict)
-                    elif self.z >= self.z_max - radius_max:
-                        self.particle_list_behind.append(p_parameters_dict)'''
+                    if self.x <= self.x_min + radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
+                    elif self.x >= self.x_max - radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
+                    elif self.y <= self.y_min + radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
+                    elif self.y >= self.y_max - radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
+                    elif self.z <= self.z_min + radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
+                    elif self.z >= self.z_max - radius_max * 2:
+                        self.particle_list_side.append(p_parameters_dict)
                 print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         
@@ -315,8 +328,6 @@ class CreatParticlesInsideOfADomain():
 
         print("Successfully write out GID DEM.mdpa file!")
 
-
-
 if __name__ == "__main__":
 
     TestDEM = CreatParticlesInsideOfADomain()
@@ -326,6 +337,6 @@ if __name__ == "__main__":
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
     domain_scale_multiplier = 1.0
     TestDEM.initialize(RVE_size, domain_scale_multiplier)
-    TestDEM.CreatParticles()
+    TestDEM.CreateParticles()
     TestDEM.WriteOutGIDData()
 
