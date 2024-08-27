@@ -24,12 +24,13 @@ class CreatParticlesInsideOfADomain():
     def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path):
 
         self.particle_list = []
+        '''
         self.particle_list_left = []
         self.particle_list_right = []
         self.particle_list_top = []
         self.particle_list_bottom = []
         self.particle_list_front = []
-        self.particle_list_behind = []
+        self.particle_list_behind = []'''
 
         RVE_length_x = RVE_size[0]
         RVE_length_y = RVE_size[1]
@@ -87,7 +88,12 @@ class CreatParticlesInsideOfADomain():
         if self.parameters_all["generator_name"].GetString() == "isotropic_compression_method":
             seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'isotropic_compression_method_run.py')
             aim_file_path_and_name = os.path.join(aim_path, 'isotropic_compression_method_run.py')
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+            with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "domain_scale_multiplier_input" in line:
+                                line = line.replace("1.5", str(self.parameters["domain_scale_multiplier"].GetDouble()))
+                            f_material_w.write(line)
 
             seed_file_name_list = ['inletPGDEM_FEM_boundary.mdpa']
             for seed_file_name in seed_file_name_list:
@@ -146,7 +152,7 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                #print("Added particle number = {}".format(particle_cnt))
+                print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
                 is_first_particle = False
             else:
@@ -167,40 +173,6 @@ class CreatParticlesInsideOfADomain():
                         real_RVE_y_length = self.y_max - self.y_min
                         real_RVE_z_length = self.z_max - self.z_min
 
-                        '''
-                        if not IsOverlaped:
-                            for particle in self.particle_list_left:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x - real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_right:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        
-                        if not IsOverlaped:
-                            for particle in self.particle_list_top:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y + real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_bottom:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y - real_RVE_y_length, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-
-                        if not IsOverlaped:
-                            for particle in self.particle_list_front:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z + real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        if not IsOverlaped:
-                            for particle in self.particle_list_behind:
-                                IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z - real_RVE_z_length, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
-                                if IsOverlaped:
-                                    break
-                        '''
                         if not IsOverlaped:
                             for particle in self.particle_list:
                                 IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x + real_RVE_x_length, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
@@ -325,6 +297,7 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
+                '''
                 if self.parameters_all["periodic_boundary_option"].GetBool():
                     if self.x <= self.x_min + radius_max * 2:
                         self.particle_list_left.append(p_parameters_dict)
@@ -337,7 +310,7 @@ class CreatParticlesInsideOfADomain():
                     if self.z <= self.z_min + radius_max * 2:
                         self.particle_list_front.append(p_parameters_dict)
                     if self.z >= self.z_max - radius_max * 2:
-                        self.particle_list_behind.append(p_parameters_dict)
+                        self.particle_list_behind.append(p_parameters_dict)'''
                 print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
         

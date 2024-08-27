@@ -27,7 +27,9 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
     def InitializePackingGenerator(self):
 
         self.periodic_boundary_move_inwards_velocity = self.parameters["BoundingBoxMoveVelocity"].GetDouble()
-        self.update_bounding_box_freq = self.parameters["MaxTimeStep"].GetDouble()
+        #Note: In Kratos DEM, the BoundingBox move every [NStepSearch] steps, which can help us get a stable results
+        self.NStepSearch = self.parameters["NeighbourSearchFrequency"].GetDouble()
+        self.update_bounding_box_freq = self.parameters["MaxTimeStep"].GetDouble() / self.NStepSearch
         self.final_check_counter = 0
         self.need_apply_forces = True
         self.end_cnt = 0
@@ -36,7 +38,10 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
         self.graph_export_freq = self.parameters["GraphExportFreq"].GetDouble()
         self.final_check_frequency  = int(self.graph_export_freq / self.parameters["MaxTimeStep"].GetDouble())
         self.final_packing_lenth_ini  = self.parameters["BoundingBoxMaxX"].GetDouble() - self.parameters["BoundingBoxMinX"].GetDouble()
-        self.total_compression_distance = self.final_packing_lenth_ini * 0.5 #TODO: you still need to update it by yourself!!!
+        self.domain_scale_multiplier_input = 1.5
+        self.domain_scale_multiplier = self.domain_scale_multiplier_input
+        self.total_compression_distance = self.final_packing_lenth_ini / (self.domain_scale_multiplier * 2.0) 
+        self.final_packing_lenth = (self.parameters["BoundingBoxMaxX"].GetDouble() - self.parameters["BoundingBoxMinX"].GetDouble()) / self.domain_scale_multiplier
 
     def RunSolutionLoop(self):
 
@@ -60,14 +65,14 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
             self.final_check_counter = 0
 
             if self.parameters["BoundingBoxMoveOption"].GetBool():
-                self.final_packing_lenth_ini -= 2 * self.periodic_boundary_move_inwards_velocity * self.update_bounding_box_freq
+                self.final_packing_lenth_ini -= 2 * self.periodic_boundary_move_inwards_velocity * self.update_bounding_box_freq * self.final_check_frequency
             
             if self.need_apply_forces:
                 self.ApplyRandomForcesToParticles()
             else:
                 self.EraseAppliedForces()
             #if self.final_packing_porosity > (1 - self.max_porosity_tolerance) * self.aim_final_packing_porosity and self.final_packing_porosity < (1 + self.max_porosity_tolerance) * self.aim_final_packing_porosity:
-            if self.final_packing_lenth_ini <= 0.005:
+            if self.final_packing_lenth_ini <= self.final_packing_lenth:
                 self.parameters["BoundingBoxMoveOption"].SetBool(False)
                 self.need_apply_forces = False
                 self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
@@ -76,7 +81,7 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
                     file.write(str(self.time) + ' ' + str(self.normalized_kinematic_energy) + '\n')
 
                 # n = 5e6;   Rate 100 = 1 / (Delta t * n); t = Delta t * n
-                expansion_stop_time = self.total_compression_distance / self.parameters["BoundingBoxMoveVelocity"].GetDouble()
+                expansion_stop_time = self.total_compression_distance / (2 * self.parameters["BoundingBoxMoveVelocity"].GetDouble() / self.NStepSearch)
                 if self.time > expansion_stop_time and self.normalized_kinematic_energy < 1e-8:
                     self.PrintResultsForGid(self.time)
                     self.WriteOutMdpaFileOfParticles('inletPGDEM.mdpa')
@@ -108,12 +113,12 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
             vect[1] = y / vect_moduli
             vect[2] = z / vect_moduli
 
-            applied_force = random.uniform(0.99e8, 1.01e8) * r * r * r
+            applied_force = random.uniform(0.99e3, 1.01e3) * (r ** 3)
             values[0] = applied_force * vect[0]
             values[1] = applied_force * vect[1]
             values[2] = applied_force * vect[2]
 
-            #node.SetSolutionStepValue(EXTERNAL_APPLIED_FORCE, values)
+            node.SetSolutionStepValue(EXTERNAL_APPLIED_FORCE, values)
 
     def EraseAppliedForces(self):
 

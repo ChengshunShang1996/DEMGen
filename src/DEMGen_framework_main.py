@@ -39,8 +39,6 @@ class DEMGenMainFramework():
             print("No file selected")
             exit(0)
 
-        #
-
     def GenerationRun(self):
         
         #particle packing generation
