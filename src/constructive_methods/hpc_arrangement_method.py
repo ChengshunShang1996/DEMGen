@@ -9,8 +9,14 @@ __date__        = "June 21, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
-class RegularArrangementMethod():
+from constructive_method import ConstructiveMethod
+
+class HpcArrangementMethod(ConstructiveMethod):
 
     def __init__(self) -> None:
+
+        pass
+    
+    def CreatInitialPackings(self):
 
         pass

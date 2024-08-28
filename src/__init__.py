@@ -41,7 +41,6 @@ __logo__        = '''
 |||||||    ||||||||  ||     ||    |||||||  ||_____||  ||   ||
 '''
 
-# 输出库的信息
 print(f"\n"
       f"{__logo__}\n"
       f"DEMGen: A Standard Particle Packing Generator for Discrete Element Method\n"

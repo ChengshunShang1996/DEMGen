@@ -56,8 +56,18 @@ class DEMGenMainFramework():
 
         elif self.parameters["generator_name"] == "radius_expansion_method":
             
+            from dynamic_methods import radius_expansion_method
+            MyDEM = radius_expansion_method.RadiusExpansionMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
+
+        elif self.parameters["generator_name"] == "cubic_arrangement_method":
+
             pass
 
+        elif self.parameters["generator_name"] == "hpc_arrangement_method":
+
+            pass
+        
         else:
             print("No generator name given")
 
