@@ -17,7 +17,7 @@ from tkinter.filedialog import askopenfilename
 
 from data_processing.pre_processing import *
 from data_processing.post_processing import *
-#from src.dynamic_methods import *
+from src import *
 
 class DEMGenMainFramework():
 
@@ -131,7 +131,7 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_isotropic_compression_method\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_method\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()

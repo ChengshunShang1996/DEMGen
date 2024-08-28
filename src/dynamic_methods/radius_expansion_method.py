@@ -26,7 +26,7 @@ class RadiusExpansionMethod(DynamicMethod):
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         packing_num = self.parameters["packing_num"]
         domain_scale_multiplier = self.parameters["random_particle_generation_parameters"]["domain_scale_multiplier"]
-        aim_file_name = 'inletPGDEM.mdpa'
+        aim_file_name = 'inletPGDEM_ini.mdpa'
 
         packing_cnt = 1
         while packing_cnt <= packing_num:

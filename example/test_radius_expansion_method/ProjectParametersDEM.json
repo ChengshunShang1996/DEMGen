@@ -66,13 +66,13 @@
     "VelTrapGraphExportFreq"         : 0.01,
     "OutputTimeStep"                 : 0.01,
     "PostBoundingBox"                : true,
-    "PostLocalContactForce"          : false,
+    "PostLocalContactForce"          : true,
     "PostDisplacement"               : true,
     "PostRadius"                     : true,
     "PostVelocity"                   : true,
     "PostAngularVelocity"            : false,
     "PostElasticForces"              : false,
-    "PostContactForces"              : false,
+    "PostContactForces"              : true,
     "PostRigidElementForces"         : false,
     "PostStressStrainOption"         : true,
     "PostTangentialElasticForces"    : false,
@@ -84,5 +84,7 @@
     "PostParticleMoment"             : false,
     "PostEulerAngles"                : false,
     "PostRollingResistanceMoment"    : false,
-    "problem_name"                   : "inletPG"
+    "problem_name"                   : "inletPG",
+    "post_vtk_option"                : true,
+    "PostContactRadius"              : true
 }

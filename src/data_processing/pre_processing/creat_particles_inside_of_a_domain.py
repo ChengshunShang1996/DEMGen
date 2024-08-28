@@ -102,8 +102,8 @@ class CreatParticlesInsideOfADomain():
                 shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v2.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v2.py')
+            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v1.3.py')
+            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v1.3.py')
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
@@ -311,19 +311,6 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
                 if self.parameters_all["periodic_boundary_option"].GetBool():
-                    '''
-                    if self.x <= self.x_min + radius_max * 2:
-                        self.particle_list_left.append(p_parameters_dict)
-                    if self.x >= self.x_max - radius_max * 2:
-                        self.particle_list_right.append(p_parameters_dict)
-                    if self.y <= self.y_min + radius_max * 2:
-                        self.particle_list_top.append(p_parameters_dict)
-                    if self.y >= self.y_max - radius_max * 2:
-                        self.particle_list_bottom.append(p_parameters_dict)
-                    if self.z <= self.z_min + radius_max * 2:
-                        self.particle_list_front.append(p_parameters_dict)
-                    if self.z >= self.z_max - radius_max * 2:
-                        self.particle_list_behind.append(p_parameters_dict)'''
                     if self.x <= self.x_min + radius_max * 2:
                         self.particle_list_side.append(p_parameters_dict)
                     elif self.x >= self.x_max - radius_max * 2:

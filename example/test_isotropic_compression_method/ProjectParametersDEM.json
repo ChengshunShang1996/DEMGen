@@ -84,5 +84,6 @@
     "PostParticleMoment"             : false,
     "PostEulerAngles"                : false,
     "PostRollingResistanceMoment"    : false,
-    "problem_name"                   : "inletPG"
+    "problem_name"                   : "inletPG",
+    "post_vtk_option"                : true
 }

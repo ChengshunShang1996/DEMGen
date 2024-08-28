@@ -164,7 +164,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             center_x = 0.0
             center_y = 0.0
             center_z = 0.0
-            stress_tensor = self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, "stress_tensor")
+            stress_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, "stress_tensor")
             with open("stress_tensor_averaged.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str((stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3) + '\n')
 
@@ -186,11 +186,12 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 else:
                     self.SetAllParticleVelocityToZero()
 
+            '''
             if self.time > 0.00001:
                 self.DEM_parameters["MaxTimeStep"].SetDouble(5e-10)
                 self._GetSolver().dt = self.DEM_parameters["MaxTimeStep"].GetDouble()
                 self.spheres_model_part.ProcessInfo[DELTA_TIME] = self.parameters["MaxTimeStep"].GetDouble()
-                self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
+                self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]'''
         
         if self.start_reset_velocity:
             self.final_check_counter_2 += 1
