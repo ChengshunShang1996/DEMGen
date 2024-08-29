@@ -186,12 +186,12 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 else:
                     self.SetAllParticleVelocityToZero()
 
-            '''
-            if self.time > 0.00001:
-                self.DEM_parameters["MaxTimeStep"].SetDouble(5e-10)
+            
+            if self.time > 0.05:
+                self.DEM_parameters["MaxTimeStep"].SetDouble(1e-5)
                 self._GetSolver().dt = self.DEM_parameters["MaxTimeStep"].GetDouble()
                 self.spheres_model_part.ProcessInfo[DELTA_TIME] = self.parameters["MaxTimeStep"].GetDouble()
-                self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]'''
+                self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         
         if self.start_reset_velocity:
             self.final_check_counter_2 += 1
