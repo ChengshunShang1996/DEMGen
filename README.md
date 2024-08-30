@@ -64,11 +64,11 @@ This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usu
 
 ### Running Simulations
 
-To run a simulation, launch the [DEMGen_framework_main.py][DEMGen_framework_main] inside the folder [./src][src_folder].
+To run a simulation, launch the [DEMGen_framework_main.py][DEMGen_framework_main] inside the folder [./src][src_folder]. For running the file correctly, please modify the "aim_path" (at the last of the file) to your own case path (absolute one).
 
 #### Packing Generation
 
-In progress...
+For running the particle packing generation process using different generation methods, different parameters need to be set in the [ParametersDEMGen.json][ParametersDEMGen_link]. Please study the [example case][examples_link] of different methods for futher usage.
 
 #### Packing Characterization
 
@@ -147,7 +147,7 @@ Some results from example [test_cubic_arrangement_method][test_cubic_arrangement
 
 ## Documentation
 
-In progress...
+In progress... (Just checking this README.md for information)
 
 ## How to Contribute
 
