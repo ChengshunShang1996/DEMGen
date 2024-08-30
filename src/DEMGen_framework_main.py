@@ -68,10 +68,12 @@ class DEMGenMainFramework():
 
         elif self.parameters["generator_name"] == "hpc_arrangement_method":
 
-            pass
+            from constructive_methods import hpc_arrangement_method
+            MyDEM = hpc_arrangement_method.HpcArrangementMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
         
         else:
-            print("No generator name given")
+            print("No (or wrong) generator name given")
 
         #what we get from above processes is a .mdpa file of DEM particles
 

@@ -1,12 +1,12 @@
 {
     "problem_name"   : "inletPG",
-    "generator_name" : "cubic_arrangement_method",
+    "generator_name" : "hpc_arrangement_method",
     "packing_num"    : 1,
     "domain_length_x": 0.004,
     "domain_length_y": 0.004,
     "domain_length_z": 0.004,
     "particle_radius_max": 0.0002,
-    "is_round_option": true,
+    "is_round_option": false,
     "periodic_boundary_option": true,
     "max_time_step"  : 1e-6,
     "inlet_properties":{

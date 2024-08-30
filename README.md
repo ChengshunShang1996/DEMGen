@@ -82,9 +82,20 @@ To load and show the results from previously run simulations, launch MATLAB and 
 
 Examples are available inside the folder [examples][examples_link].
 
-* **Case: test_gravitational_deposition_method**
+### Dynamic methods
 
-Generated with rigid walls as boundary conditions.
+- [**test_gravitational_deposition_method**][main_file_link]
+- **test_isotropic_compression_method**
+- **test_radius_expansion_method**
+
+### Constructive methods
+
+- **test_cubic_arrangement_method** 
+- **test_hpc_arrangement_method**
+
+Here are some results for example **test_gravitational_deposition_method**.
+
+    Generated with rigid walls as boundary conditions.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -93,14 +104,14 @@ Generated with rigid walls as boundary conditions.
 <img src="./docs/images/results_g/g_force_chains.png" height="250"/> 
 </p>
 
-Final packing.
+    Final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final.png" height="225"/>
 </p>
 
-Generated with periodic boundaries.
+    Generated with periodic boundaries.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -109,20 +120,29 @@ Generated with periodic boundaries.
 <img src="./docs/images/results_g/g_force_chains_periodic.png" height="225"/> 
 </p>
 
-Final packing.
+    Final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final_periodic.png" height="225"/>
 </p>
 
-By comparing the results of the two conditions, we could find that using periodic boundaries can help us get a particle packing with more homogeneous force chains.
+    By comparing the results of the two conditions, we could find that using periodic boundaries can help us get a particle packing with more homogeneous force chains.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_force_chains_1.png" height="225"/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_force_chains_2.png" height="225"/> 
+</p>
+
+Some results from example **test_cubic_arrangement_method** (left) and **test_hpc_arrangement_method** (right). 
+
+<p float="left">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_constructive_method/cubic_packing.png" height="225" title="Cubic packing"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
 
 ## Documentation

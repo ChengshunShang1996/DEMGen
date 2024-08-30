@@ -133,3 +133,4 @@ dmypy.json
 /example/test_isotropic_compression_method/generated_cases/
 /example/test_radius_expansion_method/generated_cases/
 /example/test_cubic_arrangement_method/show_packing/
+/example/test_hpc_arrangement_method/show_packing/
