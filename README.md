@@ -76,7 +76,7 @@ In progress...
 
 ### Checking Results
 
-To load and show the results from previously run simulations, launch MATLAB and execute the script file [*main.m*][main_file_link] located inside the folder [*src*][src_folder_link].
+In the case folder or in the generated case folder, the will be a folder call "show packing", there you can find the post-procesing file of the generated packing. Then it can be ckecked in Paraview or Gid.
 
 ## Examples
 
@@ -84,18 +84,18 @@ Examples are available inside the folder [examples][examples_link].
 
 ### Dynamic methods
 
-- [**test_gravitational_deposition_method**][main_file_link]
-- **test_isotropic_compression_method**
-- **test_radius_expansion_method**
+- [test_gravitational_deposition_method][test_gravitational_deposition_method_link]
+- [test_isotropic_compression_method][test_isotropic_compression_method_link]
+- [test_radius_expansion_method][test_radius_expansion_method_link]
 
 ### Constructive methods
 
-- **test_cubic_arrangement_method** 
-- **test_hpc_arrangement_method**
+- [test_cubic_arrangement_method][test_cubic_arrangement_method_link]
+- [test_hpc_arrangement_method][test_hpc_arrangement_method_link]
 
-Here are some results for example **test_gravitational_deposition_method**.
+Here are some results from example [test_gravitational_deposition_method][test_gravitational_deposition_method_link].
 
-    Generated with rigid walls as boundary conditions.
+Generated with rigid walls as boundary conditions.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -104,14 +104,14 @@ Here are some results for example **test_gravitational_deposition_method**.
 <img src="./docs/images/results_g/g_force_chains.png" height="250"/> 
 </p>
 
-    Final packing.
+Final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final.png" height="225"/>
 </p>
 
-    Generated with periodic boundaries.
+Generated with periodic boundaries.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -120,14 +120,14 @@ Here are some results for example **test_gravitational_deposition_method**.
 <img src="./docs/images/results_g/g_force_chains_periodic.png" height="225"/> 
 </p>
 
-    Final packing.
+Final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final_periodic.png" height="225"/>
 </p>
 
-    By comparing the results of the two conditions, we could find that using periodic boundaries can help us get a particle packing with more homogeneous force chains.
+By comparing the results of the two conditions, we could find that using periodic boundaries can help us get a particle packing with more homogeneous force chains.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -136,7 +136,7 @@ Here are some results for example **test_gravitational_deposition_method**.
 <img src="./docs/images/results_g/g_force_chains_2.png" height="225"/> 
 </p>
 
-Some results from example **test_cubic_arrangement_method** (left) and **test_hpc_arrangement_method** (right). 
+Some results from example [test_cubic_arrangement_method][test_cubic_arrangement_method_link] (left) and [test_hpc_arrangement_method][test_hpc_arrangement_method_link] (right). 
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -198,3 +198,9 @@ No liability and warranty are provided.
 [mdpa_link]:            https://github.com/KratosMultiphysics/Kratos/wiki/Input-data
 [paraview_link]:        https://www.paraview.org/         
 [gid_link]:             https://www.gidsimulation.com/
+
+[test_gravitational_deposition_method_link]: ./example/test_gravitational_deposition_method
+[test_isotropic_compression_method_link]:    ./example/test_isotropic_compression_method
+[test_radius_expansion_method_link]:         ./example/test_radius_expansion_method
+[test_cubic_arrangement_method_link]:        ./example/test_cubic_arrangement_method
+[test_hpc_arrangement_method_link]:          ./example/test_hpc_arrangement_method
