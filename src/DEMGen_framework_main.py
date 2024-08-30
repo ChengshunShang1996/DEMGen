@@ -62,7 +62,9 @@ class DEMGenMainFramework():
 
         elif self.parameters["generator_name"] == "cubic_arrangement_method":
 
-            pass
+            from constructive_methods import cubic_arrangement_method
+            MyDEM = cubic_arrangement_method.CubicArrangementMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
 
         elif self.parameters["generator_name"] == "hpc_arrangement_method":
 
@@ -131,7 +133,7 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_method\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\\example\\test_cubic_arrangement_method\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()

@@ -132,3 +132,4 @@ dmypy.json
 /example/test_gravitational_deposition_method/generated_cases/
 /example/test_isotropic_compression_method/generated_cases/
 /example/test_radius_expansion_method/generated_cases/
+/example/test_cubic_arrangement_method/show_packing/
