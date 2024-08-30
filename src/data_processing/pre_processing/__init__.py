@@ -24,4 +24,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-__all__=["dynamic_method", "gravitational_deposition_method", "isotropic_compression_method", "radius_expansion_method"]
+__all__=["creat_fem_and_inlet_mesh_files", "creat_particles_inside_of_a_domain"]

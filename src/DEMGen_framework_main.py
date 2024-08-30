@@ -80,15 +80,20 @@ class DEMGenMainFramework():
     def CharacterizationRun(self):
 
         #particle packing characterization
-        #this is not related to 
         if self.parameters["packing_charcterization_option"] is True:
             
             if self.parameters["regular_shape_option"] is True:
 
-                pass
-
+                if self.parameters["packing_num"] > 1:
+                    from data_processing.post_processing import packing_characterization_multi
+                    MyDEMChara = packing_characterization_multi.PackingCharacterizationMulti()
+                    MyDEMChara.Run(self.parameters, self.ini_path)
+                else:
+                    from data_processing.post_processing import packing_characterization_single
+                    MyDEMChara = packing_characterization_single.PackingCharacterizationSingle()
+                    MyDEMChara.Run(self.parameters, self.ini_path)
+            
             else:
-
                 pass
         else:
             print("No packing analysis has been done because [packing_charcterization_option] is set as [False]")

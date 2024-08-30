@@ -1,7 +1,12 @@
 #/////////////////////////////////////////////////
-#// Main author: Chengshun Shang (CIMNE)
-#// Email: chengshun.shang1996@gmail.com
-#// Date: March 2023
+__author__      = "Chengshun Shang (CIMNE)"
+__copyright__   = "Copyright (C) 2023-present by Chengshun Shang"
+__version__     = "0.0.1"
+__maintainer__  = "Chengshun Shang"
+__email__       = "cshang@cimne.upc.edu"
+__status__      = "development"
+__date__        = "June 21, 2024"
+__license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
 import KratosMultiphysics
@@ -114,94 +119,8 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     def FinalizeSolutionStep(self):
         super().FinalizeSolutionStep()
         #self.MeasureLocalPorosityOfFinalPacking()
-        self.MeasureLocalPorosityWithDifferentRadius()
-        #self.MeasureTotalPorosityOfFinalPacking()
-        #self.MeasurePSD()
-
-    def MeasureLocalPorosityOfFinalPacking(self):
-        
-        print("start measurement")
-        radius = 0.001
-        distance_between_two_measure_sphere = 0.0005
-        center_x_ini = 0.0005
-        center_y_ini = 0.002
-        center_z_ini = 0.0005
-        self.container_x_min = -0.0013499998999967166
-        self.container_x_max = 0.0225
-        self.container_y_min = 0.0
-        self.container_y_max = 0.024
-        self.container_z_min = -0.0013499998999967166
-        self.container_z_max = 0.0225
-
-        if center_x_ini - radius < self.container_x_min or center_x_ini + radius > self.container_x_max:
-            print("The measure sphere is out of the boundary. Please redefine the initial center coordinate x.")
-            exit(0)
-        elif center_y_ini - radius < self.container_y_min or center_y_ini + radius > self.container_y_max:
-            print("The measure sphere is out of the boundary. Please redefine the initial center coordinate y.")
-            exit(0)
-        elif center_z_ini - radius < self.container_z_min or center_z_ini + radius > self.container_z_max:
-            print("The measure sphere is out of the boundary. Please redefine the initial center coordinate z.")
-            exit(0)
-
-        x_direction_continuue = y_direction_continuue = z_direction_continuue = True
-        n_x = 0
-        n_y = 0
-        n_z = 0
-        measure_x_list = []
-        measure_y_list = []
-        measured_porosity = []
-
-        while z_direction_continuue:
-
-            center_z = center_z_ini + n_z * distance_between_two_measure_sphere
-            y_direction_continuue = True
-            n_y = 0
-
-            while y_direction_continuue:
-
-                center_y = center_y_ini + n_y * distance_between_two_measure_sphere
-
-                if center_y + radius > self.container_y_max:
-                    
-                        y_direction_continuue = False
-                else:
-                    x_direction_continuue = True
-                    n_x = 0
-
-                    while x_direction_continuue:
-
-                        center_x = center_x_ini + n_x * distance_between_two_measure_sphere
-
-                        if center_x + radius > self.container_x_max:
-                            x_direction_continuue = False
-                        else:
-                            measure_x_list.append(center_x)
-                            measure_y_list.append(center_y)
-                            measured_porosity.append(self.MeasureSphereForGettingPackingProperties(radius, center_x, center_y, center_z, 'porosity'))
-                        print(n_x)
-                        n_x +=1
-                print(n_y)
-                n_y +=1
-
-            print("break")
-            break
-
-        #ploting
-        levels = 20
-        plt.tricontourf(measure_x_list, measure_y_list, measured_porosity, levels=levels, cmap='coolwarm')
-        #cs.clabel(inline=True, fmt='%d', fontsize = 'smaller', manual=true)
-
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title('Measured porosity')
-
-        plt.colorbar()
-        plt.show()
-        
-        with open("porosity_r1mm.txt", "w") as f_w:
-            for i in range(len(measure_x_list)):
-                f_w.write(str(measure_x_list[i]) + ' '+ str(measure_y_list[i]) + ' '+ str(measured_porosity[i]) + '\n')
-
+        #self.MeasureLocalPorosityWithDifferentRadius()
+        self.MeasureLocalPorosityWithDifferentSideLength()
         exit(0)
 
     def MeasureLocalPorosityWithDifferentRadius(self):
@@ -271,44 +190,52 @@ class ParticlePackingGenerator(DEMAnalysisStage):
 
         exit(0)
 
-    def MeasureTotalPorosityOfFinalPacking(self):
+    def MeasureLocalPorosityWithDifferentSideLength(self):
         
-        selected_element_volume = 0.0
-        for node in self.spheres_model_part.Nodes:
-            r = node.GetSolutionStepValue(RADIUS)
-            x = node.X
-            y = node.Y
-            z = node.Z
-            is_inside_the_final_packing = self.CheckInsideFinalPackingOrNot(x,y,z)
-            if is_inside_the_final_packing:
-                element_volume = 4/3 * math.pi * r * r * r
-                selected_element_volume += element_volume
+        print("start measurement")
+        mean_diameter = 0.0002
+        RVE_lambda = 4
+        side_length = mean_diameter * RVE_lambda
+        side_length_max = 0.005
+        center_x = 0.0
+        center_y = 0.0
+        center_z = 0.0
+        self.container_x_min = -0.0025
+        self.container_x_max = 0.0025
+        self.container_y_min = -0.0025
+        self.container_y_max = 0.0025
+        self.container_z_min = -0.0025
+        self.container_z_max = 0.0025
 
-        self.final_packing_porosity = 1 - (selected_element_volume / self.final_packing_volume)
+        RVE_lambda_list = []
+        measured_packing_density = []
+        measured_averaged_coordination_number = []
+        measured_eigenvalues = []
+        measured_second_invariant_of_deviatoric_tensor = []
+        while side_length <= side_length_max:
 
-        print("Aim porosity is {} and currently porosity is {}".format(self.aim_final_packing_porosity, self.final_packing_porosity))
+            RVE_lambda_list.append(RVE_lambda)
+            #measured_packing_density.append(1 - self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'porosity'))
+            measured_packing_density.append(1 - self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'porosity'))
+            measured_averaged_coordination_number.append(self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'averaged_coordination_number'))
+            eigenvalues, second_invariant_of_deviatoric_tensor = self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'fabric_tensor')
+            measured_eigenvalues.append(eigenvalues)
+            measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
+            self.MeasureSphereForGettingRadialDistributionFunction(side_length/2, center_x, center_y, center_z, mean_diameter/15, mean_diameter)
+            self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'voronoi_input_data')
 
-        return self.final_packing_porosity
-    
-    def MeasurePSD(self):
-
-        particle_sizes = [0.00015, 0.00018, 0.0002, 0.00022, 0.00025, 0.000275, 0.0003, 0.00035]
-        frequencies = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            RVE_lambda += 2
+            side_length = mean_diameter * RVE_lambda
+            side_length = round(side_length, 4)
         
-        for node in self.spheres_model_part.Nodes:
-            r = node.GetSolutionStepValue(RADIUS)
-            for i in range(len(particle_sizes)):
-                if 2.0* r <= particle_sizes[i]:
-                    frequencies[i] += 1.0
+        with open("packing_properties_1.1.txt", "w") as f_w:
+            for i in range(len(RVE_lambda_list)):
+                f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_packing_density[i]) + ' '+ str(measured_averaged_coordination_number[i]) + ' '+\
+                           str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+ str(measured_eigenvalues[i][2]) + ' ' +\
+                            str(measured_second_invariant_of_deviatoric_tensor[i]) + '\n')
 
-        for i in range(len(frequencies)):
-            frequencies[i] = (frequencies[i] / fre_sum) * 100.0
+        print("Measurement finish")
 
-        with open("PSD.txt", "w") as f_w:
-            for i in range(len(particle_sizes)):
-                f_w.write(str(particle_sizes[i]) + ' '+ str(frequencies[i]) + '\n')
-
-        exit(0)
 
 if __name__ == "__main__":
 

@@ -23,5 +23,4 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-
-__all__=["dynamic_method", "gravitational_deposition_method", "isotropic_compression_method", "radius_expansion_method"]
+__all__=["pre_processing", "post_processing"]

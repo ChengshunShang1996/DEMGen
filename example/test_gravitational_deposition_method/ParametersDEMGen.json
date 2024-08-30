@@ -1,5 +1,6 @@
 {
     "problem_name"   : "inletPG",
+    "generator_type" : "dynamic",
     "generator_name" : "gravitational_deposition_method",
     "packing_num"    : 1,
     "domain_length_x": 0.004,
