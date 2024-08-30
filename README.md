@@ -60,7 +60,7 @@ This [JSON][json_link] file is used as input for the program. For generating par
 
 * **Output Results (_.mdpa_)**: 
 
-This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usually, you can find the generated packing in the folder "./generated_cases/cases_$number$/show_packing/" of the working path. Both [Paraview][paraview_link] and [GiD][gid_link] can be used to display the results.
+This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usually, you can find the generated packing in the folder "./generated_cases/cases_$number$/show_packing/" (for dynamic methods) or "./show_packing/" (for constructive methods) of the working path. Both [Paraview][paraview_link] and [GiD][gid_link] can be used to display the results.
 
 ### Running Simulations
 
