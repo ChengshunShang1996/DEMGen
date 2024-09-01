@@ -45,4 +45,5 @@ class IsotropicCompressionMethod(DynamicMethod):
             aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
             os.chdir(aim_path)
             os.system("python isotropic_compression_method_run.py")
+            os.chdir(current_path)
             packing_cnt += 1

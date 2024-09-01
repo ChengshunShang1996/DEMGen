@@ -112,6 +112,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.ini_p_pram_list = ini_p_pram_list
         self.start_reset_velocity = False
         self.check_status = False
+        self.second_stage_flag = False
 
     def Initialize(self):
         super().Initialize()
@@ -181,7 +182,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 self.PrintResultsForGid(self.time)
 
                 if self.normalized_kinematic_energy < 1e-8:
+                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.PrintResultsForGid(self.time)
+                    self.copy_files_and_run_show_results()
                     exit(0)
                 else:
                     self.SetAllParticleVelocityToZero()
@@ -221,7 +224,13 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
-        aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
+        if self.second_stage_flag:
+            print("I am here")
+            self.clear_old_and_creat_new_show_packing_case_folder()
+            print("I am here 2")
+            aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
+        else:
+            aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
         
         with open(aim_path_and_name,'w') as f:
             # write the particle information
@@ -262,6 +271,56 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             f.close()
 
         print("Successfully write out GID DEM.mdpa file!")
+
+    def clear_old_and_creat_new_show_packing_case_folder(self):
+
+        aim_path = os.path.join(os.getcwd(),'show_packing')
+
+        if os.path.exists(aim_path):
+            shutil.rmtree(aim_path, ignore_errors=True)
+            os.makedirs(aim_path)
+        else:
+            os.makedirs(aim_path)
+
+    def copy_seed_files_to_aim_folders(self):
+        
+        aim_path = os.path.join(os.getcwd(), 'show_packing')
+
+        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json', 'inletPGDEM_FEM_boundary.mdpa', 'show_packing.py']
+        for seed_file_name in seed_file_name_list:
+            seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
+            aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+
+            if seed_file_name == 'ProjectParametersDEM.json':
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "FinalTime" in line:
+                                line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
+                            elif "\"GraphExportFreq\"" in line:
+                                line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
+                            elif "VelTrapGraphExportFreq" in line:
+                                line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
+                            elif "OutputTimeStep" in line:
+                                line = "    \"OutputTimeStep\"                 : " + str(self.dt) + ', \n'
+                            f_material_w.write(line)
+            else:
+                if os.path.exists(seed_file_path_and_name):
+                    shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
+    def copy_files_and_run_show_results(self):
+
+        self.copy_seed_files_to_aim_folders()
+
+        current_path = os.getcwd()
+        aim_path = os.path.join(current_path,'show_packing')
+        os.chdir(aim_path)
+        os.system("python show_packing.py")
+        os.chdir(current_path)
+
+    def SetSecondStageFlag(self):
+
+        self.second_stage_flag = True
 
 if __name__ == "__main__":
     Logger.GetDefaultOutput().SetSeverity(Logger.Severity.INFO)
@@ -306,6 +365,7 @@ if __name__ == "__main__":
     MyDemCase = DEMAnalysisStageWithFlush(global_model, parameters, radius_multiplier, ini_p_pram_list)
     MyDemCase.Initialize()
     MyDemCase.SetResetStart()
+    MyDemCase.SetSecondStageFlag()
     MyDemCase.RunSolutionLoop()
     #NormalizedKineticEnergy = MyDemCase.PassNormalizedKineticEnergy()
     MyDemCase.Finalize()

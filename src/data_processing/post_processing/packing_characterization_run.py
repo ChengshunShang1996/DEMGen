@@ -14,20 +14,24 @@ from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
-import matplotlib.pyplot as plt
 
-class ParticlePackingGenerator(DEMAnalysisStage):
+import matplotlib.pyplot as plt
+import json
+
+class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
     def __init__(self, model, parameters):
         super().__init__(model, parameters)
         self.parameters = parameters
+        with open('ParametersDEMGen.json', 'r') as file:
+            self.parameters_DEMGen = json.load(file)
 
     def Initialize(self):
         super().Initialize()
-        self.InitializePackingGenerator() 
+        self.InitializePackingCharacterization() 
         #self.GetInitialDemSphereVolume()
 
-    def InitializePackingGenerator(self):
+    def InitializePackingCharacterization(self):
 
         self.max_particle_velocity_in_phase_1_2 = 0.1
         self.final_check_counter = 0
@@ -58,50 +62,69 @@ class ParticlePackingGenerator(DEMAnalysisStage):
     
     def FinalizeSolutionStep(self):
         super().FinalizeSolutionStep()
-        #self.MeasureLocalPorosityOfFinalPacking()
-        #self.MeasureLocalPorosityWithDifferentRadius()
-        self.MeasureLocalPorosityWithDifferentSideLength()
-        exit(0)
+        time_step = self.spheres_model_part.ProcessInfo[TIME_STEPS]
+        if time_step == 2:
+            self.MeasureLocalPropertiesWithDifferentRadius()
 
-    def MeasureLocalPorosityWithDifferentSideLength(self):
+    def MeasureLocalPropertiesWithDifferentRadius(self):
         
-        print("start measurement")
-        max_diameter = 0.0002
-        RVE_lambda = 4
+        print("Start measurement")
+        max_diameter = self.parameters_DEMGen["particle_radius_max"] * 2.0
+        RVE_lambda = self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_initial"]
         side_length = max_diameter * RVE_lambda
         side_length_max = self.domain_x_max - self.domain_x_min
-        #update this center point if necessary
+        #update this center point if necessary. Center point is (0, 0 ,0) by default
         center_x = 0.0
         center_y = 0.0
         center_z = 0.0
 
         RVE_lambda_list = []
         measured_packing_density = []
-        measured_averaged_coordination_number = []
+        measured_mean_coordination_number = []
         measured_eigenvalues = []
         measured_second_invariant_of_deviatoric_tensor = []
 
         while side_length <= side_length_max:
 
             RVE_lambda_list.append(RVE_lambda)
-            #measured_packing_density.append(1 - self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'porosity'))
-            measured_packing_density.append(1 - self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'porosity'))
-            measured_averaged_coordination_number.append(self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'averaged_coordination_number'))
-            eigenvalues, second_invariant_of_deviatoric_tensor = self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'fabric_tensor')
-            measured_eigenvalues.append(eigenvalues)
-            measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
-            self.MeasureSphereForGettingRadialDistributionFunction(side_length/2, center_x, center_y, center_z, mean_diameter/15, mean_diameter)
-            self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'voronoi_input_data')
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+                measured_packing_density.append(1 - self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'porosity'))
+            
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+                measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
+            
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+                eigenvalues, second_invariant_of_deviatoric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
+                measured_eigenvalues.append(eigenvalues)
+                measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
+            
+            '''
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_radia_distribution_function_option"]:
+                self.MeasureSphereForGettingRadialDistributionFunction(side_length/2, center_x, center_y, center_z, max_diameter/15, max_diameter)
+            
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_voronoi_input_option"]:
+                self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'voronoi_input_data')
+            '''
 
-            RVE_lambda += 2
+            RVE_lambda += self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_increment"]
             side_length = max_diameter * RVE_lambda
-            side_length = round(side_length, 4)
+            #side_length = round(side_length, 4)
         
-        with open("packing_properties.txt", "w") as f_w:
-            for i in range(len(RVE_lambda_list)):
-                f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_packing_density[i]) + ' '+ str(measured_averaged_coordination_number[i]) + ' '+\
-                           str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+ str(measured_eigenvalues[i][2]) + ' ' +\
-                            str(measured_second_invariant_of_deviatoric_tensor[i]) + '\n')
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+            with open("packing_properties_density.txt", "w") as f_w:
+                for i in range(len(RVE_lambda_list)):
+                    f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_packing_density[i]) + '\n')
+                    
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+            with open("packing_properties_mean_coordination_number.txt", "w") as f_w:
+                for i in range(len(RVE_lambda_list)):
+                    f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_mean_coordination_number[i]) + '\n')
+                    
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+            with open("packing_properties_anisotropy.txt", "w") as f_w:
+                for i in range(len(RVE_lambda_list)):
+                    f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+\
+                               str(measured_eigenvalues[i][2]) + ' ' + str(measured_second_invariant_of_deviatoric_tensor[i]) + '\n')
 
         print("Measurement finish")
 
@@ -111,4 +134,4 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
     model = KratosMultiphysics.Model()
-    ParticlePackingGenerator(model, parameters).Run()
+    ParticlePackingCharacterizationRun(model, parameters).Run()

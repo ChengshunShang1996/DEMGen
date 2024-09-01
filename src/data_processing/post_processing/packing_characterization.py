@@ -9,6 +9,8 @@ __date__        = "June 21, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
+import os
+
 class PackingCharacterization():
 
     def __init__(self) -> None:
@@ -19,6 +21,7 @@ class PackingCharacterization():
 
         self.parameters = parameters
         self.ini_path = ini_path
+        self.dt = self.parameters["dem_time_step"]
 
     def CreatInitialCases(self):
 

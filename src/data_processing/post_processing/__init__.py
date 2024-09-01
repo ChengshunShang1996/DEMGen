@@ -24,4 +24,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-__all__=["packing_characterization_run", "packing_characterization"]
+__all__=["packing_characterization_run", "packing_characterization", "packing_characterization_single", "packing_characterization_multi"]

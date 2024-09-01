@@ -49,7 +49,7 @@
     "RollingFrictionOption"          : false,
     "GlobalDamping"                  : 0.0,
     "GlobalViscousDamping"           : 0.0,
-    "ContactMeshOption"              : false,
+    "ContactMeshOption"              : true,
     "OutputFileType"                 : "Ascii",
     "Multifile"                      : "multiple_files",
     "ElementType"                    : "SphericPartDEMElement3D",

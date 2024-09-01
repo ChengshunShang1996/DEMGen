@@ -7,6 +7,7 @@
     "domain_length_y": 0.004,
     "domain_length_z": 0.004,
     "particle_radius_max": 0.00032,
+    "dem_time_step"  : 1e-6,
     "periodic_boundary_option": true,
     "inlet_properties":{
         "RIGID_BODY_MOTION"        : 0,
@@ -42,7 +43,13 @@
         "aim_particle_number": 312,
         "domain_scale_multiplier": 1.0
     },
-    "packing_charcterization_option" : false,
+    "packing_charcterization_option" : true,
     "regular_shape_option"           : true,
-    "packing_charcterization_setting": {}
+    "packing_charcterization_setting": {
+        "RVE_lambda_initial"                      : 4,
+        "RVE_lambda_increment"                    : 2,
+        "measure_density_option"                  : true,
+        "measure_mean_coordination_number_option" : true,
+        "measure_anisotropy_option"               : true
+    }
 }
