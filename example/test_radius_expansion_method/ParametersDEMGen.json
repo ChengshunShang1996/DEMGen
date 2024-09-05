@@ -26,8 +26,8 @@
     },
     "random_particle_generation_parameters":{
         "random_variable_settings" : {
-            "possible_values" : [0.0002],
-            "relative_frequencies" : [1],
+            "possible_values" : [0.00015, 0.0002],
+            "relative_frequencies" : [1, 1],
             "radius_scale_multiplier": 0.5,
             "do_use_seed" : false,
             "seed" : 1,
@@ -40,7 +40,7 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "aim_particle_number": 1000,
+        "aim_particle_number": 1700,
         "domain_scale_multiplier": 1.0
     },
     "packing_charcterization_option" : true,

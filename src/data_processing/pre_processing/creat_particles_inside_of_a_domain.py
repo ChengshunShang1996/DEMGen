@@ -102,8 +102,8 @@ class CreatParticlesInsideOfADomain():
                 shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v1.3.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v1.3.py')
+            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v1.4.py')
+            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v1.4.py')
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
