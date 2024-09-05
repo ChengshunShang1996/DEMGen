@@ -186,7 +186,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 max_particle_velocity = self.GetMaximumVelocity()
 
                 if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                    self.second_stage_flag = True
+                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.PrintResultsForGid(self.time)
+                    self.copy_files_and_run_show_results()
                     exit(0)
                 else:
                     self.SetAllParticleVelocityToZero()
@@ -353,7 +356,6 @@ if __name__ == "__main__":
     MyDemCase = DEMAnalysisStageWithFlush(global_model, parameters, radius_multiplier, ini_p_pram_list)
     MyDemCase.Initialize()
     MyDemCase.SetResetStart()
-    MyDemCase.SetSecondStageFlag()
     MyDemCase.RunSolutionLoop()
     #NormalizedKineticEnergy = MyDemCase.PassNormalizedKineticEnergy()
     MyDemCase.Finalize()
