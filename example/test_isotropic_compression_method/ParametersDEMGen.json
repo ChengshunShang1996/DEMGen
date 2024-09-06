@@ -39,7 +39,10 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "aim_particle_number": 312,
+        "aim_porosity": 0.36,
+        "aim_porosity_tolerance": 0.001,
+        "aim_mean_stress": 0.0,
+        "aim_mean_stress_tolerance": 100,
         "domain_scale_multiplier": 1.5
     },
     "packing_charcterization_option" : false,

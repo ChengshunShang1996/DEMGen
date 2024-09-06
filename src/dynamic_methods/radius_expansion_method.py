@@ -31,7 +31,7 @@ class RadiusExpansionMethod(DynamicMethod):
         packing_cnt = 1
         while packing_cnt <= packing_num:
             CreatIniCases.Initialize(RVE_size, domain_scale_multiplier, packing_cnt, self.ini_path)
-            CreatIniCases.CreatParticles()
+            CreatIniCases.CreatParticles(RVE_size)
             aim_folder_name = "case_" + str(packing_cnt)
             CreatIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
             packing_cnt += 1

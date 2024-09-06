@@ -6,6 +6,7 @@
 
 import os
 import random
+import math
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
 
@@ -46,12 +47,18 @@ class CreatParticlesInsideOfADomain():
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
-    def CreateParticles(self):
+    def CreateParticles(self, RVE_size):
 
         is_first_particle = True
         particle_cnt = 1
-        aim_particle_number = self.parameters["aim_particle_number"].GetInt()
-        while particle_cnt <= aim_particle_number:
+        particle_volume = 0
+        #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
+        aim_porosity = self.parameters["aim_porosity"].GetDouble()
+        aim_porosity_tolerance = self.parameters["aim_porosity_tolerance"].GetDouble()
+        radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (1 - aim_porosity - aim_porosity_tolerance) * (radius_scale_multiplier ** 3)
+        
+        while particle_volume < aim_volume:
 
             p_parameters_dict = {
                     "id" : 0,
@@ -90,6 +97,7 @@ class CreatParticlesInsideOfADomain():
                 self.particle_list.append(p_parameters_dict)
                 #print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
+                particle_volume += 4/3 * math.pi * (r**3)
                 is_first_particle = False
             else:
                 IsOverlaped = True
@@ -261,6 +269,7 @@ class CreatParticlesInsideOfADomain():
                         self.particle_list_side.append(p_parameters_dict)
                 print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
+                particle_volume += 4/3 * math.pi * (r**3)
         
     def WriteOutGIDData(self, outName = 'inletPGDEM_ini.mdpa'):
 
@@ -337,6 +346,6 @@ if __name__ == "__main__":
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
     domain_scale_multiplier = 1.0
     TestDEM.initialize(RVE_size, domain_scale_multiplier)
-    TestDEM.CreateParticles()
+    TestDEM.CreateParticles(RVE_size)
     TestDEM.WriteOutGIDData()
 
