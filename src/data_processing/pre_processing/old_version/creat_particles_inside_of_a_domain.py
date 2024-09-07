@@ -339,13 +339,16 @@ class CreatParticlesInsideOfADomain():
 
 if __name__ == "__main__":
 
-    TestDEM = CreatParticlesInsideOfADomain()
-    RVE_length_x = 0.005
-    RVE_length_y = 0.005
-    RVE_length_z = 0.005
-    RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
-    domain_scale_multiplier = 1.0
-    TestDEM.initialize(RVE_size, domain_scale_multiplier)
-    TestDEM.CreateParticles(RVE_size)
-    TestDEM.WriteOutGIDData()
+    packing_num = 3
+    for i in range(packing_num):
+        TestDEM = CreatParticlesInsideOfADomain()
+        RVE_length_x = 0.005
+        RVE_length_y = 0.005
+        RVE_length_z = 0.005
+        RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
+        domain_scale_multiplier = 1.5
+        TestDEM.initialize(RVE_size, domain_scale_multiplier)
+        TestDEM.CreateParticles(RVE_size)
+        OutName = 'inletPGDEM_ini_' + str(i) +'.mdpa'
+        TestDEM.WriteOutGIDData(OutName)
 
