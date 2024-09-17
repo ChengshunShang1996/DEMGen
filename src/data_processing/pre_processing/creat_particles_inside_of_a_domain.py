@@ -110,7 +110,7 @@ class CreatParticlesInsideOfADomain():
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-    
+        
     def CreatParticles(self, RVE_size):
 
         is_first_particle = True
@@ -122,6 +122,10 @@ class CreatParticlesInsideOfADomain():
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
         aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (1 - aim_porosity - aim_porosity_tolerance) * (radius_scale_multiplier ** 3)
         
+        self.k2 = 2 / (1 / 0.3**2 - 1)
+        self.F_1_0_3 = 0.3
+        self.F_2_0_3 = self.k2 * (-1 / (2 * 0.3**2) + 1 / 2) + self.F_1_0_3
+
         while particle_volume < aim_volume:
 
             p_parameters_dict = {
@@ -144,6 +148,7 @@ class CreatParticlesInsideOfADomain():
 
             if is_first_particle:
                 radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
+                r_original = r
                 if self.parameters_all["periodic_boundary_option"].GetBool():
                     x = random.uniform(self.x_min , self.x_max)
                     y = random.uniform(self.y_min , self.y_max)
@@ -152,6 +157,16 @@ class CreatParticlesInsideOfADomain():
                     x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                     y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                     z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
+                    u = random.uniform(0, 1)
+                    x_c = u**(1/3)
+                    x = x_c * (self.x_max - radius_max) * random.choice([-1,1])
+                    scale_r = (abs(x) / (self.x_max - radius_max))
+                    if scale_r < 0.5:
+                        scale_r = 0.5
+                        r = scale_r * r_original
+                    else:
+                        r = scale_r * r_original
+
                 p_parameters_dict["id"] = particle_cnt
                 p_parameters_dict["p_x"] = x
                 p_parameters_dict["p_y"] = y
@@ -166,6 +181,7 @@ class CreatParticlesInsideOfADomain():
             else:
                 IsOverlaped = True
                 loop_cnt = 0
+                r_original = r
                 while IsOverlaped:
                     radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                     if self.parameters_all["periodic_boundary_option"].GetBool():
@@ -299,9 +315,18 @@ class CreatParticlesInsideOfADomain():
                                 if IsOverlaped:
                                     break
                     else:
-                        self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
+                        #self.x = random.uniform(self.x_min + radius_max, self.x_max - radius_max)
                         self.y = random.uniform(self.y_min + radius_max, self.y_max - radius_max)
                         self.z = random.uniform(self.z_min + radius_max, self.z_max - radius_max)
+                        u = random.uniform(0, 1)
+                        x_c = u**(1/3)
+                        self.x = x_c * (self.x_max - radius_max) * random.choice([-1,1])
+                        scale_r = (abs(self.x) / (self.x_max - radius_max))
+                        if scale_r < 0.7368:
+                            scale_r = 0.4
+                            r = scale_r * r_original
+                        else:
+                            r = u * r_original
                         for particle in self.particle_list:
                             IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
                             if IsOverlaped:
