@@ -46,9 +46,21 @@ This program can be used for DEM particle packing generation. From this point of
 
 DEMGen is fully written in the [Python][python_website] programming language and adopts the Object Oriented Programming (OOP) paradigm to offer modularity and extensibility. Due to the nature of Python, this program can be run on different platforms (Windows or Linux)
 
-Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.0][python310_website] is recommended, as other versions haven't been tested.
+Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.X][python310_website] is recommended, as other versions haven't been tested.
 
-For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here.    
+Required Python Pakage:
+- numpy
+- matplotlib
+- pyevtk
+
+Environment variable setting in a Command Prompt:
+
+> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'
+
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment has been attached in the source code "./src/external/kratos". For using Kratos, the following environment variable need to be set in a Command Prompt:
+
+> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos \
+> set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos/libs
 
 ## Instructions
 
