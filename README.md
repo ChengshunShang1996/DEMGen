@@ -48,6 +48,11 @@ DEMGen is fully written in the [Python][python_website] programming language and
 
 Please make sure you have installed Python3.X.X on your PC. Currently, [Python3.10.0][python310_website] is recommended, as other versions haven't been tested.
 
+Required Python Pakage:
+- Numpy
+- matplotlib
+- pyevtk
+
 For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here.    
 
 ## Instructions
