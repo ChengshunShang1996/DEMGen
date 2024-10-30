@@ -1,0 +1,58 @@
+{
+    "problem_name"   : "inletPG",
+    "generator_type" : "dynamic",
+    "generator_name" : "radius_expansion_method",
+    "packing_num"    : 1,
+    "domain_length_x": 0.004,
+    "domain_length_y": 0.004,
+    "domain_length_z": 0.004,
+    "particle_radius_max": 0.0002,
+    "dem_time_step"  : 1e-6,
+    "periodic_boundary_option": true,
+    "inlet_properties":{
+        "RIGID_BODY_MOTION"        : 0,
+        "INJECTOR_ELEMENT_TYPE"    : "SphericParticle3D",
+        "ELEMENT_TYPE"             : "SphericParticle3D",
+        "CONTAINS_CLUSTERS"        : 0,
+        "VELOCITY"                 : [0.0, -0.25, 0.0],
+        "MAX_RAND_DEVIATION_ANGLE" : 0.01,
+        "INLET_NUMBER_OF_PARTICLES": 50000000,
+        "IMPOSED_MASS_FLOW_OPTION" : 0,
+        "INLET_START_TIME"         : 0.0,
+        "INLET_STOP_TIME"          : 100,
+        "RADIUS"                   : 0.0003,
+        "PROBABILITY_DISTRIBUTION" : "discrete",
+        "STANDARD_DEVIATION"       : 0.0
+    },
+    "random_particle_generation_parameters":{
+        "random_variable_settings" : {
+            "possible_values" : [0.00015, 0.0002],
+            "relative_frequencies" : [1, 1],
+            "radius_scale_multiplier": 0.5,
+            "do_use_seed" : false,
+            "seed" : 1,
+            "relative_closeness_tolerance" : 1e-8
+        },
+        "PROBABILITY_DISTRIBUTION" : "discrete",
+        "RADIUS" : 0.0002,
+        "MINIMUM_RADIUS" : 0.0002,
+        "MAXIMUM_RADIUS" : 0.0002,
+        "STANDARD_DEVIATION" : 0.0,
+        "SEED" : 1,
+        "NAME" : "DEMGen",
+        "aim_porosity": 0.36,
+        "aim_porosity_tolerance": 0.001,
+        "aim_mean_stress": 0.0,
+        "aim_mean_stress_tolerance": 100,
+        "domain_scale_multiplier": 1.0
+    },
+    "packing_charcterization_option" : true,
+    "regular_shape_option"           : true,
+    "packing_charcterization_setting": {
+        "RVE_lambda_initial"                      : 4,
+        "RVE_lambda_increment"                    : 2,
+        "measure_density_option"                  : true,
+        "measure_mean_coordination_number_option" : true,
+        "measure_anisotropy_option"               : true
+    }
+}
