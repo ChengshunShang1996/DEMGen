@@ -188,7 +188,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
                 max_particle_velocity = self.GetMaximumVelocity()
 
-                if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                if mean_stress < 5000 * 1.2:
                     self.second_stage_flag = True
                     self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.PrintResultsForGid(self.time)
