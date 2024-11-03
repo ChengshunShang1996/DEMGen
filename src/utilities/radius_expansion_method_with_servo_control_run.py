@@ -205,7 +205,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
                         self.is_start_servo_control = True
-                        #add parameters
+                        self.parameters["BoundingBoxMoveOption"].SetBool(True)
+                        self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
@@ -215,6 +216,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         if mean_stress > 5000 * 1.2:
                             self.is_in_inaccessibale_region2 = True
                         self.is_start_servo_control = True
+                        self.parameters["BoundingBoxMoveOption"].SetBool(True)
+                        self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:
