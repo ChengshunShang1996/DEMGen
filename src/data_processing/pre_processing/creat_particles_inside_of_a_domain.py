@@ -124,10 +124,10 @@ class CreatParticlesInsideOfADomain():
         particle_cnt = 1
         particle_volume = 0
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
-        aim_porosity = self.parameters["aim_porosity"].GetDouble()
-        aim_porosity_tolerance = self.parameters["aim_porosity_tolerance"].GetDouble()
+        aim_packing_density = self.parameters["aim_packing_density"].GetDouble()
+        aim_packing_density_tolerance = self.parameters["aim_packing_density_tolerance"].GetDouble()
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (1 - aim_porosity - aim_porosity_tolerance) * (radius_scale_multiplier ** 3)
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (aim_packing_density + aim_packing_density_tolerance) * (radius_scale_multiplier ** 3)
         
         while particle_volume < aim_volume:
 

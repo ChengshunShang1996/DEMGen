@@ -1,7 +1,7 @@
 {
     "problem_name"   : "inletPG",
     "generator_type" : "dynamic",
-    "generator_name" : "radius_expansion_method",
+    "generator_name" : "radius_expansion_method_with_servo_control",
     "packing_num"    : 1,
     "domain_length_x": 0.004,
     "domain_length_y": 0.004,
@@ -40,8 +40,8 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "aim_porosity": 0.36,
-        "aim_porosity_tolerance": 0.001,
+        "aim_packing_density": 0.64,
+        "aim_packing_density_tolerance": 0.0,
         "aim_mean_stress": 0.0,
         "aim_mean_stress_tolerance": 100,
         "domain_scale_multiplier": 1.0
