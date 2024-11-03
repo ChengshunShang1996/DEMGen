@@ -14,7 +14,7 @@
     "BoundingBoxMinZ"                : -0.002,
     "BoundingBoxMoveOption"          : false,
     "BoundingBoxMoveOptionDetail"    : [1, 1, 1, 1, 1, 1],
-    "BoundingBoxMoveVelocity"        : 0.05,
+    "BoundingBoxMoveVelocity"        : [0.05, 0.05, 0.05],
     "dem_inlet_option"               : false,
     "dem_inlets_settings" : {
         "Inlet_INLET": {
