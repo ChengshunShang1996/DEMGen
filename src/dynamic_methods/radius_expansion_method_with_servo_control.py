@@ -39,10 +39,12 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         aim_folder_name = "case_" + str(self.packing_cnt)
         aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
         os.chdir(aim_path)
-        os.system("python radius_expansion_method_with_servo_control_run.py")
+        if self.last_try:
+            os.system("python radius_expansion_method_with_servo_control_run_final.py")
+        else:
+            os.system("python radius_expansion_method_with_servo_control_run.py")
         
-        if os.path.isfile("success.txt") or self.last_try:
-            os.system("python servo_control.py")
+        if os.path.isfile("success.txt"):
             os.chdir(current_path)
             return True
         else:
@@ -62,7 +64,7 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
                 if try_packing_desnity == aim_packing_density_list[-1]:
                     self.last_try = True
                 self.CreatInitialCases()
-                good_work = self.RunDEM()
-                if good_work:
+                success_marker = self.RunDEM()
+                if success_marker:
                     break
             self.packing_cnt += 1

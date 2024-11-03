@@ -5,13 +5,15 @@ __version__     = "0.0.1"
 __maintainer__  = "Chengshun Shang"
 __email__       = "cshang@cimne.upc.edu"
 __status__      = "development"
-__date__        = "June 26, 2024"
+__date__        = "Dec 02, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
 import time
 import sys
 import shutil
+import math
+import numpy as np
 
 import KratosMultiphysics
 from KratosMultiphysics import *
@@ -24,6 +26,10 @@ if os.path.exists("stress_tensor_averaged.txt"):
     os.remove("stress_tensor_averaged.txt")
 if os.path.exists("inletPGDEM.mdpa"):
     os.remove("inletPGDEM.mdpa")
+if os.path.exists("stress_tensor_0.txt"):
+    os.remove("stress_tensor_0.txt")
+if os.path.exists("inletPGDEM_post_1.mdpa"):
+    os.remove("inletPGDEM_post_1.mdpa")
 
 def GetParticleDataFromMdpa(aim_mdpa_file_name):
     
@@ -111,8 +117,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.normalized_kinematic_energy = 1e10
         self.ini_p_pram_list = ini_p_pram_list
         self.start_reset_velocity = False
-        self.check_status = False
         self.second_stage_flag = False
+        self.is_in_inaccessibale_region2 = False
+        self.is_start_servo_control = False
 
     def Initialize(self):
         super().Initialize()
@@ -121,6 +128,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter = 0
         self.final_check_counter_2 = 0
         self.final_check_counter_reset = 0
+        self.measured_stress_list = []
+        self.target_porosity = 0.3905
+        self.ZeroFrictionPhase = False
+        self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
     
     def SetResetStart(self):
 
@@ -162,49 +173,80 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.final_check_counter = 0
 
-            self.check_status = True
+            self.UpdateFinalPackingVolume()
+            self.MeasureTotalPorosityOfFinalPacking()
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str(self.normalized_kinematic_energy) + '\n')
 
-            '''
-            side_length = 0.0025
-            center_x = 0.0
-            center_y = 0.0
-            center_z = 0.0
-            stress_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, "stress_tensor")
-            '''
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
             with open("stress_tensor_averaged.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str(mean_stress) + '\n')
 
-            # n = 5e6;   Rate 100 = 1 / (Delta t * n); t = Delta t * n
+            with open("stress_tensor_0.txt", 'a') as file:
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_porosity) + ' ' \
+                               + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
-            if self.start_reset_velocity:
+            self.measured_stress_list.append(mean_stress)
+
+            if not self.is_start_servo_control:
                 
-                self.PrintResultsForGid(self.time)
-
-                max_particle_velocity = self.GetMaximumVelocity()
-
-                #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                if self.start_reset_velocity:
                 
-                if mean_stress < 5000 * 1.2: # (target stress, packing density) in the accessiable region
-                    self.second_stage_flag = True
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.PrintResultsForGid(self.time)
-                    self.copy_files_and_run_show_results()
-                    exit(0)
-                elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
-                    self.second_stage_flag = True
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                    self.PrintResultsForGid(self.time)
-                    self.copy_files_and_run_show_results()
-                    exit(0)
-                else:
-                    self.SetAllParticleVelocityToZero()
 
+                    #max_particle_velocity = self.GetMaximumVelocity()
+
+                    #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                    if mean_stress < 5000 * 1.2: # (target stress, packing density) in the accessiable region
+                        self.second_stage_flag = True
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        self.PrintResultsForGid(self.time)
+                        self.is_start_servo_control = True
+                        #add parameters
+                        #self.copy_files_and_run_show_results()
+                        #exit(0)
+                    elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
+                        self.second_stage_flag = True
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        self.PrintResultsForGid(self.time)
+                        if mean_stress > 5000 * 1.2:
+                            self.is_in_inaccessibale_region2 = True
+                        self.is_start_servo_control = True
+                        #self.copy_files_and_run_show_results()
+                        #exit(0)
+                    else:
+                        self.SetAllParticleVelocityToZero()
+            else:
+                mad = 0.0
+                target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+                if len(self.measured_stress_list) > 5:
+                    mad = np.mean([abs(x - target_stress[0]) for x in self.measured_stress_list[-5:]])
+                
+                if self.ZeroFrictionPhase:
+                    for properties in self.spheres_model_part.Properties:
+                        for subproperties in properties.GetSubProperties():
+                            subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                            subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
+
+                mad_threshold = 0.02 * target_stress[0]
+                if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                    print("The stress is stable, and the simulation reaches to the 2nd phase.")
+                    if self.is_in_inaccessibale_region2:
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM_post_inac2.mdpa")
+                        exit(0)
+                    else:
+                        if abs(self.final_packing_porosity - self.target_porosity) > 0.0001:
+                            for properties in self.spheres_model_part.Properties:
+                                for subproperties in properties.GetSubProperties():
+                                    subproperties[STATIC_FRICTION] = 0.0
+                                    subproperties[DYNAMIC_FRICTION] = 0.0
+                            self.ZeroFrictionPhase = True
+                        else:
+                            self.WriteOutMdpaFileOfParticles("inletPGDEM_post_1.mdpa")
+                            exit(0)
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
@@ -225,6 +267,24 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
     def PassNormalizedKineticEnergy(self):
 
         return self.normalized_kinematic_energy
+    
+    def MeasureTotalPorosityOfFinalPacking(self):
+        
+        selected_element_volume = 0.0
+        for node in self.spheres_model_part.Nodes:
+            r = node.GetSolutionStepValue(RADIUS)
+            element_volume = 4/3 * math.pi * r * r * r
+            selected_element_volume += element_volume
+
+        self.final_packing_porosity = 1 - (selected_element_volume / self.final_packing_volume)
+
+        print("Currently porosity is {}".format(self.final_packing_porosity))
+
+    def UpdateFinalPackingVolume(self):
+         
+        self.final_packing_volume = (self.BoundingBoxMaxX_update - self.BoundingBoxMinX_update) * \
+                                (self.BoundingBoxMaxY_update - self.BoundingBoxMinY_update) * \
+                                (self.BoundingBoxMaxZ_update - self.BoundingBoxMinZ_update)
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
