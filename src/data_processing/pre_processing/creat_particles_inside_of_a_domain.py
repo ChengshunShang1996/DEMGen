@@ -112,7 +112,12 @@ class CreatParticlesInsideOfADomain():
             for seed_file_name in seed_file_name_list:
                 seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
                 aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "self.target_packing_density =" in line:
+                                line = line.replace("0.64", str(1 - self.parameters["target_packing_density"].GetDouble()))
+                            f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
@@ -124,10 +129,10 @@ class CreatParticlesInsideOfADomain():
         particle_cnt = 1
         particle_volume = 0
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
-        aim_packing_density = self.parameters["aim_packing_density"].GetDouble()
-        aim_packing_density_tolerance = self.parameters["aim_packing_density_tolerance"].GetDouble()
+        target_packing_density = self.parameters["target_packing_density"].GetDouble()
+        target_packing_density_tolerance = self.parameters["target_packing_density_tolerance"].GetDouble()
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (aim_packing_density + aim_packing_density_tolerance) * (radius_scale_multiplier ** 3)
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (target_packing_density + target_packing_density_tolerance) * (radius_scale_multiplier ** 3)
         
         while particle_volume < aim_volume:
 

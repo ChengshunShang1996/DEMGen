@@ -22,8 +22,6 @@ from KratosMultiphysics import Logger
 
 if os.path.exists("normalized_kinematic_energy.txt"):
     os.remove("normalized_kinematic_energy.txt")
-if os.path.exists("stress_tensor_averaged.txt"):
-    os.remove("stress_tensor_averaged.txt")
 if os.path.exists("inletPGDEM.mdpa"):
     os.remove("inletPGDEM.mdpa")
 if os.path.exists("stress_tensor_0.txt"):
@@ -129,13 +127,19 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter_2 = 0
         self.final_check_counter_reset = 0
         self.measured_stress_list = []
-        self.target_porosity = 0.3905
+        self.target_packing_density = 0.64
         self.ZeroFrictionPhase = False
         self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
-    
+
     def SetResetStart(self):
 
         self.start_reset_velocity = True
+
+        #set friction to zero
+        for properties in self.spheres_model_part.Properties:
+            for subproperties in properties.GetSubProperties():
+                subproperties[STATIC_FRICTION] = 0.0
+                subproperties[DYNAMIC_FRICTION] = 0.0
 
     def SetAllParticleVelocityToZero(self):
         for node in self.spheres_model_part.Nodes:
@@ -174,7 +178,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             self.final_check_counter = 0
 
             self.UpdateFinalPackingVolume()
-            self.MeasureTotalPorosityOfFinalPacking()
+            self.MeasureTotalPackingDensityOfFinalPacking()
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
@@ -182,11 +186,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
-            with open("stress_tensor_averaged.txt", 'a') as file:
-                file.write(str(self.time) + ' ' + str(mean_stress) + '\n')
 
             with open("stress_tensor_0.txt", 'a') as file:
-                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_porosity) + ' ' \
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_desnity) + ' ' \
                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
             self.measured_stress_list.append(mean_stress)
@@ -200,7 +202,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     #max_particle_velocity = self.GetMaximumVelocity()
 
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
-                    if mean_stress < 5000 * 1.2: # (target stress, packing density) in the accessiable region
+                    target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+                    target_mean_stress = (target_stress[0] + target_stress[1] + target_stress[2]) / 3
+                    if mean_stress < target_mean_stress * 1.2: # (target stress, packing density) in the accessiable region
                         self.second_stage_flag = True
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
@@ -213,7 +217,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.second_stage_flag = True
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
-                        if mean_stress > 5000 * 1.2:
+                        if mean_stress > target_mean_stress * 1.2:
                             self.is_in_inaccessibale_region2 = True
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
@@ -225,8 +229,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             else:
                 mad = 0.0
                 target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+                target_mean_stress = (target_stress[0] + target_stress[1] + target_stress[2]) / 3
                 if len(self.measured_stress_list) > 5:
-                    mad = np.mean([abs(x - target_stress[0]) for x in self.measured_stress_list[-5:]])
+                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
                 
                 if self.ZeroFrictionPhase:
                     for properties in self.spheres_model_part.Properties:
@@ -242,7 +247,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:
-                        if abs(self.final_packing_porosity - self.target_porosity) > 0.0001:
+                        if abs(self.final_packing_desnity - self.target_packing_density) > 0.0001:
                             for properties in self.spheres_model_part.Properties:
                                 for subproperties in properties.GetSubProperties():
                                     subproperties[STATIC_FRICTION] = 0.0
@@ -273,7 +278,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         return self.normalized_kinematic_energy
     
-    def MeasureTotalPorosityOfFinalPacking(self):
+    def MeasureTotalPackingDensityOfFinalPacking(self):
         
         selected_element_volume = 0.0
         for node in self.spheres_model_part.Nodes:
@@ -281,9 +286,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             element_volume = 4/3 * math.pi * r * r * r
             selected_element_volume += element_volume
 
-        self.final_packing_porosity = 1 - (selected_element_volume / self.final_packing_volume)
+        self.final_packing_desnity = selected_element_volume / self.final_packing_volume
 
-        print("Currently porosity is {}".format(self.final_packing_porosity))
+        print("Currently packing density is {}".format(self.final_packing_desnity))
 
     def UpdateFinalPackingVolume(self):
          

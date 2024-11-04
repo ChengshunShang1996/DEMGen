@@ -26,7 +26,7 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         domain_scale_multiplier = self.parameters["random_particle_generation_parameters"]["domain_scale_multiplier"]
         aim_file_name = 'inletPGDEM_ini.mdpa'
-        self.parameters["random_particle_generation_parameters"]["aim_packing_density"] = self.try_packing_desnity
+        self.parameters["random_particle_generation_parameters"]["target_packing_density"] = self.try_packing_desnity
 
         CreatIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path)
         CreatIniCases.CreatParticles(RVE_size)
@@ -54,14 +54,14 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
 
         self.Initialization(parameters, ini_path)
         packing_num = self.parameters["packing_num"]
-        aim_packing_density = self.parameters["random_particle_generation_parameters"]["aim_packing_density"]
-        aim_packing_density_list = [aim_packing_density-0.002, aim_packing_density-0.005, aim_packing_density-0.01, aim_packing_density-0.02, aim_packing_density-0.05]
+        target_packing_density = self.parameters["random_particle_generation_parameters"]["target_packing_density"]
+        target_packing_density_list = [target_packing_density-0.002, target_packing_density-0.005, target_packing_density-0.01, target_packing_density-0.02, target_packing_density-0.05]
         self.packing_cnt = 1
         while self.packing_cnt <= packing_num:
             self.last_try = False
-            for try_packing_desnity in aim_packing_density_list:
+            for try_packing_desnity in target_packing_density_list:
                 self.try_packing_desnity = try_packing_desnity
-                if try_packing_desnity == aim_packing_density_list[-1]:
+                if try_packing_desnity == target_packing_density_list[-1]:
                     self.last_try = True
                 self.CreatInitialCases()
                 success_marker = self.RunDEM()

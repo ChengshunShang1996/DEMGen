@@ -19,11 +19,11 @@
     "BoundingBoxServoLoadingSettings":{
         "BoundingBoxServoLoadingType"      : "isotropic",
         "BoundingBoxServoLoadingStress"    : [5e3, 5e3, 5e3],
-        "BoundingBoxServoLoadingFactor"    : 5,
+        "BoundingBoxServoLoadingFactor"    : 1,
         "BoundingBoxServoLoadingFrequency" : 10,
         "BoundingBoxServoLoadingVelocityMax": 1.0,
-        "MeanParticleDiameterD50"          : 2.1e-4,
-        "ParticleYoungsModulus"            : 3.5e10
+        "MeanParticleDiameterD50"          : 0.0002,
+        "ParticleYoungsModulus"            : 5e6
     },
     "dem_inlet_option"               : false,
     "dem_inlets_settings" : {

@@ -40,10 +40,8 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "aim_packing_density": 0.64,
-        "aim_packing_density_tolerance": 0.0,
-        "aim_mean_stress": 0.0,
-        "aim_mean_stress_tolerance": 100,
+        "target_packing_density": 0.64,
+        "target_packing_density_tolerance": 0.0,
         "domain_scale_multiplier": 1.0
     },
     "packing_charcterization_option" : true,
