@@ -14,6 +14,7 @@ import sys
 import shutil
 import math
 import numpy as np
+import pathlib
 
 import KratosMultiphysics
 from KratosMultiphysics import *
@@ -129,17 +130,20 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.measured_stress_list = []
         self.target_packing_density = 0.64
         self.ZeroFrictionPhase = False
-        self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
 
+    def ReadMaterialsFile(self):
+        adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
+        materials_file_abs_path = os.path.join(self.main_path, str(adapted_to_current_os_relative_path))
+        with open(materials_file_abs_path, 'r') as materials_file:
+            self.DEM_material_parameters = Parameters(materials_file.read())
+        
+        self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
+        self.DEM_material_parameters["material_relations"][0]["Variables"]["STATIC_FRICTION"].SetDouble(0.0)
+        self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].SetDouble(0.0)
+        
     def SetResetStart(self):
 
         self.start_reset_velocity = True
-
-        #set friction to zero
-        for properties in self.spheres_model_part.Properties:
-            for subproperties in properties.GetSubProperties():
-                subproperties[STATIC_FRICTION] = 0.0
-                subproperties[DYNAMIC_FRICTION] = 0.0
 
     def SetAllParticleVelocityToZero(self):
         for node in self.spheres_model_part.Nodes:
@@ -160,18 +164,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
     
     def OutputSolutionStep(self):
         
-        if not self.start_reset_velocity:
-            super().OutputSolutionStep()
-        else:
-            self.post_utils.ComputeMeanVelocitiesInTrap("Average_Velocity.txt", self.time, self.graphs_path)
-            self.DEMFEMProcedures.PrintGraph(self.time)
-            self.DEMFEMProcedures.PrintBallsGraph(self.time)
-            self.DEMFEMProcedures.PrintAdditionalGraphs(self.time, self._GetSolver())
-            self.DEMEnergyCalculator.CalculateEnergyAndPlot(self.time)
-
-            self._GetSolver().PrepareElementsForPrinting()
-            if self.DEM_parameters["ContactMeshOption"].GetBool():
-                self._GetSolver().PrepareContactElementsForPrinting()
+        super().OutputSolutionStep()
 
         if self.final_check_counter == self.final_check_frequency:
 
@@ -197,8 +190,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 
                 if self.start_reset_velocity:
                 
-                    self.PrintResultsForGid(self.time)
-
                     #max_particle_velocity = self.GetMaximumVelocity()
 
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
