@@ -18,6 +18,7 @@ import pathlib
 
 import KratosMultiphysics
 from KratosMultiphysics import *
+from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics import Logger
 
@@ -172,6 +173,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.UpdateFinalPackingVolume()
             self.MeasureTotalPackingDensityOfFinalPacking()
+
+            if self.final_packing_desnity > self.target_packing_density:
+                exit(0)
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
@@ -234,18 +238,20 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
                     print("The stress is stable, and the simulation reaches to the 2nd phase.")
                     if self.is_in_inaccessibale_region2:
-                        self.WriteOutMdpaFileOfParticles("inletPGDEM_post_inac2.mdpa")
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:
-                        if abs(self.final_packing_desnity - self.target_packing_density) > 0.0001:
+                        if (self.final_packing_desnity - self.target_packing_density) > 0.0001:
+                            exit(0)
+                        elif (self.target_packing_density - self.final_packing_desnity) > 0.0001:
                             for properties in self.spheres_model_part.Properties:
                                 for subproperties in properties.GetSubProperties():
                                     subproperties[STATIC_FRICTION] = 0.0
                                     subproperties[DYNAMIC_FRICTION] = 0.0
                             self.ZeroFrictionPhase = True
                         else:
-                            self.WriteOutMdpaFileOfParticles("inletPGDEM_post_1.mdpa")
+                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                             self.copy_files_and_run_show_results()
                             exit(0)
         self.final_check_counter += 1

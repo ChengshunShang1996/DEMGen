@@ -44,8 +44,8 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         else:
             os.system("python radius_expansion_method_with_servo_control_run.py")
         
+        os.chdir(current_path)
         if os.path.isfile("success.txt"):
-            os.chdir(current_path)
             return True
         else:
             return False
@@ -55,7 +55,7 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         self.Initialization(parameters, ini_path)
         packing_num = self.parameters["packing_num"]
         target_packing_density = self.parameters["random_particle_generation_parameters"]["target_packing_density"]
-        target_packing_density_list = [target_packing_density-0.002, target_packing_density-0.005, target_packing_density-0.01, target_packing_density-0.02, target_packing_density-0.05]
+        target_packing_density_list = [target_packing_density-0.02, target_packing_density-0.05, target_packing_density-0.1, target_packing_density-0.2, target_packing_density-0.5]
         self.packing_cnt = 1
         while self.packing_cnt <= packing_num:
             self.last_try = False

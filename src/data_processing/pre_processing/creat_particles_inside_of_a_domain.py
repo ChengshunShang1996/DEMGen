@@ -116,7 +116,7 @@ class CreatParticlesInsideOfADomain():
                     with open(aim_file_path_and_name, "w") as f_material_w:
                         for line in f_material.readlines():
                             if "self.target_packing_density =" in line:
-                                line = line.replace("0.64", str(1 - self.parameters["target_packing_density"].GetDouble()))
+                                line = line.replace("0.64", str(self.parameters["target_packing_density"].GetDouble()))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')

@@ -18,6 +18,7 @@ import pathlib
 
 import KratosMultiphysics
 from KratosMultiphysics import *
+from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics import Logger
 
@@ -224,7 +225,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
                 mad_threshold = 0.02 * target_stress[0]
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM_post_1.mdpa")
+                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.copy_files_and_run_show_results()
                     exit(0)
         self.final_check_counter += 1
