@@ -33,14 +33,14 @@ Y13 = []
 with open(aim_path_and_name, 'r') as stress_strain_data:
     for line in stress_strain_data:
         values = [float(s) for s in line.split()]
-        Y13.append(1 - values[2])
+        Y13.append(values[2])
 
 ax2.plot(X12, Y13, 'g->', label='Measured packing density', markersize=6, markerfacecolor='none')
 ax2.set_ylabel('Packing density')
 
-ax2.axhline(y=0.6095, color='gray', linestyle='--', label='Target packing density')
+ax2.axhline(y=0.64, color='gray', linestyle='--', label='Target packing density')
 
-ax2.set_ylim([0.6, 0.615])
+#ax2.set_ylim([0.6, 0.615])
 #plt.xlim([0.00035, 0.0008])
 #plt.ylim([0, 0.07])
 

@@ -22,7 +22,7 @@ class CreatParticlesInsideOfADomain():
 
         self.clear_old_cases_folder()
 
-    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path):
+    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_desnity = 0.0):
 
         self.particle_list = []
         self.particle_list_left = []
@@ -49,6 +49,11 @@ class CreatParticlesInsideOfADomain():
         parameters_file = open("ParametersDEMGen.json", 'r')
         self.parameters_all = Parameters(parameters_file.read())
         self.parameters = self.parameters_all["random_particle_generation_parameters"]
+        self.initial_target_packing_density = self.parameters["target_packing_density"].GetDouble()
+        if try_packing_desnity != 0.0:
+            self.parameters["target_packing_density"].SetDouble(try_packing_desnity)
+        print("try_packing_desnity = {}".format(try_packing_desnity))
+        print("target_packing_density = {}".format(self.parameters["target_packing_density"].GetDouble()))
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
@@ -116,7 +121,7 @@ class CreatParticlesInsideOfADomain():
                     with open(aim_file_path_and_name, "w") as f_material_w:
                         for line in f_material.readlines():
                             if "self.target_packing_density =" in line:
-                                line = line.replace("0.64", str(self.parameters["target_packing_density"].GetDouble()))
+                                line = line.replace("0.64", str(self.initial_target_packing_density))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
@@ -131,9 +136,10 @@ class CreatParticlesInsideOfADomain():
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
         target_packing_density = self.parameters["target_packing_density"].GetDouble()
         target_packing_density_tolerance = self.parameters["target_packing_density_tolerance"].GetDouble()
+        print("target_packing_density = {}".format(target_packing_density))
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
         aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (target_packing_density + target_packing_density_tolerance) * (radius_scale_multiplier ** 3)
-        
+
         while particle_volume < aim_volume:
 
             p_parameters_dict = {

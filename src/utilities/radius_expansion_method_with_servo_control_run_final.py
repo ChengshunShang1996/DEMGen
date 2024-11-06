@@ -202,6 +202,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
@@ -213,6 +217,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:

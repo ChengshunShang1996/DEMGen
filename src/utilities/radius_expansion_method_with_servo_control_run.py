@@ -173,9 +173,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.UpdateFinalPackingVolume()
             self.MeasureTotalPackingDensityOfFinalPacking()
-
-            if self.final_packing_desnity > self.target_packing_density:
-                exit(0)
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
@@ -194,6 +191,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 
                 if self.start_reset_velocity:
                 
+                    if self.final_packing_desnity > self.target_packing_density:
+                        print("The packing density is higher than the target packing density, the simulation will be terminated.")
+                        time.sleep(5)
+                        exit(0)
                     #max_particle_velocity = self.GetMaximumVelocity()
 
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
@@ -206,6 +207,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
@@ -217,6 +222,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:
@@ -242,9 +251,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:
-                        if (self.final_packing_desnity - self.target_packing_density) > 0.0001:
+                        if (self.final_packing_desnity - self.target_packing_density) > 0.005:
+                            print("2 stage The packing density is higher than the target packing density, the simulation will be terminated.")
+                            time.sleep(5)
                             exit(0)
-                        elif (self.target_packing_density - self.final_packing_desnity) > 0.0001:
+                        elif (self.target_packing_density - self.final_packing_desnity) > 0.005:
                             for properties in self.spheres_model_part.Properties:
                                 for subproperties in properties.GetSubProperties():
                                     subproperties[STATIC_FRICTION] = 0.0
