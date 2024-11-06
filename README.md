@@ -37,8 +37,9 @@ This code aims to achieve a standard particle packing generation framework for g
 
 This program can be used for DEM particle packing generation. From this point of view, it can be treated as a pre-processing tool for any 3D DEM code. Meanwhile, it can be used for quantitative packing characterization, allowing users to have a deep insight into the material properties from the view of geometry components. The main characteristics of this framework are:
 
-- It provides a standard framework for particle packing generation.
+- It provides a standardized framework for particle packing generation.
 - Both dynamic methods and constructive methods are available for particle packing generation (The constructive method is limited to regular arrangement up to now).
+- Providing a method (radius expansion method with servo control) for achieving both packing density and initial stress.
 - The periodic boundary is available for boundary conditions, allowing users to clone a small RVE packing to a large one.
 - Providing a series of tools for packing characterization.
 
@@ -57,10 +58,12 @@ Environment variable setting in a Command Prompt:
 
 > set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'
 
-For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment has been attached in the source code "./src/external/kratos". For using Kratos, the following environment variable need to be set in a Command Prompt:
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment (Python 3.10.11 and Visual Studio 2022) has been attached in the source code "./src/external/kratos". For using Kratos, the following environment variable need to be set in a Command Prompt:
 
 > set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos \
 > set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos/libs
+
+Tip: This compiled Kratos may not work properly due to the different system environment setting. So it is recommanded to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
 
 ## Instructions
 
@@ -193,6 +196,7 @@ No liability and warranty are provided.
 
 [demapp_link]:          https://github.com/KratosMultiphysics/Kratos/tree/master/applications/DEMApplication
 [kratos_link]:          https://github.com/KratosMultiphysics/Kratos
+[kratos_install_link]:  https://github.com/KratosMultiphysics/Kratos/blob/master/INSTALL.md
 [json_link]:            https://www.json.org/
 [contribute_link]:      https://github.com/ChengshunShang1996/DEMGen/blob/main/CONTRIBUTING.md
 [citation_link]:        https://github.com/ChengshunShang1996/DEMGen/blob/main/CITATION.cff

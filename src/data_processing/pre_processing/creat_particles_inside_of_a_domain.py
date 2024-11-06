@@ -107,6 +107,18 @@ class CreatParticlesInsideOfADomain():
             aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v1.4.py')
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
+        elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method_with_servo_control":
+            seed_file_name_list = ['radius_expansion_method_with_servo_control_run.py', 'radius_expansion_method_with_servo_control_run_final.py']
+            for seed_file_name in seed_file_name_list:
+                seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
+                aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "self.target_packing_density =" in line:
+                                line = line.replace("0.64", str(self.parameters["target_packing_density"].GetDouble()))
+                            f_material_w.write(line)
+
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
@@ -117,10 +129,10 @@ class CreatParticlesInsideOfADomain():
         particle_cnt = 1
         particle_volume = 0
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
-        aim_porosity = self.parameters["aim_porosity"].GetDouble()
-        aim_porosity_tolerance = self.parameters["aim_porosity_tolerance"].GetDouble()
+        target_packing_density = self.parameters["target_packing_density"].GetDouble()
+        target_packing_density_tolerance = self.parameters["target_packing_density_tolerance"].GetDouble()
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (1 - aim_porosity - aim_porosity_tolerance) * (radius_scale_multiplier ** 3)
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (target_packing_density + target_packing_density_tolerance) * (radius_scale_multiplier ** 3)
         
         while particle_volume < aim_volume:
 

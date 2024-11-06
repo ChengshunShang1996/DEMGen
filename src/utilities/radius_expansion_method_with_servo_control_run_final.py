@@ -5,23 +5,27 @@ __version__     = "0.0.1"
 __maintainer__  = "Chengshun Shang"
 __email__       = "cshang@cimne.upc.edu"
 __status__      = "development"
-__date__        = "June 26, 2024"
+__date__        = "Dec 02, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
 import time
 import sys
 import shutil
+import math
+import numpy as np
+import pathlib
 
 import KratosMultiphysics
 from KratosMultiphysics import *
+from KratosMultiphysics.DEMApplication import *
 from KratosMultiphysics.DEMApplication.DEM_analysis_stage import DEMAnalysisStage
 from KratosMultiphysics import Logger
 
 if os.path.exists("normalized_kinematic_energy.txt"):
     os.remove("normalized_kinematic_energy.txt")
-if os.path.exists("stress_tensor_averaged.txt"):
-    os.remove("stress_tensor_averaged.txt")
+if os.path.exists("stress_tensor_0.txt"):
+    os.remove("stress_tensor_0.txt")
 if os.path.exists("inletPGDEM.mdpa"):
     os.remove("inletPGDEM.mdpa")
 
@@ -111,8 +115,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.normalized_kinematic_energy = 1e10
         self.ini_p_pram_list = ini_p_pram_list
         self.start_reset_velocity = False
-        self.check_status = False
         self.second_stage_flag = False
+        self.is_in_inaccessibale_region2 = False
+        self.is_start_servo_control = False
 
     def Initialize(self):
         super().Initialize()
@@ -121,7 +126,20 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter = 0
         self.final_check_counter_2 = 0
         self.final_check_counter_reset = 0
-    
+        self.measured_stress_list = []
+        self.target_packing_density = 0.64
+        self.ZeroFrictionPhase = False
+
+    def ReadMaterialsFile(self):
+        adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
+        materials_file_abs_path = os.path.join(self.main_path, str(adapted_to_current_os_relative_path))
+        with open(materials_file_abs_path, 'r') as materials_file:
+            self.DEM_material_parameters = Parameters(materials_file.read())
+        
+        self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
+        self.DEM_material_parameters["material_relations"][0]["Variables"]["STATIC_FRICTION"].SetDouble(0.0)
+        self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].SetDouble(0.0)
+
     def SetResetStart(self):
 
         self.start_reset_velocity = True
@@ -145,58 +163,71 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
     
     def OutputSolutionStep(self):
         
-        if not self.start_reset_velocity:
-            super().OutputSolutionStep()
-        else:
-            self.post_utils.ComputeMeanVelocitiesInTrap("Average_Velocity.txt", self.time, self.graphs_path)
-            self.DEMFEMProcedures.PrintGraph(self.time)
-            self.DEMFEMProcedures.PrintBallsGraph(self.time)
-            self.DEMFEMProcedures.PrintAdditionalGraphs(self.time, self._GetSolver())
-            self.DEMEnergyCalculator.CalculateEnergyAndPlot(self.time)
-
-            self._GetSolver().PrepareElementsForPrinting()
-            if self.DEM_parameters["ContactMeshOption"].GetBool():
-                self._GetSolver().PrepareContactElementsForPrinting()
+        super().OutputSolutionStep()
 
         if self.final_check_counter == self.final_check_frequency:
 
             self.final_check_counter = 0
 
-            self.check_status = True
+            self.UpdateFinalPackingVolume()
+            self.MeasureTotalPackingDensityOfFinalPacking()
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str(self.normalized_kinematic_energy) + '\n')
 
-            '''
-            side_length = 0.0025
-            center_x = 0.0
-            center_y = 0.0
-            center_z = 0.0
-            stress_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, "stress_tensor")
-            '''
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
-            with open("stress_tensor_averaged.txt", 'a') as file:
-                file.write(str(self.time) + ' ' + str(mean_stress) + '\n')
+            with open("stress_tensor_0.txt", 'a') as file:
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
+                               + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
-            # n = 5e6;   Rate 100 = 1 / (Delta t * n); t = Delta t * n
+            self.measured_stress_list.append(mean_stress)
 
-            if self.start_reset_velocity:
+            if not self.is_start_servo_control:
                 
-                self.PrintResultsForGid(self.time)
-
-                max_particle_velocity = self.GetMaximumVelocity()
-
-                if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
-                    self.second_stage_flag = True
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                if self.start_reset_velocity:
+                
                     self.PrintResultsForGid(self.time)
+
+                    #max_particle_velocity = self.GetMaximumVelocity()
+
+                    #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
+                    target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+                    target_mean_stress = (target_stress[0] + target_stress[1] + target_stress[2]) / 3
+                    if mean_stress < target_mean_stress * 1.2: # (target stress, packing density) in the accessiable region
+                        self.second_stage_flag = True
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        self.PrintResultsForGid(self.time)
+                        self.is_start_servo_control = True
+                        self.parameters["BoundingBoxMoveOption"].SetBool(True)
+                        self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        #self.copy_files_and_run_show_results()
+                        #exit(0)
+                    elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
+                        self.second_stage_flag = True
+                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        self.PrintResultsForGid(self.time)
+                        if mean_stress > target_mean_stress * 1.2:
+                            self.is_in_inaccessibale_region2 = True
+                        self.is_start_servo_control = True
+                        self.parameters["BoundingBoxMoveOption"].SetBool(True)
+                        self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        #self.copy_files_and_run_show_results()
+                        #exit(0)
+                    else:
+                        self.SetAllParticleVelocityToZero()
+            else:
+                mad = 0.0
+                target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+                if len(self.measured_stress_list) > 5:
+                    mad = np.mean([abs(x - target_stress[0]) for x in self.measured_stress_list[-5:]])
+
+                mad_threshold = 0.02 * target_stress[0]
+                if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     self.copy_files_and_run_show_results()
                     exit(0)
-                else:
-                    self.SetAllParticleVelocityToZero()
-
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
@@ -217,6 +248,24 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
     def PassNormalizedKineticEnergy(self):
 
         return self.normalized_kinematic_energy
+    
+    def MeasureTotalPackingDensityOfFinalPacking(self):
+        
+        selected_element_volume = 0.0
+        for node in self.spheres_model_part.Nodes:
+            r = node.GetSolutionStepValue(RADIUS)
+            element_volume = 4/3 * math.pi * r * r * r
+            selected_element_volume += element_volume
+
+        self.final_packing_density = selected_element_volume / self.final_packing_volume
+
+        print("Currently packing density is {}".format(self.final_packing_density))
+
+    def UpdateFinalPackingVolume(self):
+         
+        self.final_packing_volume = (self.BoundingBoxMaxX_update - self.BoundingBoxMinX_update) * \
+                                (self.BoundingBoxMaxY_update - self.BoundingBoxMinY_update) * \
+                                (self.BoundingBoxMaxZ_update - self.BoundingBoxMinZ_update)
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 

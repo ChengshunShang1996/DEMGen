@@ -24,4 +24,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-__all__=["dynamic_method", "gravitational_deposition_method", "isotropic_compression_method", "radius_expansion_method"]
+__all__=["dynamic_method", "gravitational_deposition_method", "isotropic_compression_method", "radius_expansion_method",\
+         "radius_expansion_method_with_servo_control"]

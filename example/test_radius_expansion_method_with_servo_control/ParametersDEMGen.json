@@ -1,13 +1,13 @@
 {
     "problem_name"   : "inletPG",
     "generator_type" : "dynamic",
-    "generator_name" : "radius_expansion_method",
+    "generator_name" : "radius_expansion_method_with_servo_control",
     "packing_num"    : 1,
     "domain_length_x": 0.004,
     "domain_length_y": 0.004,
     "domain_length_z": 0.004,
     "particle_radius_max": 0.0002,
-    "dem_time_step"  : 1e-6,
+    "dem_time_step"  : 1e-7,
     "periodic_boundary_option": true,
     "inlet_properties":{
         "RIGID_BODY_MOTION"        : 0,
@@ -40,7 +40,7 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "target_packing_density": 0.64,
+        "target_packing_density": 0.61,
         "target_packing_density_tolerance": 0.0,
         "domain_scale_multiplier": 1.0
     },

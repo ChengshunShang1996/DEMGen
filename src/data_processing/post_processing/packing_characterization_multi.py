@@ -9,6 +9,7 @@ __date__        = "June 21, 2024"
 __license__     = "BSD 2-Clause License"
 #/////////////////////////////////////////////////
 
+import os
 from data_processing.post_processing.packing_characterization import PackingCharacterization
 
 class PackingCharacterizationMulti(PackingCharacterization):
