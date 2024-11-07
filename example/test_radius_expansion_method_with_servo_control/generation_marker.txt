@@ -1,5 +1,2 @@
 Generation 1 - 0.615
 Generation 1 - 0.585
-Generation 1 - 0.56
-Generation 1 - 0.535
-Generation 1 - 0.485

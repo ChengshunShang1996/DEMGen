@@ -38,7 +38,7 @@ with open(aim_path_and_name, 'r') as stress_strain_data:
 ax2.plot(X12, Y13, 'g->', label='Measured packing density', markersize=6, markerfacecolor='none')
 ax2.set_ylabel('Packing density')
 
-ax2.axhline(y=0.64, color='gray', linestyle='--', label='Target packing density')
+ax2.axhline(y=0.635, color='gray', linestyle='--', label='Target packing density')
 
 #ax2.set_ylim([0.6, 0.615])
 #plt.xlim([0.00035, 0.0008])

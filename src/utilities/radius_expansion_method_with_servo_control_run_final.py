@@ -128,7 +128,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter_reset = 0
         self.measured_stress_list = []
         self.target_packing_density = 0.64
-        self.ZeroFrictionPhase = False
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
