@@ -6,7 +6,7 @@
 ![License][license-image]
 ![Contributing][contributing-image]
 
-[release-image]: https://img.shields.io/badge/release-0.0.1-green.svg?style=flat 
+[release-image]: https://img.shields.io/badge/release-1.0.0-green.svg?style=flat 
 
 [license-image]: https://img.shields.io/badge/license-BSD-green.svg?style=flat
 
