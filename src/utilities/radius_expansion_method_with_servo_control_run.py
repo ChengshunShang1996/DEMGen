@@ -131,6 +131,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.measured_stress_list = []
         self.target_packing_density = 0.64
         self.ZeroFrictionPhase = False
+        self.zero_friction_phase_counter = 0
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
@@ -167,15 +168,21 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         
         super().OutputSolutionStep()
 
+        if self.ZeroFrictionPhase and self.zero_friction_phase_counter == 100:
+            self.zero_friction_phase_counter = 0
+            for properties in self.spheres_model_part.Properties:
+                for subproperties in properties.GetSubProperties():
+                    subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                    subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
+            self.ZeroFrictionPhase = False
+        self.zero_friction_phase_counter += 1
+
         if self.final_check_counter == self.final_check_frequency:
 
             self.final_check_counter = 0
 
             self.UpdateFinalPackingVolume()
             self.MeasureTotalPackingDensityOfFinalPacking()
-
-            if self.final_packing_desnity > self.target_packing_density:
-                exit(0)
             
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
@@ -194,6 +201,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 
                 if self.start_reset_velocity:
                 
+                    if self.final_packing_desnity > self.target_packing_density:
+                        print("The packing density is higher than the target packing density, the simulation will be terminated.")
+                        time.sleep(5)
+                        exit(0)
                     #max_particle_velocity = self.GetMaximumVelocity()
 
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
@@ -206,6 +217,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
@@ -217,6 +232,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:
@@ -228,21 +247,26 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 if len(self.measured_stress_list) > 5:
                     mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
                 
+                '''
                 if self.ZeroFrictionPhase:
                     for properties in self.spheres_model_part.Properties:
                         for subproperties in properties.GetSubProperties():
                             subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
-                            subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
+                            subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient'''
 
                 mad_threshold = 0.02 * target_stress[0]
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
                     print("The stress is stable, and the simulation reaches to the 2nd phase.")
                     if self.is_in_inaccessibale_region2:
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        with open("success.txt", 'w') as file:
+                            file.write("Simulation completed successfully.")
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:
                         if (self.final_packing_desnity - self.target_packing_density) > 0.0001:
+                            print("2 stage The packing density is higher than the target packing density, the simulation will be terminated.")
+                            time.sleep(5)
                             exit(0)
                         elif (self.target_packing_density - self.final_packing_desnity) > 0.0001:
                             for properties in self.spheres_model_part.Properties:
@@ -250,8 +274,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                     subproperties[STATIC_FRICTION] = 0.0
                                     subproperties[DYNAMIC_FRICTION] = 0.0
                             self.ZeroFrictionPhase = True
+                            self.zero_friction_phase_counter = 0
                         else:
                             self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                            with open("success.txt", 'w') as file:
+                                file.write("Simulation completed successfully.")
                             self.copy_files_and_run_show_results()
                             exit(0)
         self.final_check_counter += 1

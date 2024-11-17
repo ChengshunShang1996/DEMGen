@@ -1,4 +1,4 @@
-# DEMGen: A Standard Particle Packing Generator for the Discrete Element Method
+# DEMGen: A Standardized Particle Packing Generator for the Discrete Element Method
 
 <p align=center><img height="80.0%" width="80.0%" src="docs/images/LOGO1.png"></p>
 
@@ -14,7 +14,7 @@
 
 
 
-This code aims to achieve a standard particle packing generation framework for granular materials. This code not only allows users to generate a series of random packings that fulfill their requirements (such as particle size distribution, porosity, and stress) but also provides a series of tools for particle packing characterization of internally or externally generated packings.
+This code aims to achieve a standardized particle packing generation framework for granular materials. This code not only allows users to generate a series of random packings that fulfill their requirements (such as particle size distribution, porosity, and stress) but also provides a series of tools for particle packing characterization of internally or externally generated packings.
 
 
 ## Table of Contents
@@ -87,11 +87,22 @@ For running the particle packing generation process using different generation m
 
 #### Packing Characterization
 
-In progress...
+If the related parameters in [ParametersDEMGen.json][ParametersDEMGen_link] are 'activated', the partcile packing characterization process will be run automatically. Those parameters are:
+
+> "packing_charcterization_option" : true/flase,\
+> "regular_shape_option"           : true/flase,\
+> "packing_charcterization_setting": \
+> {\
+>   "RVE_lambda_initial"                      : 1,\
+>   "RVE_lambda_increment"                    : 1,\
+>   "measure_density_option"                  : true/flase,\
+>   "measure_mean_coordination_number_option" : true/flase,\
+>   "measure_anisotropy_option"               : true/flase \
+> }
 
 ### Checking Results
 
-In the case folder or in the generated case folder, the will be a folder call "show packing", there you can find the post-procesing file of the generated packing. Then it can be ckecked in Paraview or Gid.
+In the case folder or in the generated case folder, there will be a folder call "show packing", there you can find the post-procesing file of the generated packing. Then it can be checked in Paraview or Gid.
 
 ## Examples
 
@@ -102,6 +113,7 @@ Examples are available inside the folder [examples][examples_link].
 - [test_gravitational_deposition_method][test_gravitational_deposition_method_link]
 - [test_isotropic_compression_method][test_isotropic_compression_method_link]
 - [test_radius_expansion_method][test_radius_expansion_method_link]
+- [test_radius_expansion_method_with_servo_control][test_radius_expansion_method_with_servo_control_link]
 
 ### Constructive methods
 
@@ -162,7 +174,7 @@ Some results from example [test_cubic_arrangement_method][test_cubic_arrangement
 
 ## Documentation
 
-In progress... (Just checking this README.md for information)
+Please read this README.md for information.
 
 ## How to Contribute
 
@@ -218,5 +230,6 @@ No liability and warranty are provided.
 [test_gravitational_deposition_method_link]: ./example/test_gravitational_deposition_method
 [test_isotropic_compression_method_link]:    ./example/test_isotropic_compression_method
 [test_radius_expansion_method_link]:         ./example/test_radius_expansion_method
+[test_radius_expansion_method_with_servo_control_link]: ./example/test_radius_expansion_method_with_servo_control
 [test_cubic_arrangement_method_link]:        ./example/test_cubic_arrangement_method
 [test_hpc_arrangement_method_link]:          ./example/test_hpc_arrangement_method

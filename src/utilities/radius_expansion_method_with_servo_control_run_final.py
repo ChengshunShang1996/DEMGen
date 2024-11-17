@@ -128,7 +128,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter_reset = 0
         self.measured_stress_list = []
         self.target_packing_density = 0.64
-        self.ZeroFrictionPhase = False
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
@@ -202,6 +201,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     elif self.normalized_kinematic_energy < 1e-8: # (target stress, packing density) in the inaccessiable region (2)
@@ -213,6 +216,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
                         self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                        for properties in self.spheres_model_part.Properties:
+                            for subproperties in properties.GetSubProperties():
+                                subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:

@@ -33,25 +33,25 @@ Y13 = []
 with open(aim_path_and_name, 'r') as stress_strain_data:
     for line in stress_strain_data:
         values = [float(s) for s in line.split()]
-        Y13.append(1 - values[2])
+        Y13.append(values[2])
 
 ax2.plot(X12, Y13, 'g->', label='Measured packing density', markersize=6, markerfacecolor='none')
 ax2.set_ylabel('Packing density')
 
-ax2.axhline(y=0.6095, color='gray', linestyle='--', label='Target packing density')
+ax2.axhline(y=0.635, color='gray', linestyle='--', label='Target packing density')
 
-ax2.set_ylim([0.6, 0.615])
+#ax2.set_ylim([0.6, 0.615])
 #plt.xlim([0.00035, 0.0008])
 #plt.ylim([0, 0.07])
 
-ax1.tick_params(axis='both', which='major', labelsize=14)
-ax2.tick_params(axis='both', which='major', labelsize=14)
-ax1.xaxis.label.set_size(16)
-ax1.yaxis.label.set_size(16)
-ax2.yaxis.label.set_size(16)
+ax1.tick_params(axis='both', which='major', labelsize=10)
+ax2.tick_params(axis='both', which='major', labelsize=10)
+ax1.xaxis.label.set_size(10)
+ax1.yaxis.label.set_size(10)
+ax2.yaxis.label.set_size(10)
 
 lines1, labels1 = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=14)
+ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=10)
 
 plt.show()
