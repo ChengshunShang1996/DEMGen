@@ -1,14 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using these metadata."
-title: "DEMGen: A Standardized Particle Packing Generator for Discrete Element Method"
+title: "DEMGen: A Standardized Particle Packing Generator for the Discrete Element Method"
 type: software
 authors:
   - family-names: Shang
     given-names: Chengshun
 version: 1.0.0
-date-released: "2024-10-01"
+date-released: "2024-11-17"
 identifiers:
   - type: doi
-    value: --
-license: BSD
+    value: 10.5281/zenodo.14176116
+license: BSD-2-Clause license
 repository-code: "https://github.com/ChengshunShang1996/DEMGen"
