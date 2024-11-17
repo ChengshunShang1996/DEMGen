@@ -40,15 +40,15 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "target_packing_density": 0.635,
+        "target_packing_density": 0.5,
         "target_packing_density_tolerance": 0.0,
         "domain_scale_multiplier": 1.0
     },
     "packing_charcterization_option" : true,
     "regular_shape_option"           : true,
     "packing_charcterization_setting": {
-        "RVE_lambda_initial"                      : 4,
-        "RVE_lambda_increment"                    : 2,
+        "RVE_lambda_initial"                      : 1,
+        "RVE_lambda_increment"                    : 1,
         "measure_density_option"                  : true,
         "measure_mean_coordination_number_option" : true,
         "measure_anisotropy_option"               : true

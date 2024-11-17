@@ -113,7 +113,7 @@ class CreatParticlesInsideOfADomain():
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method_with_servo_control":
-            seed_file_name_list = ['radius_expansion_method_with_servo_control_run.py', 'radius_expansion_method_with_servo_control_run_final.py']
+            seed_file_name_list = ['radius_expansion_method_with_servo_control_run.py', 'radius_expansion_method_with_servo_control_run_final.py', 'plot_stress.py']
             for seed_file_name in seed_file_name_list:
                 seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
                 aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
@@ -122,6 +122,8 @@ class CreatParticlesInsideOfADomain():
                         for line in f_material.readlines():
                             if "self.target_packing_density =" in line:
                                 line = line.replace("0.64", str(self.initial_target_packing_density))
+                            if "ax2.axhline(y=" in line:
+                                line = line.replace("0.635", str(self.initial_target_packing_density))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')

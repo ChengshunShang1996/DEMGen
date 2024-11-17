@@ -259,6 +259,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     print("The stress is stable, and the simulation reaches to the 2nd phase.")
                     if self.is_in_inaccessibale_region2:
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        with open("success.txt", 'w') as file:
+                            file.write("Simulation completed successfully.")
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:

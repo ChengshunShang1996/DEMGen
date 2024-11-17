@@ -44,14 +44,14 @@ ax2.axhline(y=0.635, color='gray', linestyle='--', label='Target packing density
 #plt.xlim([0.00035, 0.0008])
 #plt.ylim([0, 0.07])
 
-ax1.tick_params(axis='both', which='major', labelsize=14)
-ax2.tick_params(axis='both', which='major', labelsize=14)
-ax1.xaxis.label.set_size(16)
-ax1.yaxis.label.set_size(16)
-ax2.yaxis.label.set_size(16)
+ax1.tick_params(axis='both', which='major', labelsize=10)
+ax2.tick_params(axis='both', which='major', labelsize=10)
+ax1.xaxis.label.set_size(10)
+ax1.yaxis.label.set_size(10)
+ax2.yaxis.label.set_size(10)
 
 lines1, labels1 = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=14)
+ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=10)
 
 plt.show()
