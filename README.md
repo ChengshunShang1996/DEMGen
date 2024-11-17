@@ -12,6 +12,7 @@
 
 [contributing-image]: https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14176116.svg)](https://doi.org/10.5281/zenodo.14176116)
 
 
 This code aims to achieve a standardized particle packing generation framework for granular materials. This code not only allows users to generate a series of random packings that fulfill their requirements (such as particle size distribution, porosity, and stress) but also provides a series of tools for particle packing characterization of internally or externally generated packings.
