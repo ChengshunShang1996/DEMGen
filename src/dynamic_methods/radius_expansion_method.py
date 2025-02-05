@@ -45,6 +45,9 @@ class RadiusExpansionMethod(DynamicMethod):
             aim_folder_name = "case_" + str(packing_cnt)
             aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
             os.chdir(aim_path)
-            os.system("python radius_expansion_method_run_v1.4.py")
+            if os.name == 'nt': # for windows
+                os.system("python radius_expansion_method_run_v1.4.py")
+            else: # for linux
+                os.system("python3 radius_expansion_method_run_v1.4.py")
             os.chdir(current_path)
             packing_cnt += 1

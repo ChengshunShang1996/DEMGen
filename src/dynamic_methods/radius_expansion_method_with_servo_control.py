@@ -39,9 +39,15 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
         os.chdir(aim_path)
         if self.last_try:
-            os.system("python radius_expansion_method_with_servo_control_run_final.py")
+            if os.name == 'nt': # for windows
+                os.system("python radius_expansion_method_with_servo_control_run_final.py")
+            else: # for linux
+                os.system("python3 radius_expansion_method_with_servo_control_run_final.py")
         else:
-            os.system("python radius_expansion_method_with_servo_control_run.py")
+            if os.name == 'nt': # for windows
+                os.system("python radius_expansion_method_with_servo_control_run.py")
+            else: # for linux
+                os.system("python3 radius_expansion_method_with_servo_control_run.py")
         
         if os.path.isfile("success.txt"):
             os.chdir(current_path)

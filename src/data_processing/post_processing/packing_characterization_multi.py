@@ -36,5 +36,8 @@ class PackingCharacterizationMulti(PackingCharacterization):
             aim_folder_name = "case_" + str(packing_cnt)
             aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
             os.chdir(aim_path)
-            os.system("python isotropic_compression_method_run.py")
+            if os.name == 'nt': # for windows
+                os.system("python isotropic_compression_method_run.py")
+            else: # for linux
+                os.system("python3 isotropic_compression_method_run.py")
             packing_cnt += 1

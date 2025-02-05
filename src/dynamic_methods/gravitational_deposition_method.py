@@ -44,7 +44,10 @@ class GravitationalDepositionMethod(DynamicMethod):
             aim_folder_name = "case_" + str(packing_cnt)
             aim_path = os.path.join(current_path, "generated_cases", aim_folder_name)
             os.chdir(aim_path)
-            os.system("python gravitational_deposition_method_run.py")
+            if os.name == 'nt': # for windows
+                os.system("python gravitational_deposition_method_run.py")
+            else: # for linux
+                os.system("python3 gravitational_deposition_method_run.py")
             os.chdir(current_path)
             packing_cnt += 1
 

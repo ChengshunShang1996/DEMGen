@@ -35,7 +35,10 @@ class PackingCharacterizationSingle(PackingCharacterization):
             aim_path = os.path.join(os.getcwd(), 'generated_cases', 'case_1', cases_folder_name)
         
         os.chdir(aim_path)
-        os.system("python packing_characterization_run.py")
+        if os.name == 'nt': # for windows
+            os.system("python packing_characterization_run.py")
+        else: # for linux
+            os.system("python3 packing_characterization_run.py")
 
     def clear_old_cases_folder(self):
 
