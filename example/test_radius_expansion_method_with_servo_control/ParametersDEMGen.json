@@ -9,21 +9,7 @@
     "particle_radius_max": 0.0002,
     "dem_time_step"  : 1e-7,
     "periodic_boundary_option": true,
-    "inlet_properties":{
-        "RIGID_BODY_MOTION"        : 0,
-        "INJECTOR_ELEMENT_TYPE"    : "SphericParticle3D",
-        "ELEMENT_TYPE"             : "SphericParticle3D",
-        "CONTAINS_CLUSTERS"        : 0,
-        "VELOCITY"                 : [0.0, -0.25, 0.0],
-        "MAX_RAND_DEVIATION_ANGLE" : 0.01,
-        "INLET_NUMBER_OF_PARTICLES": 50000000,
-        "IMPOSED_MASS_FLOW_OPTION" : 0,
-        "INLET_START_TIME"         : 0.0,
-        "INLET_STOP_TIME"          : 100,
-        "RADIUS"                   : 0.0003,
-        "PROBABILITY_DISTRIBUTION" : "discrete",
-        "STANDARD_DEVIATION"       : 0.0
-    },
+    "inlet_properties":{},
     "random_particle_generation_parameters":{
         "random_variable_settings" : {
             "possible_values" : [0.00015, 0.0002],
@@ -40,7 +26,7 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "target_packing_density": 0.5,
+        "target_packing_density": 0.61,
         "target_packing_density_tolerance": 0.0,
         "domain_scale_multiplier": 1.0
     },
