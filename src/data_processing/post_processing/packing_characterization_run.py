@@ -178,7 +178,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, density_list, marker='o')
                     
-                    plt.xlabel('$/lambda$')
+                    plt.xlabel('$\lambda$')
                     plt.ylabel('Packing density')
                     plt.title(f'Measured packing density')
                     #plt.legend()
@@ -200,7 +200,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, mcn_list, marker='o')
                     
-                    plt.xlabel('$/lambda$')
+                    plt.xlabel('$\lambda$')
                     plt.ylabel('MCN')
                     plt.title(f'Measured mean coordination number (MCN)')
                     #plt.legend()
@@ -232,7 +232,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
                     plt.axhline(y=1/3, color='blue', linestyle='--')
                     
-                    plt.xlabel('$/lambda$')
+                    plt.xlabel('$\lambda$')
                     plt.ylabel('Eigenvalue')
                     plt.title(f'Measured eigenvalues')
                     plt.legend()
@@ -244,7 +244,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, anisotrpy_intensity_list, marker='o')
                     
-                    plt.xlabel('$/lambda$')
+                    plt.xlabel('$\lambda$')
                     plt.ylabel('Anisotrpy intensity')
                     plt.title(f'Measured anisotrpy intensity')
                     #plt.legend()
