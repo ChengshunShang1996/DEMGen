@@ -24,7 +24,7 @@ class ConstructiveMethod():
         self.particle_list = []
         self.dt = self.parameters['max_time_step']
 
-    def CreatInitialPackings(self):
+    def CreateInitialPackings(self):
 
         try:
             int("string") 
@@ -33,7 +33,7 @@ class ConstructiveMethod():
     
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
-        self.ClearOldAndCreatNewShowPackingCaseFolder()
+        self.ClearOldAndCreateNewShowPackingCaseFolder()
         aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
 
         # clean the exsisted file first
@@ -112,7 +112,7 @@ class ConstructiveMethod():
         else: # for linux
             os.system("python3 show_packing.py")
 
-    def ClearOldAndCreatNewShowPackingCaseFolder(self):
+    def ClearOldAndCreateNewShowPackingCaseFolder(self):
 
         aim_path = os.path.join(os.getcwd(),'show_packing')
 
@@ -172,6 +172,6 @@ class ConstructiveMethod():
     def Run(self, parameters, ini_path):
 
         self.Initialization(parameters, ini_path)
-        self.CreatInitialPackings()
+        self.CreateInitialPackings()
         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
         self.CopyFilesAndRunShowResults()

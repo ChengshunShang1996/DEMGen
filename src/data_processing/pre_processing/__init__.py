@@ -24,4 +24,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 
-__all__=["creat_fem_and_inlet_mesh_files", "creat_particles_inside_of_a_domain"]
+__all__=["create_fem_and_inlet_mesh_files", "create_particles_inside_of_a_domain"]

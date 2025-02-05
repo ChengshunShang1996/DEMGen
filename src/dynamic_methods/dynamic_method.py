@@ -20,7 +20,7 @@ class DynamicMethod():
         self.parameters = parameters
         self.ini_path = ini_path
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
         try:
             int("string") 
@@ -37,5 +37,5 @@ class DynamicMethod():
     def Run(self, parameters, ini_path):
 
         self.Initialization(parameters, ini_path)
-        self.CreatInitialCases()
+        self.CreateInitialCases()
         self.RunDEM()

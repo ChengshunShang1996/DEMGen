@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-class CreatParticlesInsideOfADomain():
+class CreateParticlesInsideOfADomain():
 
     def __init__(self) -> None:  
         
@@ -35,13 +35,13 @@ class CreatParticlesInsideOfADomain():
         self.z_min = -0.5 * domain_scale_multiplier * RVE_length_z
         self.z_max = 0.5 * domain_scale_multiplier * RVE_length_z
 
-        parameters_file = open("creat_particles_input_parameters.json", 'r')
+        parameters_file = open("create_particles_input_parameters.json", 'r')
         self.parameters = Parameters(parameters_file.read())
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
-    def CreatParticles(self):
+    def CreateParticles(self):
 
         is_first_particle = True
         particle_cnt = 1
@@ -182,13 +182,13 @@ class CreatParticlesInsideOfADomain():
 
 if __name__ == "__main__":
 
-    TestDEM = CreatParticlesInsideOfADomain()
+    TestDEM = CreateParticlesInsideOfADomain()
     RVE_length_x = 0.05
     RVE_length_y = 0.1
     RVE_length_z = 0.05
     RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
     domain_scale_multiplier = 1
     TestDEM.initialize(RVE_size, domain_scale_multiplier)
-    TestDEM.CreatParticles()
+    TestDEM.CreateParticles()
     TestDEM.WriteOutGIDData()
 

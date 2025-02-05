@@ -23,7 +23,7 @@ class PackingCharacterizationMulti(PackingCharacterization):
         self.parameters = parameters
         self.ini_path = ini_path
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
         pass
 

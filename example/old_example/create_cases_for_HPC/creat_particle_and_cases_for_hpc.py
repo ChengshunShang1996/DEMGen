@@ -3,9 +3,9 @@ import shutil
 import random
 import math
 
-from creat_particles_inside_of_a_domain import CreatParticlesInsideOfADomain
+from create_particles_inside_of_a_domain import CreateParticlesInsideOfADomain
 
-class CreatParticlesAndCasesForHpc(CreatParticlesInsideOfADomain):
+class CreateParticlesAndCasesForHpc(CreateParticlesInsideOfADomain):
 
     def clear_old_mesher_cases_folder(self):
         mesher_cases_folder_name = 'generated_mesher_cases'
@@ -16,7 +16,7 @@ class CreatParticlesAndCasesForHpc(CreatParticlesInsideOfADomain):
         else:
             os.makedirs(mesher_cases_folder_name)
 
-    def creat_kratos_cases(self, cases_number, nodes_num, partition_name_list):
+    def create_kratos_cases(self, cases_number, nodes_num, partition_name_list):
         
         self.end_sim_file_num = 0
         self.is_sh_head_write = False
@@ -34,7 +34,7 @@ class CreatParticlesAndCasesForHpc(CreatParticlesInsideOfADomain):
             RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
             domain_scale_multiplier = 1.0
             self.initialize(RVE_size, domain_scale_multiplier)
-            self.CreatParticles()
+            self.CreateParticles()
             dem_mdpa_path = os.path.join(aim_path, 'inletPGDEM.mdpa')
             self.WriteOutGIDData(dem_mdpa_path)
 
@@ -64,7 +64,7 @@ class CreatParticlesAndCasesForHpc(CreatParticlesInsideOfADomain):
                 self.is_sh_head_write = False
             sh_file_name = 'cases_run_' + str(self.sh_marker) + '.sh'
 
-            # creat the cases_run.sh
+            # create the cases_run.sh
             cases_run_path_and_name = os.path.join(os.getcwd(), 'generated_mesher_cases', sh_file_name)
 
             with open(cases_run_path_and_name, "a") as f_w_cases_run:
@@ -91,12 +91,12 @@ class CreatParticlesAndCasesForHpc(CreatParticlesInsideOfADomain):
 
 if __name__ == "__main__":
 
-    TestDEM = CreatParticlesAndCasesForHpc()
+    TestDEM = CreateParticlesAndCasesForHpc()
     TestDEM.clear_old_mesher_cases_folder()
     cases_number = 100
     nodes_num = 20
     partition_name_list = ['HighParallelization']
-    TestDEM.creat_kratos_cases(cases_number, nodes_num, partition_name_list)
+    TestDEM.create_kratos_cases(cases_number, nodes_num, partition_name_list)
     max_index = 5
     TestDEM.run_kratos_cases(max_index)
 

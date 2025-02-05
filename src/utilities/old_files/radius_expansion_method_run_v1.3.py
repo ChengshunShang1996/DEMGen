@@ -226,7 +226,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         if self.second_stage_flag:
             print("I am here")
-            self.clear_old_and_creat_new_show_packing_case_folder()
+            self.clear_old_and_create_new_show_packing_case_folder()
             print("I am here 2")
             aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
         else:
@@ -272,7 +272,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         print("Successfully write out GID DEM.mdpa file!")
 
-    def clear_old_and_creat_new_show_packing_case_folder(self):
+    def clear_old_and_create_new_show_packing_case_folder(self):
 
         aim_path = os.path.join(os.getcwd(),'show_packing')
 

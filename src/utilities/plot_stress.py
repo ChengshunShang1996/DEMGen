@@ -9,7 +9,7 @@ plt.figure(1)
 #plt.title('Hertz model')  
 plt.xlabel('Time / s')  
 plt.ylabel(r'$\bar{p}$ / MPa')   
-# creat the BTS_peak_points.dat
+# create the BTS_peak_points.dat
 
 aim_path_and_name = os.path.join(os.getcwd(), 'stress_tensor_0.txt')
 

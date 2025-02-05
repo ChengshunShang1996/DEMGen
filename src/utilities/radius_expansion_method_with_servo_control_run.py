@@ -323,7 +323,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
         if self.second_stage_flag:
-            self.clear_old_and_creat_new_show_packing_case_folder()
+            self.clear_old_and_create_new_show_packing_case_folder()
             aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
         else:
             aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
@@ -368,7 +368,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         print("Successfully write out GID DEM.mdpa file!")
 
-    def clear_old_and_creat_new_show_packing_case_folder(self):
+    def clear_old_and_create_new_show_packing_case_folder(self):
 
         aim_path = os.path.join(os.getcwd(),'show_packing')
 

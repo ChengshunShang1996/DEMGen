@@ -20,7 +20,7 @@ class PackingCharacterizationSingle(PackingCharacterization):
 
         pass
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
         self.clear_old_cases_folder()
         self.copy_seed_files_to_aim_folders()

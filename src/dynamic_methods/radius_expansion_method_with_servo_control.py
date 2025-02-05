@@ -12,7 +12,7 @@ __license__     = "BSD 2-Clause License"
 import os
 
 from dynamic_methods.dynamic_method import DynamicMethod
-from data_processing.pre_processing import creat_particles_inside_of_a_domain
+from data_processing.pre_processing import create_particles_inside_of_a_domain
 
 class RadiusExpansionMethodWithServoControl(DynamicMethod):
 
@@ -20,17 +20,17 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
 
         pass
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
-        CreatIniCases = creat_particles_inside_of_a_domain.CreatParticlesInsideOfADomain()
+        CreateIniCases = create_particles_inside_of_a_domain.CreateParticlesInsideOfADomain()
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         domain_scale_multiplier = self.parameters["random_particle_generation_parameters"]["domain_scale_multiplier"]
         aim_file_name = 'inletPGDEM_ini.mdpa'
 
-        CreatIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_desnity)
-        CreatIniCases.CreatParticles(RVE_size)
+        CreateIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_desnity)
+        CreateIniCases.CreateParticles(RVE_size)
         aim_folder_name = "case_" + str(self.packing_cnt)
-        CreatIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
+        CreateIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
 
     def RunDEM(self):
 
@@ -74,7 +74,7 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
                 with open("generation_marker.txt", "a") as marker_file:
                     marker_file.write("Generation " + str(self.packing_cnt) + " - " + str(try_packing_desnity) + "\n")
                     marker_file.close()
-                self.CreatInitialCases()
+                self.CreateInitialCases()
                 success_marker = self.RunDEM()
                 if success_marker:
                     break

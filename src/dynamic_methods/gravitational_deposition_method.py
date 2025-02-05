@@ -12,7 +12,7 @@ __license__     = "BSD 2-Clause License"
 import os
 
 from dynamic_methods.dynamic_method import DynamicMethod
-from data_processing.pre_processing import creat_fem_and_inlet_mesh_files
+from data_processing.pre_processing import create_fem_and_inlet_mesh_files
 
 class GravitationalDepositionMethod(DynamicMethod):
 
@@ -20,19 +20,19 @@ class GravitationalDepositionMethod(DynamicMethod):
 
         pass
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
-        CreatIniCases = creat_fem_and_inlet_mesh_files.CreatFemAndInletMeshFiles()
+        CreateIniCases = create_fem_and_inlet_mesh_files.CreateFemAndInletMeshFiles()
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         packing_num = self.parameters["packing_num"]
         problem_name = self.parameters["problem_name"]
         
         packing_cnt = 1
         while packing_cnt <= packing_num:
-            CreatIniCases.Initialize(RVE_size, self.parameters["particle_radius_max"], packing_cnt, self.ini_path)
-            CreatIniCases.CreatFemMeshFile(problem_name, self.parameters["periodic_boundary_option"])
-            CreatIniCases.CreatInletMeshFile(problem_name, self.parameters["inlet_properties"])
-            CreatIniCases.CreatDemMeshFile(problem_name)
+            CreateIniCases.Initialize(RVE_size, self.parameters["particle_radius_max"], packing_cnt, self.ini_path)
+            CreateIniCases.CreateFemMeshFile(problem_name, self.parameters["periodic_boundary_option"])
+            CreateIniCases.CreateInletMeshFile(problem_name, self.parameters["inlet_properties"])
+            CreateIniCases.CreateDemMeshFile(problem_name)
             packing_cnt += 1
 
     def RunDEM(self):

@@ -23,7 +23,7 @@ class PackingCharacterization():
         self.ini_path = ini_path
         self.dt = self.parameters["dem_time_step"]
 
-    def CreatInitialCases(self):
+    def CreateInitialCases(self):
 
         try:
             int("string") 
@@ -40,6 +40,6 @@ class PackingCharacterization():
     def Run(self, parameters, ini_path):
 
         self.Initialization(parameters, ini_path)
-        self.CreatInitialCases()
+        self.CreateInitialCases()
         self.RunDEM()
 

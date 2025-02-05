@@ -1,36 +1,31 @@
 #/////////////////////////////////////////////////
-__author__      = "Chengshun Shang (CIMNE)"
-__copyright__   = "Copyright (C) 2023-present by Chengshun Shang"
-__version__     = "0.0.1"
-__maintainer__  = "Chengshun Shang"
-__email__       = "cshang@cimne.upc.edu"
-__status__      = "development"
-__date__        = "August 2, 2023"
-__license__     = "BSD 2-Clause License"
+#// Main author: Chengshun Shang (CIMNE)
+#// Email: chengshun.shang1996@gmail.com
+#// Date: August 2023
 #/////////////////////////////////////////////////
 
 import os
 import random
-import shutil
 import math
 from KratosMultiphysics import *
 from KratosMultiphysics.DEMApplication import *
 
-class CreatParticlesInsideOfADomain():
+class CreateParticlesInsideOfADomain():
 
     def __init__(self) -> None:  
 
-        self.clear_old_cases_folder()
+        pass
 
-    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_desnity = 0.0):
+    def initialize(self, RVE_size, domain_scale_multiplier):
 
         self.particle_list = []
+        '''
         self.particle_list_left = []
         self.particle_list_right = []
         self.particle_list_top = []
         self.particle_list_bottom = []
         self.particle_list_front = []
-        self.particle_list_behind = []
+        self.particle_list_behind = []'''
         self.particle_list_side = []
 
         RVE_length_x = RVE_size[0]
@@ -46,102 +41,23 @@ class CreatParticlesInsideOfADomain():
         self.z_min = -0.5 * domain_scale_multiplier * RVE_length_z
         self.z_max = 0.5 * domain_scale_multiplier * RVE_length_z
 
-        parameters_file = open("ParametersDEMGen.json", 'r')
-        self.parameters_all = Parameters(parameters_file.read())
-        self.parameters = self.parameters_all["random_particle_generation_parameters"]
-        self.initial_target_packing_density = self.parameters["target_packing_density"].GetDouble()
-        if try_packing_desnity != 0.0:
-            self.parameters["target_packing_density"].SetDouble(try_packing_desnity)
-        print("try_packing_desnity = {}".format(try_packing_desnity))
-        print("target_packing_density = {}".format(self.parameters["target_packing_density"].GetDouble()))
+        parameters_file = open("create_particles_input_parameters.json", 'r')
+        self.parameters = Parameters(parameters_file.read())
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
 
-        self.packing_cnt = packing_cnt
-        self.ini_path = ini_path
-
-        self.creat_new_cases_folder()
-        self.copy_seed_files_to_aim_folders()
-
-    def clear_old_cases_folder(self):
-
-        cases_folder_name = 'generated_cases'
-        
-        if os.path.exists(cases_folder_name):
-            shutil.rmtree(cases_folder_name, ignore_errors=True)
-            os.makedirs(cases_folder_name)
-        else:
-            os.makedirs(cases_folder_name)
-
-    def creat_new_cases_folder(self):
-
-        new_folder_name = "case_" + str(self.packing_cnt)
-        aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
-        os.makedirs(aim_path)
-    
-    def copy_seed_files_to_aim_folders(self):
-        
-        aim_folder_name = "case_" + str(self.packing_cnt)
-        aim_path = os.path.join(os.getcwd(), "generated_cases", aim_folder_name)
-
-        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json']
-        for seed_file_name in seed_file_name_list:
-            seed_file_path_and_name = os.path.join(os.getcwd(), seed_file_name)
-            aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        if self.parameters_all["generator_name"].GetString() == "isotropic_compression_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'isotropic_compression_method_run.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'isotropic_compression_method_run.py')
-            with open(seed_file_path_and_name, "r") as f_material:
-                    with open(aim_file_path_and_name, "w") as f_material_w:
-                        for line in f_material.readlines():
-                            if "domain_scale_multiplier_input" in line:
-                                line = line.replace("1.5", str(self.parameters["domain_scale_multiplier"].GetDouble()))
-                            f_material_w.write(line)
-
-            seed_file_name_list = ['inletPGDEM_FEM_boundary.mdpa']
-            for seed_file_name in seed_file_name_list:
-                seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities','rem_seed_files', seed_file_name)
-                aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method":
-            seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'radius_expansion_method_run_v1.4.py')
-            aim_file_path_and_name = os.path.join(aim_path, 'radius_expansion_method_run_v1.4.py')
-            shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-
-        elif self.parameters_all["generator_name"].GetString() == "radius_expansion_method_with_servo_control":
-            seed_file_name_list = ['radius_expansion_method_with_servo_control_run.py', 'radius_expansion_method_with_servo_control_run_final.py', 'plot_stress.py']
-            for seed_file_name in seed_file_name_list:
-                seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
-                aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-                with open(seed_file_path_and_name, "r") as f_material:
-                    with open(aim_file_path_and_name, "w") as f_material_w:
-                        for line in f_material.readlines():
-                            if "self.target_packing_density =" in line:
-                                line = line.replace("0.64", str(self.initial_target_packing_density))
-                            if "ax2.axhline(y=" in line:
-                                line = line.replace("0.635", str(self.initial_target_packing_density))
-                            f_material_w.write(line)
-
-        seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
-        aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
-        shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-    
-    def CreatParticles(self, RVE_size):
+    def CreateParticles(self, RVE_size):
 
         is_first_particle = True
         particle_cnt = 1
         particle_volume = 0
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
-        target_packing_density = self.parameters["target_packing_density"].GetDouble()
-        target_packing_density_tolerance = self.parameters["target_packing_density_tolerance"].GetDouble()
-        print("target_packing_density = {}".format(target_packing_density))
+        aim_porosity = self.parameters["aim_porosity"].GetDouble()
+        aim_porosity_tolerance = self.parameters["aim_porosity_tolerance"].GetDouble()
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (target_packing_density + target_packing_density_tolerance) * (radius_scale_multiplier ** 3)
-
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (1 - aim_porosity - aim_porosity_tolerance) * (radius_scale_multiplier ** 3)
+        
         while particle_volume < aim_volume:
 
             p_parameters_dict = {
@@ -164,7 +80,7 @@ class CreatParticlesInsideOfADomain():
 
             if is_first_particle:
                 radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-                if self.parameters_all["periodic_boundary_option"].GetBool():
+                if self.parameters["UsingPeriodicBoundary"].GetBool():
                     x = random.uniform(self.x_min , self.x_max)
                     y = random.uniform(self.y_min , self.y_max)
                     z = random.uniform(self.z_min , self.z_max)
@@ -179,16 +95,16 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                print("Added particle number = {}".format(particle_cnt))
+                #print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
                 particle_volume += 4/3 * math.pi * (r**3)
                 is_first_particle = False
             else:
                 IsOverlaped = True
                 loop_cnt = 0
+                radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
                 while IsOverlaped:
-                    radius_max = self.parameters["MAXIMUM_RADIUS"].GetDouble() * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-                    if self.parameters_all["periodic_boundary_option"].GetBool():
+                    if self.parameters["UsingPeriodicBoundary"].GetBool():
                         self.x = random.uniform(self.x_min, self.x_max)
                         self.y = random.uniform(self.y_min, self.y_max)
                         self.z = random.uniform(self.z_min, self.z_max)
@@ -196,7 +112,7 @@ class CreatParticlesInsideOfADomain():
                             IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(self.x, self.y, self.z, r, particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"])
                             if IsOverlaped:
                                 break
-
+                        
                         real_RVE_x_length = self.x_max - self.x_min
                         real_RVE_y_length = self.y_max - self.y_min
                         real_RVE_z_length = self.z_max - self.z_min
@@ -338,7 +254,7 @@ class CreatParticlesInsideOfADomain():
                 p_parameters_dict["radius"] = r
                 p_parameters_dict["p_ele_id"] = particle_cnt
                 self.particle_list.append(p_parameters_dict)
-                if self.parameters_all["periodic_boundary_option"].GetBool():
+                if self.parameters["UsingPeriodicBoundary"].GetBool():
                     if self.x <= self.x_min + radius_max * 2:
                         self.particle_list_side.append(p_parameters_dict)
                     elif self.x >= self.x_max - radius_max * 2:
@@ -355,15 +271,13 @@ class CreatParticlesInsideOfADomain():
                 particle_cnt += 1
                 particle_volume += 4/3 * math.pi * (r**3)
         
-    def WriteOutGIDData(self, aim_folder_name, aim_file_name):
-
-        aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
+    def WriteOutGIDData(self, outName = 'inletPGDEM_ini.mdpa'):
 
         # clean the exsisted file first
-        if os.path.isfile(aim_path_and_name):
-            os.remove(aim_path_and_name)
+        if os.path.isfile(outName):
+            os.remove(outName)
         
-        with open(aim_path_and_name,'a') as f:
+        with open(outName,'a') as f:
             # write the particle information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
             f.write("Begin Nodes\n")
@@ -421,4 +335,20 @@ class CreatParticlesInsideOfADomain():
 
             f.close()
 
-        print("Successfully write out file {}-{}!".format(aim_folder_name, aim_file_name))
+        print("Successfully write out GID DEM.mdpa file!")
+
+if __name__ == "__main__":
+
+    packing_num = 3
+    for i in range(packing_num):
+        TestDEM = CreateParticlesInsideOfADomain()
+        RVE_length_x = 0.005
+        RVE_length_y = 0.005
+        RVE_length_z = 0.005
+        RVE_size = [RVE_length_x, RVE_length_y, RVE_length_z]
+        domain_scale_multiplier = 1.5
+        TestDEM.initialize(RVE_size, domain_scale_multiplier)
+        TestDEM.CreateParticles(RVE_size)
+        OutName = 'inletPGDEM_ini_' + str(i) +'.mdpa'
+        TestDEM.WriteOutGIDData(OutName)
+
