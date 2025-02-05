@@ -17,7 +17,7 @@ class HpcArrangementMethod(ConstructiveMethod):
 
         pass
     
-    def CreatInitialPackings(self):
+    def CreateInitialPackings(self):
 
         p_id = 1
         i_row = 1
@@ -95,4 +95,4 @@ class HpcArrangementMethod(ConstructiveMethod):
                 i_thick = 1
             i_row += 1
             i_col = 1
-        print("Creat HPC spheres finished!\t")
+        print("Create HPC spheres finished!\t")

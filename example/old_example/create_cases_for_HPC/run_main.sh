@@ -18,4 +18,4 @@
 ########### Further details -> man sbatch ##########
 #export OMP_NUM_THREADS=16
 
-python3 creat_particle_and_cases_for_hpc.py
+python3 create_particle_and_cases_for_hpc.py

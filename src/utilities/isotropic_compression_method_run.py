@@ -137,7 +137,7 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
 
     def WriteOutMdpaFileOfParticles(self, output_file_name):
 
-        self.clear_old_and_creat_new_show_packing_case_folder()
+        self.clear_old_and_create_new_show_packing_case_folder()
         aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
 
         # clean the exsisted file first
@@ -191,9 +191,12 @@ class IsotropicCompressionTestRun(DEMAnalysisStage):
 
         aim_path = os.path.join(os.getcwd(),'show_packing')
         os.chdir(aim_path)
-        os.system("python show_packing.py")
+        if os.name == 'nt': # for windows
+            os.system("python show_packing.py")
+        else: # for linux
+            os.system("python3 show_packing.py")
 
-    def clear_old_and_creat_new_show_packing_case_folder(self):
+    def clear_old_and_create_new_show_packing_case_folder(self):
 
         aim_path = os.path.join(os.getcwd(),'show_packing')
 
