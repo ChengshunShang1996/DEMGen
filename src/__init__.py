@@ -28,7 +28,7 @@ __all__         =["constructive_methods","data_processing","dynamic_methods","ut
 
 __author__      = "Chengshun Shang (CIMNE)"
 __copyright__   = "Copyright (C) 2023-present by Chengshun Shang"
-__version__     = "0.0.1"
+__version__     = "1.0.1"
 __license__     = "BSD 2-Clause License"
 __URL__         = 'https://github.com/ChengshunShang1996/DEMGen'
 __logo__        = '''
