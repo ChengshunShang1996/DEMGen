@@ -11,10 +11,12 @@ __license__     = "BSD 2-Clause License"
 
 import os
 import json
+import sys
 
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from src import *
 from data_processing.pre_processing import *
 from data_processing.post_processing import *

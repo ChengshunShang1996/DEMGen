@@ -55,14 +55,20 @@ class CreateParticlesInsideOfADomain():
         print("try_packing_desnity = {}".format(try_packing_desnity))
         print("target_packing_density = {}".format(self.parameters["target_packing_density"].GetDouble()))
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
-        scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
-        self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_pad)
+        #scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
+        radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
+        scaled_psd = []
+        for i in range(len(original_psd)):
+            scaled_psd.append(original_psd[i] * radius_scale_multiplier)
+        self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_psd)
 
         self.packing_cnt = packing_cnt
         self.ini_path = ini_path
 
+        print("before creat folder")
         self.create_new_cases_folder()
         self.copy_seed_files_to_aim_folders()
+        print("after creat folder")
 
     def clear_old_cases_folder(self):
 
