@@ -146,8 +146,8 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
-    #aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
+    #aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
