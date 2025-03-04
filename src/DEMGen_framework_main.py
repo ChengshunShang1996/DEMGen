@@ -18,6 +18,8 @@ from tkinter.filedialog import askopenfilename
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from src import *
+from constructive_methods import *
+from dynamic_methods import *
 from data_processing.pre_processing import *
 from data_processing.post_processing import *
 
