@@ -22,7 +22,7 @@ class CreateParticlesInsideOfADomain():
 
         self.clear_old_cases_folder()
 
-    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_desnity = 0.0):
+    def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_density = 0.0):
 
         self.particle_list = []
         self.particle_list_left = []
@@ -37,7 +37,7 @@ class CreateParticlesInsideOfADomain():
         RVE_length_y = RVE_size[1]
         RVE_length_z = RVE_size[2]
 
-        #two times of the RVE size
+        #two times the RVE size
 
         self.x_min = -0.5 * domain_scale_multiplier * RVE_length_x
         self.x_max = 0.5 * domain_scale_multiplier * RVE_length_x
@@ -50,9 +50,9 @@ class CreateParticlesInsideOfADomain():
         self.parameters_all = Parameters(parameters_file.read())
         self.parameters = self.parameters_all["random_particle_generation_parameters"]
         self.initial_target_packing_density = self.parameters["target_packing_density"].GetDouble()
-        if try_packing_desnity != 0.0:
-            self.parameters["target_packing_density"].SetDouble(try_packing_desnity)
-        print("try_packing_desnity = {}".format(try_packing_desnity))
+        if try_packing_density != 0.0:
+            self.parameters["target_packing_density"].SetDouble(try_packing_density)
+        print("try_packing_density = {}".format(try_packing_density))
         print("target_packing_density = {}".format(self.parameters["target_packing_density"].GetDouble()))
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         #scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
@@ -65,10 +65,10 @@ class CreateParticlesInsideOfADomain():
         self.packing_cnt = packing_cnt
         self.ini_path = ini_path
 
-        print("before creat folder")
+        print("Before creating folder")
         self.create_new_cases_folder()
         self.copy_seed_files_to_aim_folders()
-        print("after creat folder")
+        print("After creating folder")
 
     def clear_old_cases_folder(self):
 

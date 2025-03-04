@@ -109,7 +109,7 @@ class DEMGenMainFramework():
             print("No packing analysis has been done because [packing_charcterization_option] is set as [False]")
 
 
-    def Finilization(self):
+    def Finalization(self):
         
         print("Successfully finish!")
 
@@ -155,5 +155,5 @@ if __name__ == "__main__":
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
-    TestDEM.Finilization()
+    TestDEM.Finalization()
     
