@@ -27,7 +27,7 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         domain_scale_multiplier = self.parameters["random_particle_generation_parameters"]["domain_scale_multiplier"]
         aim_file_name = 'inletPGDEM_ini.mdpa'
 
-        CreateIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_desnity)
+        CreateIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_density)
         CreateIniCases.CreateParticles(RVE_size)
         aim_folder_name = "case_" + str(self.packing_cnt)
         CreateIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
@@ -67,12 +67,12 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
             os.remove("generation_marker.txt")
         while self.packing_cnt <= packing_num:
             self.last_try = False
-            for try_packing_desnity in target_packing_density_list:
-                self.try_packing_desnity = try_packing_desnity
-                if try_packing_desnity == target_packing_density_list[-1]:
+            for try_packing_density in target_packing_density_list:
+                self.try_packing_density = try_packing_density
+                if try_packing_density == target_packing_density_list[-1]:
                     self.last_try = True
                 with open("generation_marker.txt", "a") as marker_file:
-                    marker_file.write("Generation " + str(self.packing_cnt) + " - " + str(try_packing_desnity) + "\n")
+                    marker_file.write("Generation " + str(self.packing_cnt) + " - " + str(try_packing_density) + "\n")
                     marker_file.close()
                 self.CreateInitialCases()
                 success_marker = self.RunDEM()

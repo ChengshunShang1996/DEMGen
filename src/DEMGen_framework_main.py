@@ -18,6 +18,8 @@ from tkinter.filedialog import askopenfilename
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from src import *
+from constructive_methods import *
+from dynamic_methods import *
 from data_processing.pre_processing import *
 from data_processing.post_processing import *
 
@@ -107,7 +109,7 @@ class DEMGenMainFramework():
             print("No packing analysis has been done because [packing_charcterization_option] is set as [False]")
 
 
-    def Finilization(self):
+    def Finalization(self):
         
         print("Successfully finish!")
 
@@ -153,5 +155,5 @@ if __name__ == "__main__":
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
-    TestDEM.Finilization()
+    TestDEM.Finalization()
     
