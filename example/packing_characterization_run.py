@@ -97,7 +97,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
-                eigenvalues, second_invariant_of_deviatoric_tensor, measured_fabric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
+                eigenvalues, second_invariant_of_deviatoric_tensor, fabric_tensor_trace = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
                 measured_eigenvalues.append(eigenvalues)
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
 
