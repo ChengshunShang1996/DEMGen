@@ -216,7 +216,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             granular_temperature, max_granular_temperature = self.GetGranularTemperature()
 
             with open("stress_tensor_0.txt", 'a') as file:
-                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_desnity) + ' ' \
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
             with open("granular_temperature_0.txt", 'a') as file:
