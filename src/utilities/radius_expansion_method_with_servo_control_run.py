@@ -229,7 +229,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             granular_temperature, max_granular_temperature = self.GetGranularTemperature()
 
             with open("stress_tensor_0.txt", 'a') as file:
-                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_desnity) + ' ' \
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
             with open("granular_temperature_0.txt", 'a') as file:
@@ -241,7 +241,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
                 if self.start_reset_velocity:
 
-                    if self.final_packing_desnity > self.target_packing_density:
+                    if self.final_packing_density > self.target_packing_density:
                         print("The packing density is higher than the target packing density, the simulation will be terminated.")
                         time.sleep(5)
                         exit(0)
@@ -304,11 +304,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.copy_files_and_run_show_results()
                         exit(0)
                     else:
-                        if (self.final_packing_desnity - self.target_packing_density) > 0.0001:
+                        if (self.final_packing_density - self.target_packing_density) > 0.0001:
                             print("2 stage The packing density is higher than the target packing density, the simulation will be terminated.")
                             time.sleep(5)
                             exit(0)
-                        elif (self.target_packing_density - self.final_packing_desnity) > 0.0001:
+                        elif (self.target_packing_density - self.final_packing_density) > 0.0001:
                             for properties in self.spheres_model_part.Properties:
                                 for subproperties in properties.GetSubProperties():
                                     subproperties[STATIC_FRICTION] = 0.0
@@ -350,9 +350,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             element_volume = 4/3 * math.pi * r * r * r
             selected_element_volume += element_volume
 
-        self.final_packing_desnity = selected_element_volume / self.final_packing_volume
+        self.final_packing_density = selected_element_volume / self.final_packing_volume
 
-        print("Currently packing density is {}".format(self.final_packing_desnity))
+        print("Currently packing density is {}".format(self.final_packing_density))
 
     def UpdateFinalPackingVolume(self):
 
