@@ -26,11 +26,13 @@ if os.path.exists("normalized_kinematic_energy.txt"):
     os.remove("normalized_kinematic_energy.txt")
 if os.path.exists("stress_tensor_0.txt"):
     os.remove("stress_tensor_0.txt")
+if os.path.exists("granular_temperature_0.txt"):
+    os.remove("granular_temperature_0.txt")
 if os.path.exists("inletPGDEM.mdpa"):
     os.remove("inletPGDEM.mdpa")
 
 def GetParticleDataFromMdpa(aim_mdpa_file_name):
-    
+
     p_id = 1
     p_record_nodes = False
     p_record_elements = False
@@ -38,7 +40,7 @@ def GetParticleDataFromMdpa(aim_mdpa_file_name):
     p_pram_list = []
 
     if os.path.isfile(aim_mdpa_file_name):
-        
+
         with open(aim_mdpa_file_name, 'r') as mdpa_data:
 
             for line in mdpa_data:
@@ -55,7 +57,7 @@ def GetParticleDataFromMdpa(aim_mdpa_file_name):
                 "p_ele_id": 0,
                 "p_group_id": 0
                 }
-                        
+
                 values = [str(s) for s in line.split()]
 
                 if len(values) > 1:
@@ -134,7 +136,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         materials_file_abs_path = os.path.join(self.main_path, str(adapted_to_current_os_relative_path))
         with open(materials_file_abs_path, 'r') as materials_file:
             self.DEM_material_parameters = Parameters(materials_file.read())
-        
+
         self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
         self.DEM_material_parameters["material_relations"][0]["Variables"]["STATIC_FRICTION"].SetDouble(0.0)
         self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].SetDouble(0.0)
@@ -159,9 +161,43 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             if velocity_magnitude > max_particle_velocity:
                 max_particle_velocity = velocity_magnitude
         return max_particle_velocity
-    
+
+    def GetGranularTemperature(self):
+        vel_x = []
+        vel_y = []
+        vel_z = []
+        volume = []
+        total_volume = 0.0
+        for node in self.spheres_model_part.Nodes:
+            vol = 4/3*math.pi*node.GetSolutionStepValue(RADIUS)**3
+            volume.append(vol)
+            vel_x.append(vol*node.GetSolutionStepValue(VELOCITY_X))
+            vel_y.append(vol*node.GetSolutionStepValue(VELOCITY_Y))
+            vel_z.append(vol*node.GetSolutionStepValue(VELOCITY_Z))
+            total_volume += vol
+        mean_vel_x = sum(vel_x)/total_volume
+        mean_vel_y = sum(vel_y)/total_volume
+        mean_vel_z = sum(vel_z)/total_volume
+
+        T_x = 0.0
+        T_y = 0.0
+        T_z = 0.0
+        max_gran_temp = 0.0
+        for V,u,v,w in zip(volume,vel_x,vel_y,vel_z):
+            T_x += (u/V-mean_vel_x)**2
+            T_y += (v/V-mean_vel_y)**2
+            T_z += (w/V-mean_vel_z)**2
+            T_p = 1/3*((u/V-mean_vel_x)**2 + (v/V-mean_vel_y)**2 + (w/V-mean_vel_z)**2)
+            if T_p > max_gran_temp:
+                max_gran_temp = T_p
+        T_x /= len(vel_x)
+        T_y /= len(vel_y)
+        T_z /= len(vel_z)
+
+        return (T_x+T_y+T_z)/3, max_gran_temp
+
     def OutputSolutionStep(self):
-        
+
         super().OutputSolutionStep()
 
         if self.final_check_counter == self.final_check_frequency:
@@ -170,23 +206,28 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.UpdateFinalPackingVolume()
             self.MeasureTotalPackingDensityOfFinalPacking()
-            
+
             self.normalized_kinematic_energy = self.DEMEnergyCalculator.CalculateNormalizedKinematicEnergy()
             with open("normalized_kinematic_energy.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str(self.normalized_kinematic_energy) + '\n')
 
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
+            granular_temperature, max_granular_temperature = self.GetGranularTemperature()
+
             with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
+            with open("granular_temperature_0.txt", 'a') as file:
+                    file.write(str(self.time) + ' ' + str(granular_temperature) + ' ' + str(max_granular_temperature) + '\n')
+
             self.measured_stress_list.append(mean_stress)
 
             if not self.is_start_servo_control:
-                
+
                 if self.start_reset_velocity:
-                
+
                     self.PrintResultsForGid(self.time)
 
                     #max_particle_velocity = self.GetMaximumVelocity()
@@ -251,13 +292,13 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
         self.PrintResultsForGid(self.time)
         super().Finalize()
-    
+
     def PassNormalizedKineticEnergy(self):
 
         return self.normalized_kinematic_energy
-    
+
     def MeasureTotalPackingDensityOfFinalPacking(self):
-        
+
         selected_element_volume = 0.0
         for node in self.spheres_model_part.Nodes:
             r = node.GetSolutionStepValue(RADIUS)
@@ -269,7 +310,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         print("Currently packing density is {}".format(self.final_packing_density))
 
     def UpdateFinalPackingVolume(self):
-         
+
         self.final_packing_volume = (self.BoundingBoxMaxX_update - self.BoundingBoxMinX_update) * \
                                 (self.BoundingBoxMaxY_update - self.BoundingBoxMinY_update) * \
                                 (self.BoundingBoxMaxZ_update - self.BoundingBoxMinZ_update)
@@ -281,7 +322,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             aim_path_and_name = os.path.join(os.getcwd(), 'show_packing', output_file_name)
         else:
             aim_path_and_name = os.path.join(os.getcwd(), output_file_name)
-        
+
         with open(aim_path_and_name,'w') as f:
             # write the particle information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
@@ -333,7 +374,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             os.makedirs(aim_path)
 
     def copy_seed_files_to_aim_folders(self):
-        
+
         aim_path = os.path.join(os.getcwd(), 'show_packing')
 
         seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json', 'inletPGDEM_FEM_boundary.mdpa', 'show_packing.py']
@@ -379,7 +420,7 @@ if __name__ == "__main__":
     Logger.GetDefaultOutput().SetSeverity(Logger.Severity.INFO)
     radius_multiplier = 1.0
     NormalizedKineticEnergy = 1e8
-    
+
     shutil.copyfile('inletPGDEM_ini.mdpa', 'inletPGDEM.mdpa')
 
     ini_p_pram_list = GetParticleDataFromMdpa('inletPGDEM_ini.mdpa')
@@ -422,4 +463,3 @@ if __name__ == "__main__":
     #NormalizedKineticEnergy = MyDemCase.PassNormalizedKineticEnergy()
     MyDemCase.Finalize()
 
-    

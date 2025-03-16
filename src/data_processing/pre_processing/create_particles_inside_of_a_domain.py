@@ -18,7 +18,7 @@ from KratosMultiphysics.DEMApplication import *
 
 class CreateParticlesInsideOfADomain():
 
-    def __init__(self) -> None:  
+    def __init__(self) -> None:
 
         self.clear_old_cases_folder()
 
@@ -73,7 +73,7 @@ class CreateParticlesInsideOfADomain():
     def clear_old_cases_folder(self):
 
         cases_folder_name = 'generated_cases'
-        
+
         if os.path.exists(cases_folder_name):
             shutil.rmtree(cases_folder_name, ignore_errors=True)
             os.makedirs(cases_folder_name)
@@ -85,9 +85,9 @@ class CreateParticlesInsideOfADomain():
         new_folder_name = "case_" + str(self.packing_cnt)
         aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
         os.makedirs(aim_path)
-    
+
     def copy_seed_files_to_aim_folders(self):
-        
+
         aim_folder_name = "case_" + str(self.packing_cnt)
         aim_path = os.path.join(os.getcwd(), "generated_cases", aim_folder_name)
 
@@ -135,7 +135,7 @@ class CreateParticlesInsideOfADomain():
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
-    
+
     def CreateParticles(self, RVE_size):
 
         is_first_particle = True
@@ -162,7 +162,7 @@ class CreateParticlesInsideOfADomain():
                     "p_ele_id": 0,
                     "p_group_id": 0
                     }
- 
+
             seed = self.parameters["SEED"].GetInt()
             creator_destructor = ParticleCreatorDestructor()
             self.Fast_Filling_Creator = Fast_Filling_Creator(self.parameters, seed)
@@ -250,7 +250,7 @@ class CreateParticlesInsideOfADomain():
                                 IsOverlaped = self.Fast_Filling_Creator.CheckHasIndentationOrNot(x_minus, self.y, z_minus, r, p_x, p_y, p_z, p_r)
                                 if IsOverlaped:
                                     break
-                        
+
                         if not IsOverlaped:
                             for particle in self.particle_list_side:
                                 p_x, p_y, p_z, p_r = particle["p_x"], particle["p_y"], particle["p_z"], particle["radius"]
@@ -336,7 +336,7 @@ class CreateParticlesInsideOfADomain():
                     if loop_cnt > 10000:
                         print("Too much loop for one particle!")
                         exit(0)
-                    
+
                 p_parameters_dict["id"] = particle_cnt
                 p_parameters_dict["p_x"] = self.x
                 p_parameters_dict["p_y"] = self.y
@@ -360,7 +360,7 @@ class CreateParticlesInsideOfADomain():
                 print("Added particle number = {}".format(particle_cnt))
                 particle_cnt += 1
                 particle_volume += 4/3 * math.pi * (r**3)
-        
+
     def WriteOutGIDData(self, aim_folder_name, aim_file_name):
 
         aim_path_and_name = os.path.join(os.getcwd(), "generated_cases", aim_folder_name, aim_file_name)
@@ -368,7 +368,7 @@ class CreateParticlesInsideOfADomain():
         # clean the exsisted file first
         if os.path.isfile(aim_path_and_name):
             os.remove(aim_path_and_name)
-        
+
         with open(aim_path_and_name,'a') as f:
             # write the particle information
             f.write("Begin ModelPartData \n //  VARIABLE_NAME value \n End ModelPartData \n \n Begin Properties 0 \n End Properties \n \n")
