@@ -102,7 +102,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
-                eigenvalues, second_invariant_of_deviatoric_tensor, measured_non_homogenized_conductivity_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
+                particle_number_inside, measured_non_homogenized_conductivity_tensor, conductivity_tensor_trace, angles_xy, angles_xz, angles_yz = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
                 measured_conductivity.append(measured_non_homogenized_conductivity_tensor)
 
             '''
