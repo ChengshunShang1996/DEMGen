@@ -47,6 +47,26 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         self.domain_z_min = self.parameters["BoundingBoxMinZ"].GetDouble()
         self.domain_z_max = self.parameters["BoundingBoxMaxZ"].GetDouble()
 
+        if "measure_density_option" in self.parameters_DEMGen["packing_charcterization_setting"]:
+            self.measure_density_option = self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]
+        else:
+            self.measure_density_option = False
+
+        if "measure_mean_coordination_number_option" in self.parameters_DEMGen["packing_charcterization_setting"]:
+            self.measure_mean_coordination_number_option = self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]
+        else:
+            self.measure_mean_coordination_number_option = False
+
+        if "measure_anisotropy_option" in self.parameters_DEMGen["packing_charcterization_setting"]:
+            self.measure_anisotropy_option = self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]
+        else:
+            self.measure_anisotropy_option = False
+
+        if "measure_conductivity_tensor_option" in self.parameters_DEMGen["packing_charcterization_setting"]:
+            self.measure_conductivity_tensor_option = self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]
+        else:
+            self.measure_conductivity_tensor_option = False
+
     def RunSolutionLoop(self):
 
         while self.KeepAdvancingSolutionLoop():
@@ -90,18 +110,18 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         while side_length <= side_length_max:
 
             RVE_lambda_list.append(RVE_lambda)
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+            if self.measure_density_option:
                 measured_packing_density.append(1 - self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'porosity'))
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+            if self.measure_mean_coordination_number_option:
                 measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+            if self.measure_anisotropy_option:
                 eigenvalues, second_invariant_of_deviatoric_tensor, measured_fabric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
                 measured_eigenvalues.append(eigenvalues)
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+            if self.measure_conductivity_tensor_option:
                 particle_number_inside, measured_non_homogenized_conductivity_tensor, conductivity_tensor_trace, angles_xy, angles_xz, angles_yz = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
                 measured_non_homogenized_conductivity_tensor_clean = [float(x) for x in measured_non_homogenized_conductivity_tensor]
                 measured_conductivity.append(measured_non_homogenized_conductivity_tensor_clean)
@@ -118,23 +138,23 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
             side_length = max_diameter * RVE_lambda
             #side_length = round(side_length, 4)
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+        if self.measure_density_option:
             with open("packing_properties_density.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_packing_density[i]) + '\n')
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+        if self.measure_mean_coordination_number_option:
             with open("packing_properties_mean_coordination_number.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_mean_coordination_number[i]) + '\n')
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+        if self.measure_anisotropy_option:
             with open("packing_properties_anisotropy.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+\
                                str(measured_eigenvalues[i][2]) + ' ' + str(measured_second_invariant_of_deviatoric_tensor[i]) + '\n')
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+        if self.measure_conductivity_tensor_option:
             with open("packing_properties_conductivity.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_conductivity[i][0]) + ' ' + str(measured_conductivity[i][1]) + ' ' + str(measured_conductivity[i][2]) + '\n')
@@ -147,13 +167,13 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         from datetime import datetime
 
         file_names = []
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+        if self.measure_density_option:
             file_names.append("packing_properties_density.txt")
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+        if self.measure_mean_coordination_number_option:
             file_names.append("packing_properties_mean_coordination_number.txt")
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+        if self.measure_anisotropy_option:
             file_names.append("packing_properties_anisotropy.txt")
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+        if self.measure_conductivity_tensor_option:
             file_names.append("packing_properties_conductivity.txt")
 
         github_link = "https://github.com/ChengshunShang1996/DEMGen"
