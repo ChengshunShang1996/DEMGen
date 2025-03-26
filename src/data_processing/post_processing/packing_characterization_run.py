@@ -103,7 +103,8 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
                 particle_number_inside, measured_non_homogenized_conductivity_tensor, conductivity_tensor_trace, angles_xy, angles_xz, angles_yz = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
-                measured_conductivity.append(measured_non_homogenized_conductivity_tensor)
+                measured_non_homogenized_conductivity_tensor_clean = [float(x) for x in measured_non_homogenized_conductivity_tensor]
+                measured_conductivity.append(measured_non_homogenized_conductivity_tensor_clean)
 
             '''
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_radia_distribution_function_option"]:
@@ -136,7 +137,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
             with open("packing_properties_conductivity.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
-                    f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_conductivity[i]) + '\n')
+                    f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_conductivity[i][0]) + ' ' + str(measured_conductivity[i][1]) + ' ' + str(measured_conductivity[i][2]) + '\n')
 
         print("Measurement finish")
 
@@ -191,7 +192,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, density_list, marker='o')
 
-                    plt.xlabel('$\lambda$')
+                    plt.xlabel(r'$\lambda$')
 
                     plt.ylabel('Packing density')
                     plt.title(f'Measured packing density')
@@ -214,7 +215,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, mcn_list, marker='o')
 
-                    plt.xlabel('$\lambda$')
+                    plt.xlabel(r'$\lambda$')
 
                     plt.ylabel('MCN')
                     plt.title(f'Measured mean coordination number (MCN)')
@@ -248,7 +249,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.axhline(y=1/3, color='blue', linestyle='--')
 
 
-                    plt.xlabel('$\lambda$')
+                    plt.xlabel(r'$\lambda$')
 
                     plt.ylabel('Eigenvalue')
                     plt.title(f'Measured eigenvalues')
@@ -261,7 +262,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list, anisotrpy_intensity_list, marker='o')
 
-                    plt.xlabel('$\lambda$')
+                    plt.xlabel(r'$\lambda$')
                     plt.ylabel('Anisotrpy intensity')
                     plt.title(f'Measured anisotrpy intensity')
 
@@ -276,13 +277,14 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
                     with open(file_name, 'r') as file:
                         for line in file:
-                            conductivity_tensor = float(line.split()[1])
-                            conductivity_tensor_list.append(conductivity_tensor)
+                            num_list = list(map(float, line.split()[1:]))
+                            mean_conductivity = sum(num_list) / len(num_list)
+                            conductivity_tensor_list.append(mean_conductivity)
 
                     plt.figure(figsize=(8, 6))
                     plt.plot(self.lambda_list, conductivity_tensor_list, label = '$F$1', marker='o')
 
-                    plt.xlabel('$\lambda$')
+                    plt.xlabel(r'$\lambda$')
 
                     plt.ylabel('K')
                     plt.title(f'Measured mean conductivity')
