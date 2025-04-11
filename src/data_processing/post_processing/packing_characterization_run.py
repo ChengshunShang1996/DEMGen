@@ -17,6 +17,12 @@ from KratosMultiphysics.DEMApplication import DEM_procedures as DEM_procedures
 
 import matplotlib.pyplot as plt
 import json
+import scienceplots
+import numpy as np
+import pandas as pd
+import ast
+
+plt.style.use(['science'])
 
 class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
@@ -86,6 +92,13 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         measured_eigenvalues = []
         measured_second_invariant_of_deviatoric_tensor = []
         measured_conductivity = []
+        measured_fabric_tensor = []
+        diagram_xy = []
+        diagram_xz = []
+        diagram_yz = []
+        fabric_tensor_list = []
+        conductivity_tensor_list = []
+        n_particles_list = []
 
         while side_length <= side_length_max:
 
@@ -97,13 +110,21 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
-                eigenvalues, second_invariant_of_deviatoric_tensor, measured_fabric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
+                eigenvalues, second_invariant_of_deviatoric_tensor, fabric_tensor, fabric_tensor_trace = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
                 measured_eigenvalues.append(eigenvalues)
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
+                measured_fabric_tensor.append(fabric_tensor_trace)
+                fabric_tensor_list.append(fabric_tensor)
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
-                eigenvalues, second_invariant_of_deviatoric_tensor, measured_non_homogenized_conductivity_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
-                measured_conductivity.append(measured_non_homogenized_conductivity_tensor)
+                n_particles, conductivity_tensor, measured_non_homogenized_conductivity_tensor_trace, angles_xy, angles_xz, angles_yz = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
+                measured_conductivity.append(measured_non_homogenized_conductivity_tensor_trace)
+                diagram_xy.append(angles_xy)
+                diagram_xz.append(angles_xz)
+                diagram_yz.append(angles_yz)
+                conductivity_tensor_list.append(conductivity_tensor)
+                n_particles_list.append(n_particles)
+
 
             '''
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_radia_distribution_function_option"]:
@@ -131,12 +152,19 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
             with open("packing_properties_anisotropy.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+\
-                               str(measured_eigenvalues[i][2]) + ' ' + str(measured_second_invariant_of_deviatoric_tensor[i]) + '\n')
+                               str(measured_eigenvalues[i][2]) + ' ' + str(measured_second_invariant_of_deviatoric_tensor[i]) + ' ' + str(measured_fabric_tensor[i]) + '\n')
+            df_F = pd.DataFrame(data={"F": fabric_tensor_list})
+            df_F.to_csv("fabric_tensor_diagonal.csv", sep=";")
 
         if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
             with open("packing_properties_conductivity.txt", "w") as f_w:
-                for i in range(len(RVE_lambda_list)):
-                    f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_conductivity[i]) + '\n')
+                for i in range(len(n_particles_list)):
+                    f_w.write(str(n_particles_list[i]) + ' ' + str(measured_conductivity[i]) + '\n')
+            df = pd.DataFrame(data={"rose_xy": diagram_xy, "rose_xz": diagram_xz, "rose_yz": diagram_yz})
+            df.to_csv("rose_diagrams_direction.csv", sep=";")
+            df_K = pd.DataFrame(data={"K": conductivity_tensor_list})
+            df_K.to_csv("conductivity_tensor_diagonal.csv", sep=";")
+
 
         print("Measurement finish")
 
@@ -189,7 +217,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                             density_list.append(density)
 
                     plt.figure(figsize=(8, 6))
-                    plt.plot(lambda_list, density_list, marker='o')
+                    plt.plot(lambda_list[1:], density_list[1:], marker='o')
 
                     plt.xlabel('$\lambda$')
 
@@ -212,7 +240,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                             mcn_list.append(mcn)
 
                     plt.figure(figsize=(8, 6))
-                    plt.plot(lambda_list, mcn_list, marker='o')
+                    plt.plot(lambda_list[1:], mcn_list[1:], marker='o')
 
                     plt.xlabel('$\lambda$')
 
@@ -229,21 +257,34 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     eigenvalue_1_list = []
                     eigenvalue_2_list = []
                     eigenvalue_3_list = []
-                    anisotrpy_intensity_list = []
+                    fabric_tensor_trace_list = []
+                    fabric_tensor_XX_list = []
+                    fabric_tensor_YY_list = []
+                    fabric_tensor_ZZ_list = []
+                    anisotropy_intensity_list = []
+
+                    df = pd.read_csv("fabric_tensor_diagonal.csv",sep=";")
+                    data_base = df["F"].apply(ast.literal_eval)
+                    for i in range(0,len(data_base)):
+                        fabric_tensor_XX_list.append(data_base[i][0])
+                        fabric_tensor_YY_list.append(data_base[i][1])
+                        fabric_tensor_ZZ_list.append(data_base[i][2])
 
                     with open(file_name, 'r') as file:
                         for line in file:
-                            my_lambda, eigenvalue_1, eigenvalue_2, eigenvalue_3, anisotrpy_intensity = map(float, line.split())
+                            my_lambda, eigenvalue_1, eigenvalue_2, eigenvalue_3, anisotropy_intensity, fabric_tensor_trace = map(float, line.split())
                             self.lambda_list.append(my_lambda)
                             eigenvalue_1_list.append(eigenvalue_1)
                             eigenvalue_2_list.append(eigenvalue_2)
                             eigenvalue_3_list.append(eigenvalue_3)
-                            anisotrpy_intensity_list.append(anisotrpy_intensity)
+                            anisotropy_intensity_list.append(anisotropy_intensity)
+                            fabric_tensor_trace_list.append(fabric_tensor_trace)
 
                     plt.figure(figsize=(8, 6))
-                    plt.plot(lambda_list, eigenvalue_1_list, label = '$F$1', marker='o')
-                    plt.plot(lambda_list, eigenvalue_2_list, label = '$F$2', marker='o')
-                    plt.plot(lambda_list, eigenvalue_3_list, label = '$F$3', marker='o')
+                    plt.plot(lambda_list[1:], eigenvalue_1_list[1:], label = '$F$1', marker='o')
+                    plt.plot(lambda_list[1:], eigenvalue_2_list[1:], label = '$F$2', marker='o')
+                    plt.plot(lambda_list[1:], eigenvalue_3_list[1:], label = '$F$3', marker='o')
+
 
                     plt.axhline(y=1/3, color='blue', linestyle='--')
 
@@ -259,13 +300,29 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     plt.close()
 
                     plt.figure(figsize=(8, 6))
-                    plt.plot(lambda_list, anisotrpy_intensity_list, marker='o')
+                    plt.plot(lambda_list[1:], anisotropy_intensity_list[1:], marker='o')
 
                     plt.xlabel('$\lambda$')
-                    plt.ylabel('Anisotrpy intensity')
-                    plt.title(f'Measured anisotrpy intensity')
+                    plt.ylabel('Anisotropy intensity')
+                    plt.title(f'Measured anisotropy intensity')
 
-                    #plt.legend()
+
+                    plt.grid('both')
+
+                    pdf.savefig()
+                    plt.close()
+
+                    plt.figure(figsize=(8, 6))
+                    plt.plot(lambda_list[1:], fabric_tensor_trace_list[1:], marker='o', label = r'Tr($\pmb{F}$)')
+                    plt.plot(lambda_list[1:], fabric_tensor_XX_list[1:], marker = 'o', label = r'$F_{xx}$')
+                    plt.plot(lambda_list[1:], fabric_tensor_YY_list[1:], marker = 'o', label = r'$F_{yy}$')
+                    plt.plot(lambda_list[1:], fabric_tensor_ZZ_list[1:], marker = 'o', label = r'$F_{zz}$')
+
+                    plt.xlabel('$\lambda$')
+                    plt.ylabel('F')
+                    plt.title(f'Measured fabric tensor trace')
+                    plt.legend()
+
                     plt.grid('both')
 
                     pdf.savefig()
@@ -273,23 +330,113 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
                 elif file_name == "packing_properties_conductivity.txt":
                     conductivity_tensor_list = []
+                    conductivity_tensor_XX_list = []
+                    conductivity_tensor_YY_list = []
+                    conductivity_tensor_ZZ_list = []
+                    n_particles_list = []
+
+                    df = pd.read_csv("conductivity_tensor_diagonal.csv",sep=";")
+                    data_base = df["K"].apply(ast.literal_eval)
+                    for i in range(0,len(data_base)):
+                        conductivity_tensor_XX_list.append(data_base[i][0])
+                        conductivity_tensor_YY_list.append(data_base[i][1])
+                        conductivity_tensor_ZZ_list.append(data_base[i][2])
 
                     with open(file_name, 'r') as file:
                         for line in file:
+                            n_particles = int(line.split()[0])
                             conductivity_tensor = float(line.split()[1])
                             conductivity_tensor_list.append(conductivity_tensor)
+                            n_particles_list.append(n_particles)
 
                     plt.figure(figsize=(8, 6))
-                    plt.plot(self.lambda_list, conductivity_tensor_list, label = '$F$1', marker='o')
 
-                    plt.xlabel('$\lambda$')
+                    fig, ax1 = plt.subplots()
+                    fig.set_figheight(6)
+                    fig.set_figwidth(8)
 
-                    plt.ylabel('K')
-                    plt.title(f'Measured mean conductivity')
-                    #plt.legend()
-                    plt.grid('both')
+                    ax1.set_xlabel('$\lambda$')
+                    ax1.set_ylabel("Mean Value K", color="blue")
+                    line1, = ax1.plot(self.lambda_list[1:], conductivity_tensor_list[1:], marker='o', label=r'Tr($\pmb{K}$)',zorder=10)
+                    line2, = ax1.plot(self.lambda_list[1:], conductivity_tensor_XX_list[1:],  marker='o', label=r'$K_{xx}$',zorder=10)
+                    line3, = ax1.plot(self.lambda_list[1:], conductivity_tensor_YY_list[1:], marker='o', label=r'$K_{yy}$',zorder=10)
+                    line4, = ax1.plot(self.lambda_list[1:], conductivity_tensor_ZZ_list[1:], marker='o', label=r'$K_{zz}$',zorder=10)
+                    ax1.tick_params(axis="y", labelcolor="blue")
+
+                    plt.grid(zorder=0)
+
+                    # Add legends
+                    lines = [line1, line2, line3, line4]
+                    labels = [line.get_label() for line in lines]
+                    ax1.legend(lines, labels)
 
                     pdf.savefig()
+                    plt.close()
+
+                    ### ROSES CREATION ###
+
+                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig.suptitle(f'Rose diagram in XY direction', fontsize=25)
+                    axes = axes.flatten()
+
+                    df = pd.read_csv("rose_diagrams_direction.csv",sep=";")
+
+                    for i, (ax, angles) in enumerate(zip(axes, df['rose_xy'].apply(ast.literal_eval))):
+                        # Bin the angles into 10-degree intervals
+                        bins = np.arange(0, 370, 10)  # Bins from 0 to 360 degrees in steps of 10
+                        hist, bin_edges = np.histogram(angles, bins=bins, density=True)
+
+                        # Normalize the histogram to percentages
+                        if hist.sum() > 0:
+                            ax.grid(zorder=2)
+                            hist_percent = hist / hist.sum()
+                            ax.bar(np.deg2rad(bin_edges[:-1]), hist_percent, width=np.deg2rad(10), color='skyblue', edgecolor='black')
+                            ax.set_title(f'N $ = $ {n_particles_list[i]}', fontsize=12)
+                            ax.grid(color='gray', linewidth=0.5, zorder=0)
+
+                    pdf.savefig(fig)
+                    plt.close()
+
+                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig.suptitle(f'Rose diagram in XZ direction', fontsize=25)
+                    axes = axes.flatten()
+
+                    for i, (ax, angles) in enumerate(zip(axes, df['rose_xz'].apply(ast.literal_eval))):
+                        # Bin the angles into 10-degree intervals
+                        bins = np.arange(0, 370, 10)  # Bins from 0 to 360 degrees in steps of 10
+                        hist, bin_edges = np.histogram(angles, bins=bins, density=True)
+
+                        # Normalize the histogram to percentages
+                        if hist.sum() > 0:
+                            ax.grid(zorder=2)
+                            hist_percent = hist / hist.sum()
+                            ax.bar(np.deg2rad(bin_edges[:-1]), hist_percent, width=np.deg2rad(10), color='skyblue', edgecolor='black',zorder=1)
+                            ax.set_title(f'N $ = $ {n_particles_list[i]}', fontsize=12)
+
+                    pdf.savefig(fig)
+                    plt.close()
+
+                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig.suptitle(f'Rose diagram in YZ direction', fontsize=25)
+                    axes = axes.flatten()
+
+                    for i, (ax, angles) in enumerate(zip(axes, df['rose_yz'].apply(ast.literal_eval))):
+                        # Bin the angles into 10-degree intervals
+                        bins = np.arange(0, 370, 10)  # Bins from 0 to 360 degrees in steps of 10
+                        hist, bin_edges = np.histogram(angles, bins=bins, density=True)
+
+                        # Normalize the histogram to percentages
+                        if hist.sum() > 0:
+                            # Customize the grid and set its zorder (bottom layer)
+                            ax.grid(color='gray', linestyle='-', linewidth=0.5, zorder=2)
+                            # Bring axis labels and tick labels to the front
+                            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                                label.set_zorder(0)  # Set zorder for tick labels (front layer)
+                            hist_percent = hist / hist.sum()
+                            ax.bar(np.deg2rad(bin_edges[:-1]), hist_percent, width=np.deg2rad(10), color='skyblue', edgecolor='black',zorder=1)
+                            ax.set_title(f'N $ = $ {n_particles_list[i]}', fontsize=12)
+
+                    pdf.savefig(fig)
                     plt.close()
 
 if __name__ == "__main__":
