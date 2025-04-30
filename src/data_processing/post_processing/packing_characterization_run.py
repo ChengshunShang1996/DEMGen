@@ -277,6 +277,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                         fabric_tensor_XX_list.append(data_base[i][0][0])
                         fabric_tensor_YY_list.append(data_base[i][1][1])
                         fabric_tensor_ZZ_list.append(data_base[i][2][2])
+                        fabric_tensor_trace_list.append((data_base[i][0][0]+data_base[i][1][1]+data_base[i][2][2])/3)
 
                     with open(file_name, 'r') as file:
                         for line in file:
@@ -286,7 +287,6 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                             eigenvalue_2_list.append(eigenvalue_2)
                             eigenvalue_3_list.append(eigenvalue_3)
                             anisotropy_intensity_list.append(anisotropy_intensity)
-                            fabric_tensor_trace_list.append(fabric_tensor_trace)
 
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list[1:], eigenvalue_1_list[1:], label = '$F$1', marker='o')
