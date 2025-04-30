@@ -110,10 +110,12 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
-                eigenvalues, second_invariant_of_deviatoric_tensor, fabric_tensor, fabric_tensor_trace = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
+                eigenvalues, second_invariant_of_deviatoric_tensor, fabric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
                 measured_eigenvalues.append(eigenvalues)
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
-                measured_fabric_tensor.append(fabric_tensor_trace)
+                measured_fabric_tensor.append(fabric_tensor[0][0])
+                measured_fabric_tensor.append(fabric_tensor[1][1])
+                measured_fabric_tensor.append(fabric_tensor[2][2])
                 fabric_tensor_list.append(fabric_tensor)
 
             if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
@@ -264,11 +266,17 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     anisotropy_intensity_list = []
 
                     df = pd.read_csv("fabric_tensor_diagonal.csv",sep=";")
-                    data_base = df["F"].apply(ast.literal_eval)
+                    def parse_fabric_tensor(s):
+                        # Remove outer brackets and parse numbers
+                        numbers = np.fromstring(s.replace('[', '').replace(']', ''), sep=' ')
+                        return numbers.reshape(3, 3)  # Assumes a 3x3 tensor
+                    # Apply parser to column
+                    data_base = df["F"].apply(parse_fabric_tensor)
+
                     for i in range(0,len(data_base)):
-                        fabric_tensor_XX_list.append(data_base[i][0])
-                        fabric_tensor_YY_list.append(data_base[i][1])
-                        fabric_tensor_ZZ_list.append(data_base[i][2])
+                        fabric_tensor_XX_list.append(data_base[i][0][0])
+                        fabric_tensor_YY_list.append(data_base[i][1][1])
+                        fabric_tensor_ZZ_list.append(data_base[i][2][2])
 
                     with open(file_name, 'r') as file:
                         for line in file:
