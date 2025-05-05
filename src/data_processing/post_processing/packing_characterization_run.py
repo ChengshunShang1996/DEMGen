@@ -21,6 +21,9 @@ import scienceplots
 import numpy as np
 import pandas as pd
 import ast
+import os
+from pathlib import Path
+
 
 plt.style.use(['science'])
 
@@ -30,13 +33,157 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         super().__init__(model, parameters)
         self.parameters = parameters
         with open('ParametersDEMGen.json', 'r') as file:
-            self.parameters_DEMGen = json.load(file)
+            self.parameters_DEMGen = KratosMultiphysics.Parameters(file.read())
 
+    def CreateMDPA(self): # Now we ensure that we are analyzing the last packing generated from the simulation (folder inletPG_Post_Files)
+        # Set the directory to search in
+        script_dir = Path(__file__).resolve().parent
+
+        meshes_dir = script_dir.parent / "inletPG_Post_Files"
+        # Find all .post.msh files in inletPG_Post_Files/
+        post_files = list(meshes_dir.glob("*.post.msh"))
+
+        # Check if any .post files were found
+        if not post_files:
+            print("No .post files found in the folder.")
+        else:
+            # Find the most recently modified .post file
+            latest_post_file = max(post_files, key=lambda f: f.stat().st_mtime)
+
+            # Print the file name
+            print(f"Latest .post file: {latest_post_file.name}")
+
+        SpheresMesh = open(str(meshes_dir) + '/' + latest_post_file.name, 'r')
+        SpheresMdpa = open("inletPGDEM.mdpa", 'w')
+
+        node_section_started = False
+        node_section_finished = False
+        element_section_started = False
+        boundary_analysis = False
+        node_list = []
+        coord_x_list = []
+        coord_y_list = []
+        coord_z_list = []
+        element_list = []
+        radius_list = []
+        props_list = []
+        zeros_list = []
+        boundary_coordinates_list = []
+
+        for Line in SpheresMesh:
+
+            if Line.startswith('Coordinates'):
+                node_section_started = True
+                continue
+            if node_section_started and not node_section_finished:
+                if Line.startswith('End Coordinates'):
+                    node_section_finished = True
+                    continue
+                data = Line.split(" ")
+                node_list.append(data[0])
+                coord_x_list.append(data[1])
+                coord_y_list.append(data[2])
+                coord_z_list.append(data[3])
+                zeros_list.append('0')
+
+            if Line.startswith('Elements'):
+                element_section_started = True
+                continue
+
+            if element_section_started: # and not element_section_finished:
+                if Line.startswith('End Elements'):
+                    element_section_started = False
+                    continue
+                data = Line.split(" ")
+                element_list.append(data[0])
+                radius_list.append(data[2])
+                props_list.append(data[3])
+
+            if Line.startswith('MESH "Kratos_Line3D2_Mesh_10000" dimension 3 ElemType Linear Nnode 2'): # SubModelPart of the bounding box
+                boundary_analysis = True
+                continue
+
+            if boundary_analysis:
+                if not (Line.startswith('Coordinates') or Line.startswith('End Coordinates')):
+                    data = Line.split(" ")
+                    boundary_coordinates_list.append(float(data[1]))
+                    boundary_coordinates_list.append(float(data[2]))
+                    boundary_coordinates_list.append(float(data[3]))
+                if Line.startswith('End Coordinates'):
+                    break
+
+        SpheresMesh.close()
+
+        node_list = [int(i) for i in node_list]
+        coord_x_list = [float(i) for i in coord_x_list]
+        coord_y_list = [float(i) for i in coord_y_list]
+        coord_z_list = [float(i) for i in coord_z_list]
+        element_list = [int(i) for i in element_list]
+        radius_list = [float(i) for i in radius_list]
+        props_list = [int(i) for i in props_list]
+        zeros_list = [int(i) for i in zeros_list]
+
+        SpheresMdpa.write('''Begin ModelPartData
+        //  VARIABLE_NAME value
+        End ModelPartData
+
+        Begin Properties 0
+        End Properties
+
+        Begin Nodes\n''')
+
+        for i in range(len(node_list)):
+            SpheresMdpa.write("%i %12.8f %12.8f %12.8f\n" % (node_list[i], coord_x_list[i], coord_y_list[i], coord_z_list[i]))
+
+        SpheresMdpa.write('''End Nodes
+
+        Begin Elements SphericParticle3D\n''')
+
+        for i in range(len(node_list)):
+            SpheresMdpa.write("%i %i %i\n" % (element_list[i], props_list[i], node_list[i]))
+
+        SpheresMdpa.write('''End Elements
+
+        Begin NodalData RADIUS\n''')
+
+        for i in range(len(node_list)):
+            SpheresMdpa.write("%i %i %12.8f\n" % (node_list[i], zeros_list[i], radius_list[i]))
+
+        SpheresMdpa.write('''End NodalData
+
+        Begin SubModelPart DEMParts_Body // Group dem // Subtree PartsCont
+            Begin SubModelPartNodes\n''')
+
+        for i in range(len(node_list)):
+            SpheresMdpa.write("%i\n" % (node_list[i]))
+
+        SpheresMdpa.write('''End SubModelPartNodes
+            Begin SubModelPartElements\n''')
+
+        for i in range(len(node_list)):
+            SpheresMdpa.write("%i\n" % (element_list[i]))
+
+        SpheresMdpa.write('''End SubModelPartElements
+            Begin SubModelPartConditions
+            End SubModelPartConditions
+        End SubModelPart\n''')
+
+        SpheresMdpa.close()
+        print('WARNING: The assignment of the boundaries assumes the domain as a cube centered at (0,0,0)')
+        length_domain = max(boundary_coordinates_list) - min(boundary_coordinates_list)
+        self.parameters_DEMGen["domain_length_x"].SetDouble(length_domain)
+        self.parameters_DEMGen["domain_length_y"].SetDouble(length_domain)
+        self.parameters_DEMGen["domain_length_z"].SetDouble(length_domain)
+        self.parameters["BoundingBoxMinX"].SetDouble(min(boundary_coordinates_list))
+        self.parameters["BoundingBoxMaxX"].SetDouble(max(boundary_coordinates_list))
+        self.parameters["BoundingBoxMinY"].SetDouble(min(boundary_coordinates_list))
+        self.parameters["BoundingBoxMaxY"].SetDouble(max(boundary_coordinates_list))
+        self.parameters["BoundingBoxMinZ"].SetDouble(min(boundary_coordinates_list))
+        self.parameters["BoundingBoxMaxZ"].SetDouble(max(boundary_coordinates_list))
 
     def Initialize(self):
         super().Initialize()
         self.InitializePackingCharacterization()
-        #self.GetInitialDemSphereVolume()
 
     def InitializePackingCharacterization(self):
 
@@ -77,8 +224,8 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
     def MeasureLocalPropertiesWithDifferentRadius(self):
 
         print("Start measurement")
-        max_diameter = self.parameters_DEMGen["particle_radius_max"] * 2.0
-        RVE_lambda = self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_initial"]
+        max_diameter = self.parameters_DEMGen["particle_radius_max"].GetDouble() * 2.0
+        RVE_lambda = self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_initial"].GetInt()
         side_length = max_diameter * RVE_lambda
         side_length_max = self.domain_x_max - self.domain_x_min
         #update this center point if necessary. Center point is (0, 0 ,0) by default
@@ -103,13 +250,13 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         while side_length <= side_length_max:
 
             RVE_lambda_list.append(RVE_lambda)
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"].GetBool():
                 measured_packing_density.append(1 - self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'porosity'))
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"].GetBool():
                 measured_mean_coordination_number.append(self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'averaged_coordination_number'))
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"].GetBool():
                 eigenvalues, second_invariant_of_deviatoric_tensor, fabric_tensor = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'fabric_tensor')
                 measured_eigenvalues.append(eigenvalues)
                 measured_second_invariant_of_deviatoric_tensor.append(second_invariant_of_deviatoric_tensor)
@@ -118,7 +265,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 measured_fabric_tensor.append(fabric_tensor[2][2])
                 fabric_tensor_list.append(fabric_tensor)
 
-            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+            if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"].GetBool():
                 n_particles, conductivity_tensor, measured_non_homogenized_conductivity_tensor_trace, angles_xy, angles_xz, angles_yz = self.MeasureSphereForGettingPackingProperties((side_length/2), center_x, center_y, center_z, 'conductivity_tensor')
                 measured_conductivity.append(measured_non_homogenized_conductivity_tensor_trace)
                 diagram_xy.append(angles_xy)
@@ -136,21 +283,21 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                 self.MeasureCubicForGettingPackingProperties(side_length, center_x, center_y, center_z, 'voronoi_input_data')
             '''
 
-            RVE_lambda += self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_increment"]
+            RVE_lambda += self.parameters_DEMGen["packing_charcterization_setting"]["RVE_lambda_increment"].GetInt()
             side_length = max_diameter * RVE_lambda
             #side_length = round(side_length, 4)
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"].GetBool():
             with open("packing_properties_density.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' '+ str(measured_packing_density[i]) + '\n')
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"].GetBool():
             with open("packing_properties_mean_coordination_number.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_mean_coordination_number[i]) + '\n')
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"].GetBool():
             with open("packing_properties_anisotropy.txt", "w") as f_w:
                 for i in range(len(RVE_lambda_list)):
                     f_w.write(str(RVE_lambda_list[i]) + ' ' + str(measured_eigenvalues[i][0]) + ' '+ str(measured_eigenvalues[i][1]) + ' '+\
@@ -158,7 +305,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
             df_F = pd.DataFrame(data={"F": fabric_tensor_list})
             df_F.to_csv("fabric_tensor_diagonal.csv", sep=";")
 
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"].GetBool():
             with open("packing_properties_conductivity.txt", "w") as f_w:
                 for i in range(len(n_particles_list)):
                     f_w.write(str(n_particles_list[i]) + ' ' + str(measured_conductivity[i]) + '\n')
@@ -176,13 +323,13 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         from datetime import datetime
 
         file_names = []
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_density_option"].GetBool():
             file_names.append("packing_properties_density.txt")
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_mean_coordination_number_option"].GetBool():
             file_names.append("packing_properties_mean_coordination_number.txt")
         if self.parameters_DEMGen["packing_charcterization_setting"]["measure_anisotropy_option"]:
             file_names.append("packing_properties_anisotropy.txt")
-        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"]:
+        if self.parameters_DEMGen["packing_charcterization_setting"]["measure_conductivity_tensor_option"].GetBool():
             file_names.append("packing_properties_conductivity.txt")
 
         github_link = "https://github.com/ChengshunShang1996/DEMGen"
@@ -266,6 +413,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     anisotropy_intensity_list = []
 
                     df = pd.read_csv("fabric_tensor_diagonal.csv",sep=";")
+                        # Parse the NumPy-like string using np.fromstring
                     def parse_fabric_tensor(s):
                         # Remove outer brackets and parse numbers
                         numbers = np.fromstring(s.replace('[', '').replace(']', ''), sep=' ')
@@ -277,7 +425,6 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                         fabric_tensor_XX_list.append(data_base[i][0][0])
                         fabric_tensor_YY_list.append(data_base[i][1][1])
                         fabric_tensor_ZZ_list.append(data_base[i][2][2])
-                        fabric_tensor_trace_list.append((data_base[i][0][0]+data_base[i][1][1]+data_base[i][2][2])/3)
 
                     with open(file_name, 'r') as file:
                         for line in file:
@@ -287,6 +434,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                             eigenvalue_2_list.append(eigenvalue_2)
                             eigenvalue_3_list.append(eigenvalue_3)
                             anisotropy_intensity_list.append(anisotropy_intensity)
+                            fabric_tensor_trace_list.append(fabric_tensor_trace)
 
                     plt.figure(figsize=(8, 6))
                     plt.plot(lambda_list[1:], eigenvalue_1_list[1:], label = '$F$1', marker='o')
@@ -352,7 +500,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
                     with open(file_name, 'r') as file:
                         for line in file:
-                            n_particles = int(line.split()[0])
+                            n_particles = int(float(line.split()[0]))
                             conductivity_tensor = float(line.split()[1])
                             conductivity_tensor_list.append(conductivity_tensor)
                             n_particles_list.append(n_particles)
@@ -383,7 +531,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
                     ### ROSES CREATION ###
 
-                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig, axes = plt.subplots(4, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
                     fig.suptitle(f'Rose diagram in XY direction', fontsize=25)
                     axes = axes.flatten()
 
@@ -405,7 +553,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     pdf.savefig(fig)
                     plt.close()
 
-                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig, axes = plt.subplots(4, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
                     fig.suptitle(f'Rose diagram in XZ direction', fontsize=25)
                     axes = axes.flatten()
 
@@ -424,7 +572,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
                     pdf.savefig(fig)
                     plt.close()
 
-                    fig, axes = plt.subplots(3, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
+                    fig, axes = plt.subplots(4, 6, figsize=(30, 20), subplot_kw={'projection': 'polar'})
                     fig.suptitle(f'Rose diagram in YZ direction', fontsize=25)
                     axes = axes.flatten()
 
@@ -453,4 +601,6 @@ if __name__ == "__main__":
         parameters = KratosMultiphysics.Parameters(parameter_file.read())
 
     model = KratosMultiphysics.Model()
-    ParticlePackingCharacterizationRun(model, parameters).Run()
+    packing_characterizer = ParticlePackingCharacterizationRun(model, parameters)
+    packing_characterizer.CreateMDPA()
+    packing_characterizer.Run()
