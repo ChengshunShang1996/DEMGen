@@ -40,14 +40,14 @@ class RadiusExpansionWithServoControlMethod(DynamicMethod):
         os.chdir(aim_path)
         if self.last_try:
             if os.name == 'nt': # for windows
-                os.system("python radius_expansion_method_with_servo_control_run_final.py")
+                os.system("python radius_expansion_with_servo_control_method_run_final.py")
             else: # for linux
-                os.system("python3 radius_expansion_method_with_servo_control_run_final.py")
+                os.system("python3 radius_expansion_with_servo_control_method_run_final.py")
         else:
             if os.name == 'nt': # for windows
-                os.system("python radius_expansion_method_with_servo_control_run.py")
+                os.system("python radius_expansion_with_servo_control_method_run.py")
             else: # for linux
-                os.system("python3 radius_expansion_method_with_servo_control_run.py")
+                os.system("python3 radius_expansion_with_servo_control_method_run.py")
 
         if os.path.isfile("success.txt"):
             os.chdir(current_path)

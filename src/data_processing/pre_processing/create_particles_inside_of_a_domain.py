@@ -119,7 +119,7 @@ class CreateParticlesInsideOfADomain():
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         elif self.parameters_all["generator_name"].GetString() == "radius_expansion_with_servo_control_method":
-            seed_file_name_list = ['radius_expansion_method_with_servo_control_run.py', 'radius_expansion_method_with_servo_control_run_final.py', 'plot_stress.py']
+            seed_file_name_list = ['radius_expansion_with_servo_control_method_run.py', 'radius_expansion_with_servo_control_method_run_final.py', 'plot_stress.py']
             for seed_file_name in seed_file_name_list:
                 seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
                 aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
