@@ -61,15 +61,16 @@ class RadiusExpansionMethodWithServoControl(DynamicMethod):
         self.Initialization(parameters, ini_path)
         packing_num = self.parameters["packing_num"]
         target_packing_density = self.parameters["random_particle_generation_parameters"]["target_packing_density"]
-        target_packing_density_list = [target_packing_density-0.002, target_packing_density-0.02, target_packing_density-0.05, target_packing_density-0.075, target_packing_density-0.1, target_packing_density-0.15]
+        packing_density_delta_list = self.parameters["random_particle_generation_parameters"]["packing_density_delta_list"]
+        try_packing_density_list = [target_packing_density - delta for delta in packing_density_delta_list]
         self.packing_cnt = 1
         if os.path.isfile("generation_marker.txt"):
             os.remove("generation_marker.txt")
         while self.packing_cnt <= packing_num:
             self.last_try = False
-            for try_packing_density in target_packing_density_list:
+            for try_packing_density in try_packing_density_list:
                 self.try_packing_density = try_packing_density
-                if try_packing_density == target_packing_density_list[-1]:
+                if try_packing_density == try_packing_density_list[-1]:
                     self.last_try = True
                 with open("generation_marker.txt", "a") as marker_file:
                     marker_file.write("Generation " + str(self.packing_cnt) + " - " + str(try_packing_density) + "\n")

@@ -28,6 +28,7 @@
         "NAME" : "DEMGen",
         "target_packing_density": 0.635,
         "target_packing_density_tolerance": 0.0,
+        "packing_density_delta_list" : [2.5e-4, 5e-4, 1e-3, 2.5e-3, 5e-3, 1e-2],
         "domain_scale_multiplier": 1.0
     },
     "packing_charcterization_option" : true,
