@@ -14,7 +14,7 @@ import os
 from dynamic_methods.dynamic_method import DynamicMethod
 from data_processing.pre_processing import create_particles_inside_of_a_domain
 
-class RadiusExpansionMethodWithServoControl(DynamicMethod):
+class RadiusExpansionWithServoControlMethod(DynamicMethod):
 
     def __init__(self) -> None:
 

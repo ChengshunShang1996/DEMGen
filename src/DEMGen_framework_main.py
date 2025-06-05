@@ -64,10 +64,10 @@ class DEMGenMainFramework():
             MyDEM = radius_expansion_method.RadiusExpansionMethod()
             MyDEM.Run(self.parameters, self.ini_path)
 
-        elif self.parameters["generator_name"] == "radius_expansion_method_with_servo_control":
+        elif self.parameters["generator_name"] == "radius_expansion_with_servo_control_method":
             
-            from dynamic_methods import radius_expansion_method_with_servo_control
-            MyDEM = radius_expansion_method_with_servo_control.RadiusExpansionMethodWithServoControl()
+            from src.dynamic_methods import radius_expansion_with_servo_control_method
+            MyDEM = radius_expansion_with_servo_control_method.RadiusExpansionWithServoControlMethod()
             MyDEM.Run(self.parameters, self.ini_path)
 
         elif self.parameters["generator_name"] == "cubic_arrangement_method":
@@ -150,8 +150,7 @@ class DEMGenMainFramework():
 if __name__ == "__main__":
     
     TestDEM = DEMGenMainFramework()
-    #aim_path = 'C:\\Users\\cshang.PCCB201\\Desktop\\particle_packing_generator\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
-    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_method_with_servo_control\\ParametersDEMGen.json'
+    aim_path = 'C:\\Users\\10237\\Desktop\\DEMGen\\example\\test_radius_expansion_with_servo_control_method\\ParametersDEMGen.json'
     TestDEM.Initilization(aim_path)
     TestDEM.GenerationRun()
     TestDEM.CharacterizationRun()
