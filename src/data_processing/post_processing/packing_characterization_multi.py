@@ -29,6 +29,9 @@ class PackingCharacterizationMulti(PackingCharacterization):
 
     def RunDEM(self):
 
+        print("Warning: This method is not implemented for multi-packing characterization. ")
+        exit(0)
+        #TODO:
         packing_num = self.parameters["packing_num"]
         packing_cnt = 1
         current_path = os.getcwd()
