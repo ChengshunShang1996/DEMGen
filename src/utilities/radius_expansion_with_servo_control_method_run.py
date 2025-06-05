@@ -344,11 +344,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
     def MeasureTotalPackingDensityOfFinalPacking(self):
 
-        selected_element_volume = 0.0
-        for node in self.spheres_model_part.Nodes:
-            r = node.GetSolutionStepValue(RADIUS)
-            element_volume = 4/3 * math.pi * r * r * r
-            selected_element_volume += element_volume
+        selected_element_volume = self.MeasureTotalSpheresVolume()
 
         self.final_packing_density = selected_element_volume / self.final_packing_volume
 

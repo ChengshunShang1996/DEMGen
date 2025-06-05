@@ -184,7 +184,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             if self.start_reset_velocity:
                 
-                self.PrintResultsForGid(self.time)
+                #self.PrintResultsForGid(self.time)
 
                 max_particle_velocity = self.GetMaximumVelocity()
 
