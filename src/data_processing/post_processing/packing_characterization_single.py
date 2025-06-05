@@ -38,7 +38,8 @@ class PackingCharacterizationSingle(PackingCharacterization):
         os.chdir(aim_path)
         if os.name == 'nt': # for windows
             #os.system("python packing_characterization_run.py")
-            #subprocess.run(['python', 'packing_characterization_run.py'], check=True)
+            subprocess.run(['python', 'packing_characterization_run.py'], check=True)
+            '''
             try:
                 result = subprocess.run(
                     ['python', 'packing_characterization_run.py'],
@@ -50,7 +51,7 @@ class PackingCharacterizationSingle(PackingCharacterization):
             except subprocess.CalledProcessError as e:
                 print("Script failed with return code:", e.returncode)
                 print("Standard output:\n", e.stdout)
-                print("Standard error:\n", e.stderr)
+                print("Standard error:\n", e.stderr)'''
         else: # for linux
             os.system("python3 packing_characterization_run.py")
 

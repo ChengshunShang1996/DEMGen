@@ -70,6 +70,12 @@ class DEMGenMainFramework():
             MyDEM = radius_expansion_with_servo_control_method.RadiusExpansionWithServoControlMethod()
             MyDEM.Run(self.parameters, self.ini_path)
 
+        elif self.parameters["generator_name"] == "improved_radius_expansion_with_servo_control_method":
+
+            from dynamic_methods import improved_radius_expansion_with_servo_control_method
+            MyDEM = improved_radius_expansion_with_servo_control_method.ImprovedRadiusExpansionWithServoControlMethod()
+            MyDEM.Run(self.parameters, self.ini_path)
+
         elif self.parameters["generator_name"] == "cubic_arrangement_method":
 
             from constructive_methods import cubic_arrangement_method
