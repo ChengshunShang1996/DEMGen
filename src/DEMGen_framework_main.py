@@ -109,6 +109,7 @@ class DEMGenMainFramework():
         else:
             print("No packing analysis has been done because [packing_charcterization_option] is set as [False]")
 
+        print("Particle packing characterization finished.")
 
     def Finalization(self):
         
