@@ -155,17 +155,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             node.SetSolutionStepValue(VELOCITY_Y, 0.0)
             node.SetSolutionStepValue(VELOCITY_Z, 0.0)
 
-    def GetMaximumVelocity(self):
-        max_particle_velocity = 0.0
-        for node in self.spheres_model_part.Nodes:
-            velocity_x = node.GetSolutionStepValue(VELOCITY_X)
-            velocity_y = node.GetSolutionStepValue(VELOCITY_Y)
-            velocity_z = node.GetSolutionStepValue(VELOCITY_Z)
-            velocity_magnitude = (velocity_x * velocity_x + velocity_y * velocity_y + velocity_z * velocity_z)**0.5
-            if velocity_magnitude > max_particle_velocity:
-                max_particle_velocity = velocity_magnitude
-        return max_particle_velocity
-
+    #TODO: this should be moved to CPP, too expensive to calculate in python
     def GetGranularTemperature(self):
         vel_x = []
         vel_y = []
@@ -226,12 +216,12 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
-            granular_temperature, max_granular_temperature = self.GetGranularTemperature()
-
             with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
 
+            #TODO: this should be optional, not always output
+            granular_temperature, max_granular_temperature = self.GetGranularTemperature()
             with open("granular_temperature_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(granular_temperature) + ' ' + str(max_granular_temperature) + '\n')
 
@@ -245,7 +235,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         print("The packing density is higher than the target packing density, the simulation will be terminated.")
                         time.sleep(5)
                         exit(0)
-                    #max_particle_velocity = self.GetMaximumVelocity()
 
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
                     target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
