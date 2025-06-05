@@ -102,7 +102,7 @@ If the related parameters in [ParametersDEMGen.json][ParametersDEMGen_link] are 
 
 ### Checking Results
 
-In the case folder or in the generated case folder, there will be a folder call "show packing", there you can find the post-procesing file of the generated packing. Then it can be checked in Paraview or Gid.
+In the case folder or in the generated case folder, there will be a folder call "show packing", there you can find the post-processing file of the generated packing. Then it can be checked in Paraview or Gid.
 
 ## Examples
 
