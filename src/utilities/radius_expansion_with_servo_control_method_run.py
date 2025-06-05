@@ -216,7 +216,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
-            
+
             if self.is_start_servo_control:
                 with open("stress_tensor_0.txt", 'a') as file:
                         file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
@@ -241,7 +241,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     #if ((self.normalized_kinematic_energy < 1e-8) and (mean_stress < 5000)) or ((max_particle_velocity < 1e-3) and (mean_stress < 5000)):
                     target_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
                     target_mean_stress = (target_stress[0] + target_stress[1] + target_stress[2]) / 3
-                    if mean_stress < target_mean_stress * 1.2: # (target stress, packing density) in the accessiable region
+                    if mean_stress < target_mean_stress: # (target stress, packing density) in the accessiable region
                         self.second_stage_flag = True
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
@@ -258,7 +258,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.second_stage_flag = True
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
-                        if mean_stress > target_mean_stress * 1.2:
+                        if mean_stress > target_mean_stress:
                             self.is_in_inaccessibale_region2 = True
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)

@@ -89,6 +89,7 @@ class DEMGenMainFramework():
 
     def CharacterizationRun(self):
 
+        print("Start particle packing characterization...")
         #particle packing characterization
         if self.parameters["packing_charcterization_option"] is True:
             
