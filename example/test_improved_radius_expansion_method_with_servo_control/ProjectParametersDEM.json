@@ -22,8 +22,8 @@
         "BoundingBoxServoLoadingFactor"    : 1,
         "BoundingBoxServoLoadingFrequency" : 10,
         "BoundingBoxServoLoadingVelocityMax": 1.0,
-        "MeanParticleDiameterD50"          : 0.0002,
-        "ParticleYoungsModulus"            : 5e6
+        "MeanParticleDiameterD50"          : 0.0001,
+        "ParticleYoungsModulus"            : 2e9
     },
     "GravityX"                       : 0.0,
     "GravityY"                       : 0.0,
