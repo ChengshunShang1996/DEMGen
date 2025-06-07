@@ -50,16 +50,20 @@ class CreateParticlesInsideOfADomain():
         self.parameters_all = Parameters(parameters_file.read())
         self.parameters = self.parameters_all["random_particle_generation_parameters"]
         self.initial_target_packing_density = self.parameters["target_packing_density"].GetDouble()
+        self.tolerance_of_packing_density = self.parameters["tolerance_of_packing_density"].GetDouble()
+        self.tolerance_of_unbalanced_force = self.parameters["tolerance_of_unbalanced_force"].GetDouble()
+        self.tolerance_of_target_mean_stress = self.parameters["tolerance_of_target_mean_stress"].GetDouble()
+        self.minimum_mean_stress = self.parameters["minimum_mean_stress"].GetDouble()
         if try_packing_density != 0.0:
             self.parameters["target_packing_density"].SetDouble(try_packing_density)
         print("try_packing_density = {}".format(try_packing_density))
         print("target_packing_density = {}".format(self.parameters["target_packing_density"].GetDouble()))
         original_psd = self.parameters["random_variable_settings"]["possible_values"].GetVector()
         #scaled_pad = [x * self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble() for x in original_psd]
-        radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
+        self.radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
         scaled_psd = []
         for i in range(len(original_psd)):
-            scaled_psd.append(original_psd[i] * radius_scale_multiplier)
+            scaled_psd.append(original_psd[i] * self.radius_scale_multiplier)
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_psd)
 
         self.packing_cnt = packing_cnt
@@ -132,6 +136,28 @@ class CreateParticlesInsideOfADomain():
                                 line = line.replace("0.635", str(self.initial_target_packing_density))
                             f_material_w.write(line)
 
+        elif self.parameters_all["generator_name"].GetString() == "improved_radius_expansion_with_servo_control_method":
+            seed_file_name_list = ['improved_radius_expansion_with_servo_control_method_run.py', 'improved_radius_expansion_with_servo_control_method_run_final.py', 'plot_stress.py']
+            for seed_file_name in seed_file_name_list:
+                seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', seed_file_name)
+                aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+                with open(seed_file_path_and_name, "r") as f_material:
+                    with open(aim_file_path_and_name, "w") as f_material_w:
+                        for line in f_material.readlines():
+                            if "self.target_packing_density =" in line:
+                                line = line.replace("0.64", str(self.initial_target_packing_density))
+                            if "ax2.axhline(y=" in line:
+                                line = line.replace("0.635", str(self.initial_target_packing_density))
+                            if "self.tolerance_of_packing_density =" in line:
+                                line = line.replace("0.0001", str(self.tolerance_of_packing_density))
+                            if "self.tolerance_of_unbalanced_force =" in line:
+                                line = line.replace("0.01", str(self.tolerance_of_unbalanced_force))
+                            if "self.tolerance_of_target_mean_stress =" in line:
+                                line = line.replace("100", str(self.tolerance_of_target_mean_stress))
+                            if "self.minimum_mean_stress =" in line:
+                                line = line.replace("1000", str(self.minimum_mean_stress))
+                            f_material_w.write(line)
+
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
         aim_file_path_and_name = os.path.join(aim_path, 'show_packing.py')
         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
@@ -143,10 +169,9 @@ class CreateParticlesInsideOfADomain():
         particle_volume = 0
         #aim_particle_number = self.parameters["aim_particle_number"].GetInt()
         target_packing_density = self.parameters["target_packing_density"].GetDouble()
-        target_packing_density_tolerance = self.parameters["target_packing_density_tolerance"].GetDouble()
         print("target_packing_density = {}".format(target_packing_density))
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
-        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * (target_packing_density + target_packing_density_tolerance) * (radius_scale_multiplier ** 3)
+        aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * target_packing_density * (radius_scale_multiplier ** 3)
 
         check_intial_overlap_option = False
         if "check_initial_overlap_option" in self.parameters.keys():
