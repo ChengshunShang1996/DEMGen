@@ -28,6 +28,8 @@ if os.path.exists("inletPGDEM.mdpa"):
     os.remove("inletPGDEM.mdpa")
 if os.path.exists("stress_tensor_0.txt"):
     os.remove("stress_tensor_0.txt")
+if os.path.exists("stress_tensor_1.txt"):
+    os.remove("stress_tensor_1.txt")
 if os.path.exists("inletPGDEM_post_1.mdpa"):
     os.remove("inletPGDEM_post_1.mdpa")
 ''' 
@@ -131,8 +133,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.dt = self.spheres_model_part.ProcessInfo[DELTA_TIME]
         self.final_check_frequency  = int(self.parameters["GraphExportFreq"].GetDouble()/self.parameters["MaxTimeStep"].GetDouble())
         self.final_check_counter = 0
-        self.final_check_counter_2 = 0
-        self.final_check_counter_reset = 0
+        self.final_check_counter_ini = 0
         self.measured_stress_list = []
         self.target_packing_density = 0.64
         self.tolerance_of_packing_density = 0.0001
@@ -149,8 +150,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             self.DEM_material_parameters = Parameters(materials_file.read())
 
         self.initial_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].GetDouble()
+        self.initial_rolling_friction_coefficient = self.DEM_material_parameters["material_relations"][0]["Variables"]["ROLLING_FRICTION"].GetDouble()
         self.DEM_material_parameters["material_relations"][0]["Variables"]["STATIC_FRICTION"].SetDouble(0.0)
         self.DEM_material_parameters["material_relations"][0]["Variables"]["DYNAMIC_FRICTION"].SetDouble(0.0)
+        self.DEM_material_parameters["material_relations"][0]["Variables"]["ROLLING_FRICTION"].SetDouble(0.0)
 
     def SetResetStart(self):
 
@@ -197,6 +200,18 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         return (T_x+T_y+T_z)/3, max_gran_temp
 
+    def InitializeSolutionStep(self):
+        super().InitializeSolutionStep()
+
+        if self.final_check_counter_ini == self.final_check_frequency:
+
+            self.final_check_counter_ini = 0
+
+            if self.DEM_parameters["ContactMeshOption"].GetBool():
+                self.UpdateIsTimeToPrintInModelParts(True)
+
+        self.final_check_counter_ini += 1
+
     def OutputSolutionStep(self):
 
         if not self.start_reset_velocity:
@@ -208,9 +223,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             self.DEMFEMProcedures.PrintAdditionalGraphs(self.time, self._GetSolver())
             self.DEMEnergyCalculator.CalculateEnergyAndPlot(self.time)
 
-            self._GetSolver().PrepareElementsForPrinting()
-            if self.DEM_parameters["ContactMeshOption"].GetBool():
-                self._GetSolver().PrepareContactElementsForPrinting()
+        self._GetSolver().PrepareElementsForPrinting()
+        if self.DEM_parameters["ContactMeshOption"].GetBool():
+            self._GetSolver().PrepareContactElementsForPrinting()
 
         if self.ZeroFrictionPhase and self.zero_friction_phase_counter == 100:
             self.zero_friction_phase_counter = 0
@@ -246,6 +261,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
 
             if self.is_start_servo_control:
+                with open("stress_tensor_1.txt", 'a') as file:
+                    file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
+                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
+            else:
                 with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
                                 + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
@@ -286,6 +305,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                             self.is_start_servo_control = True
                             self.parameters["BoundingBoxMoveOption"].SetBool(True)
                             self.parameters["BoundingBoxServoLoadingOption"].SetBool(True)
+                            for properties in self.spheres_model_part.Properties:
+                                for subproperties in properties.GetSubProperties():
+                                    subproperties[ROLLING_FRICTION] = self.initial_rolling_friction_coefficient
                         
                         #self.copy_files_and_run_show_results()
                         #exit(0)
@@ -302,6 +324,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                             for subproperties in properties.GetSubProperties():
                                 subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
                                 subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
+                                subproperties[ROLLING_FRICTION] = self.initial_rolling_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                     else:

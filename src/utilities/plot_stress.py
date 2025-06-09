@@ -11,7 +11,7 @@ plt.xlabel('Time / s')
 plt.ylabel(r'$\bar{p}$ / MPa')   
 # create the BTS_peak_points.dat
 
-aim_path_and_name = os.path.join(os.getcwd(), 'stress_tensor_0.txt')
+aim_path_and_name = os.path.join(os.getcwd(), 'stress_tensor_1.txt')
 
 if os.path.isfile(aim_path_and_name):
     X12, Y12 = [], []

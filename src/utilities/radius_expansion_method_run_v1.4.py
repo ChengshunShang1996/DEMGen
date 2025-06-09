@@ -121,6 +121,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter = 0
         self.final_check_counter_2 = 0
         self.final_check_counter_reset = 0
+        self.final_check_counter_ini = 0
     
     def SetResetStart(self):
 
@@ -143,6 +144,18 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 max_particle_velocity = velocity_magnitude
         return max_particle_velocity
     
+    def InitializeSolutionStep(self):
+        super().InitializeSolutionStep()
+
+        if self.final_check_counter_ini == self.final_check_frequency:
+
+            self.final_check_counter_ini = 0
+
+            if self.DEM_parameters["ContactMeshOption"].GetBool():
+                self.UpdateIsTimeToPrintInModelParts(True)
+
+        self.final_check_counter_ini += 1
+
     def OutputSolutionStep(self):
         
         if not self.start_reset_velocity:

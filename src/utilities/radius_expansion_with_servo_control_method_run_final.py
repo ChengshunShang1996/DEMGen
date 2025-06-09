@@ -128,6 +128,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.final_check_counter = 0
         self.final_check_counter_2 = 0
         self.final_check_counter_reset = 0
+        self.final_check_counter_ini = 0
         self.measured_stress_list = []
         self.target_packing_density = 0.64
 
@@ -196,6 +197,18 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
         return (T_x+T_y+T_z)/3, max_gran_temp
 
+    def InitializeSolutionStep(self):
+        super().InitializeSolutionStep()
+
+        if self.final_check_counter_ini == self.final_check_frequency:
+
+            self.final_check_counter_ini = 0
+
+            if self.DEM_parameters["ContactMeshOption"].GetBool():
+                self.UpdateIsTimeToPrintInModelParts(True)
+
+        self.final_check_counter_ini += 1
+    
     def OutputSolutionStep(self):
 
         super().OutputSolutionStep()
