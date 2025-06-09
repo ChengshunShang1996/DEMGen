@@ -2,7 +2,7 @@
     "problem_name"   : "inletPG",
     "generator_type" : "dynamic",
     "generator_name" : "improved_radius_expansion_with_servo_control_method",
-    "packing_num"    : 1,
+    "packing_num"    : 3,
     "domain_length_x": 0.005,
     "domain_length_y": 0.005,
     "domain_length_z": 0.005,
