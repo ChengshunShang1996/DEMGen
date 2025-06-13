@@ -18,19 +18,18 @@ class RadiusExpansionWithServoControlMethod(DynamicMethod):
 
     def __init__(self) -> None:
 
-        pass
+        self.CreateIniCases = create_particles_inside_of_a_domain.CreateParticlesInsideOfADomain()
 
     def CreateInitialCases(self):
-
-        CreateIniCases = create_particles_inside_of_a_domain.CreateParticlesInsideOfADomain()
+ 
         RVE_size = [self.parameters["domain_length_x"], self.parameters["domain_length_y"], self.parameters["domain_length_z"]]
         domain_scale_multiplier = self.parameters["random_particle_generation_parameters"]["domain_scale_multiplier"]
         aim_file_name = 'inletPGDEM_ini.mdpa'
 
-        CreateIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_density)
-        CreateIniCases.CreateParticles(RVE_size)
+        self.CreateIniCases.Initialize(RVE_size, domain_scale_multiplier, self.packing_cnt, self.ini_path, self.try_packing_density)
+        self.CreateIniCases.CreateParticles(RVE_size)
         aim_folder_name = "case_" + str(self.packing_cnt)
-        CreateIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
+        self.CreateIniCases.WriteOutGIDData(aim_folder_name, aim_file_name)
 
     def RunDEM(self):
 

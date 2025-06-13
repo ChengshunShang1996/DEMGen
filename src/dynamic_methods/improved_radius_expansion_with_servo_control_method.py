@@ -15,6 +15,7 @@ import subprocess
 from dynamic_methods.radius_expansion_with_servo_control_method import RadiusExpansionWithServoControlMethod
 
 class ImprovedRadiusExpansionWithServoControlMethod(RadiusExpansionWithServoControlMethod):
+    
     def __init__(self) -> None:
         super().__init__()
 
