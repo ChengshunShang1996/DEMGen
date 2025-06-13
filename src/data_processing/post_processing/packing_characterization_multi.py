@@ -20,11 +20,6 @@ class PackingCharacterizationMulti(PackingCharacterization):
 
         pass
 
-    def Initialization(self, parameters, ini_path):
-
-        self.parameters = parameters
-        self.ini_path = ini_path
-
     def CreateInitialCases(self):
 
         packing_num = self.parameters["packing_num"]
