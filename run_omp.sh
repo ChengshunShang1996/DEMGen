@@ -19,4 +19,4 @@
 ########### Further details -> man sbatch ##########
 #export OMP_NUM_THREADS=16
 
-python3 ../../src/DEMGen_framework_main.py
+python3 src/DEMGen_framework_main.py

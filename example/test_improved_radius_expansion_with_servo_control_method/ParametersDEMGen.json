@@ -37,7 +37,7 @@
     "packing_charcterization_option" : true,
     "regular_shape_option"           : true,
     "packing_charcterization_setting": {
-        "RVE_lambda_initial"                      : 1,
+        "RVE_lambda_initial"                      : 0.5,
         "RVE_lambda_increment"                    : 0.25,
         "measure_density_option"                  : true,
         "measure_mean_coordination_number_option" : true,
