@@ -5,7 +5,7 @@
 ![Release][release-image] 
 ![License][license-image]
 ![Contributing][contributing-image]
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14176116.svg)](https://doi.org/10.5281/zenodo.14176116)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16282499.svg)](https://doi.org/10.5281/zenodo.16282499)
 
 [release-image]: https://img.shields.io/badge/release-1.0.0-green.svg?style=flat 
 
