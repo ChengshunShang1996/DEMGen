@@ -131,6 +131,8 @@ Three random generated particle packings according to the PSD of weak sandstone.
 <img src="./docs/images/results_i_rem/weak_sandstone.png" height="250"/>
 </p>
 
+Here is [an example PDF file][an_example_PDF_link] for packing characterization.
+
 #### Case 2: Some results from example [test_gravitational_deposition_method][test_gravitational_deposition_method_link].
 
 Packing generated with rigid walls as boundary conditions.
@@ -182,6 +184,8 @@ By comparing the results of the two conditions, we could find that using periodi
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
+
+![Alt](./docs/example_of_packing_characterization/all_measured_results.pdf)
 
 ## Documentation
 
@@ -245,3 +249,4 @@ No liability and warranty are provided.
 [test_improved_radius_expansion_with_servo_control_method_link]: ./example/test_improved_radius_expansion_with_servo_control_method
 [test_cubic_arrangement_method_link]:        ./example/test_cubic_arrangement_method
 [test_hpc_arrangement_method_link]:          ./example/test_hpc_arrangement_method
+[an_example_PDF_link]:                       ./docs/example_of_packing_characterization/all_measured_results.pdf
