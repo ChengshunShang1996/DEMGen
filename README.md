@@ -7,7 +7,7 @@
 ![Contributing][contributing-image]
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16282499.svg)](https://doi.org/10.5281/zenodo.16282499)
 
-[release-image]: https://img.shields.io/badge/release-1.0.0-green.svg?style=flat 
+[release-image]: https://img.shields.io/badge/release-1.1.0-green.svg?style=flat 
 
 [license-image]: https://img.shields.io/badge/license-BSD-green.svg?style=flat
 
