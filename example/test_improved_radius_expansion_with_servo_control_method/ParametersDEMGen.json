@@ -26,7 +26,7 @@
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
         "NAME" : "DEMGen",
-        "target_packing_density": 0.635,
+        "target_packing_density": 0.64,
         "tolerance_of_packing_density": 0.0001,
         "tolerance_of_unbalanced_force" : 1e-2,
         "tolerance_of_target_mean_stress" : 100.0,
