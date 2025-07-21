@@ -185,8 +185,6 @@ By comparing the results of the two conditions, we could find that using periodi
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
 
-![Alt](./docs/example_of_packing_characterization/all_measured_results.pdf)
-
 ## Documentation
 
 Please read this README.md for information.
