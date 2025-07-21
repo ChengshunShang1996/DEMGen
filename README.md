@@ -7,7 +7,7 @@
 ![Contributing][contributing-image]
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16282499.svg)](https://doi.org/10.5281/zenodo.16282499)
 
-[release-image]: https://img.shields.io/badge/release-1.0.0-green.svg?style=flat 
+[release-image]: https://img.shields.io/badge/release-1.1.0-green.svg?style=flat 
 
 [license-image]: https://img.shields.io/badge/license-BSD-green.svg?style=flat
 
@@ -184,8 +184,6 @@ By comparing the results of the two conditions, we could find that using periodi
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
-
-![Alt](./docs/example_of_packing_characterization/all_measured_results.pdf)
 
 ## Documentation
 
