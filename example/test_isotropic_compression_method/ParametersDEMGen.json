@@ -40,7 +40,7 @@
         "SEED" : 1,
         "NAME" : "DEMGen",
         "target_packing_density": 0.64,
-        "target_packing_density_tolerance": 0.0,
+        "tolerance_packing_density": 0.0,
         "domain_scale_multiplier": 1.5
     },
     "packing_charcterization_option" : false,

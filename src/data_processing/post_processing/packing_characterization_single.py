@@ -11,6 +11,7 @@ __license__     = "BSD 2-Clause License"
 
 import os
 import shutil
+import subprocess
 
 from data_processing.post_processing.packing_characterization import PackingCharacterization
 
@@ -36,7 +37,21 @@ class PackingCharacterizationSingle(PackingCharacterization):
         
         os.chdir(aim_path)
         if os.name == 'nt': # for windows
-            os.system("python packing_characterization_run.py")
+            #os.system("python packing_characterization_run.py")
+            subprocess.run(['python', 'packing_characterization_run.py'], check=True)
+            '''
+            try:
+                result = subprocess.run(
+                    ['python', 'packing_characterization_run.py'],
+                    cwd=aim_path,
+                    capture_output=True,
+                    text=True,
+                    check=True
+                )
+            except subprocess.CalledProcessError as e:
+                print("Script failed with return code:", e.returncode)
+                print("Standard output:\n", e.stdout)
+                print("Standard error:\n", e.stderr)'''
         else: # for linux
             os.system("python3 packing_characterization_run.py")
 

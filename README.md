@@ -75,7 +75,7 @@ This [JSON][json_link] file is used as input for the program. For generating par
 
 * **Output Results (_.mdpa_)**: 
 
-This [MDPA][mdpa_link] file is used for storing the results of a simulation. Usually, you can find the generated packing in the folder "./generated_cases/cases_$number$/show_packing/" (for dynamic methods) or "./show_packing/" (for constructive methods) of the working path. Both [Paraview][paraview_link] and [GiD][gid_link] can be used to display the results.
+This [MDPA][mdpa_link] file is used for storing the particle information of a packing. Usually, you can find the generated packing in the folder "./generated_cases/cases_$number$/show_packing/" (for dynamic methods) or "./show_packing/" (for constructive methods) of the working path. To visualize the results, ".vtu" format is used for [Paraview][paraview_link] and ".res" format is used for [GiD][gid_link].
 
 ### Running Simulations
 
@@ -102,7 +102,7 @@ If the related parameters in [ParametersDEMGen.json][ParametersDEMGen_link] are 
 
 ### Checking Results
 
-In the case folder or in the generated case folder, there will be a folder call "show packing", there you can find the post-procesing file of the generated packing. Then it can be checked in Paraview or Gid.
+In the case folder or in the generated case folder, there will be a folder call "show packing", there you can find the post-processing file of the generated packing. Then it can be checked in Paraview or Gid.
 
 ## Examples
 
@@ -113,16 +113,29 @@ Examples are available inside the folder [examples][examples_link].
 - [test_gravitational_deposition_method][test_gravitational_deposition_method_link]
 - [test_isotropic_compression_method][test_isotropic_compression_method_link]
 - [test_radius_expansion_method][test_radius_expansion_method_link]
-- [test_radius_expansion_method_with_servo_control][test_radius_expansion_method_with_servo_control_link]
+- [test_radius_expansion_with_servo_control_method][test_radius_expansion_with_servo_control_method_link]
+- [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link]. (**Important tip**: To run this method properly, you need to use the branch named "fix-stress-calculation" of Kratos DEM until the development in this branch is merged to the "master".)
 
 ### Constructive methods
 
 - [test_cubic_arrangement_method][test_cubic_arrangement_method_link]
 - [test_hpc_arrangement_method][test_hpc_arrangement_method_link]
 
-Here are some results from example [test_gravitational_deposition_method][test_gravitational_deposition_method_link].
+### Example cases
 
-Generated with rigid walls as boundary conditions.
+#### Case 1: Some results from example [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link].
+
+Three random generated particle packings according to the PSD of weak sandstone.
+
+<p float="left">
+<img src="./docs/images/results_i_rem/weak_sandstone.png" height="250"/>
+</p>
+
+Here is [an example PDF file][an_example_PDF_link] for packing characterization.
+
+#### Case 2: Some results from example [test_gravitational_deposition_method][test_gravitational_deposition_method_link].
+
+Packing generated with rigid walls as boundary conditions.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -131,14 +144,14 @@ Generated with rigid walls as boundary conditions.
 <img src="./docs/images/results_g/g_force_chains.png" height="250"/> 
 </p>
 
-Final packing.
+The final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_g/g_final.png" height="225"/>
 </p>
 
-Generated with periodic boundaries.
+Packing generated with periodic boundaries.
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -147,7 +160,7 @@ Generated with periodic boundaries.
 <img src="./docs/images/results_g/g_force_chains_periodic.png" height="225"/> 
 </p>
 
-Final packing.
+The final packing.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -163,7 +176,7 @@ By comparing the results of the two conditions, we could find that using periodi
 <img src="./docs/images/results_g/g_force_chains_2.png" height="225"/> 
 </p>
 
-Some results from example [test_cubic_arrangement_method][test_cubic_arrangement_method_link] (left) and [test_hpc_arrangement_method][test_hpc_arrangement_method_link] (right). 
+#### Case 3: Some results from example [test_cubic_arrangement_method][test_cubic_arrangement_method_link] (left) and [test_hpc_arrangement_method][test_hpc_arrangement_method_link] (right). 
 
 <p float="left">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -171,6 +184,8 @@ Some results from example [test_cubic_arrangement_method][test_cubic_arrangement
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
+
+![Alt](./docs/example_of_packing_characterization/all_measured_results.pdf)
 
 ## Documentation
 
@@ -230,6 +245,8 @@ No liability and warranty are provided.
 [test_gravitational_deposition_method_link]: ./example/test_gravitational_deposition_method
 [test_isotropic_compression_method_link]:    ./example/test_isotropic_compression_method
 [test_radius_expansion_method_link]:         ./example/test_radius_expansion_method
-[test_radius_expansion_method_with_servo_control_link]: ./example/test_radius_expansion_method_with_servo_control
+[test_radius_expansion_with_servo_control_method_link]: ./example/test_radius_expansion_with_servo_control_method
+[test_improved_radius_expansion_with_servo_control_method_link]: ./example/test_improved_radius_expansion_with_servo_control_method
 [test_cubic_arrangement_method_link]:        ./example/test_cubic_arrangement_method
 [test_hpc_arrangement_method_link]:          ./example/test_hpc_arrangement_method
+[an_example_PDF_link]:                       ./docs/example_of_packing_characterization/all_measured_results.pdf

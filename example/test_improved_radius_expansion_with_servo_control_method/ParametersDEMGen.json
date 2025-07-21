@@ -1,0 +1,46 @@
+{
+    "problem_name"   : "inletPG",
+    "generator_type" : "dynamic",
+    "generator_name" : "improved_radius_expansion_with_servo_control_method",
+    "packing_num"    : 3,
+    "domain_length_x": 0.005,
+    "domain_length_y": 0.005,
+    "domain_length_z": 0.005,
+    "particle_radius_max": 0.0001,
+    "dem_time_step"  : 2e-8,
+    "periodic_boundary_option": true,
+    "inlet_properties":{},
+    "random_particle_generation_parameters":{
+        "random_variable_settings" : {
+            "possible_values" : [0.000075,0.00009,0.0001,0.00011,0.000125,0.0001375,0.00015,0.000175],
+            "relative_frequencies" : [0.20754,0.15525,0.13346,0.13821,0.1751,0.09922,0.05418,0.03704],
+            "radius_scale_multiplier": 0.5,
+            "do_use_seed" : false,
+            "seed" : 1,
+            "relative_closeness_tolerance" : 1e-8
+        },
+        "PROBABILITY_DISTRIBUTION" : "discrete",
+        "RADIUS" : 0.0001,
+        "MINIMUM_RADIUS" : 0.000075,
+        "MAXIMUM_RADIUS" : 0.000175,
+        "STANDARD_DEVIATION" : 0.0,
+        "SEED" : 1,
+        "NAME" : "DEMGen",
+        "target_packing_density": 0.64,
+        "tolerance_of_packing_density": 0.0001,
+        "tolerance_of_unbalanced_force" : 1e-2,
+        "tolerance_of_target_mean_stress" : 100.0,
+        "minimum_mean_stress" : 1000.0,
+        "packing_density_delta_list" : [2.5e-4, 5e-4, 1e-3, 2.5e-3, 5e-3, 1e-2],
+        "domain_scale_multiplier": 1.0
+    },
+    "packing_charcterization_option" : true,
+    "regular_shape_option"           : true,
+    "packing_charcterization_setting": {
+        "RVE_lambda_initial"                      : 0.5,
+        "RVE_lambda_increment"                    : 0.25,
+        "measure_density_option"                  : true,
+        "measure_mean_coordination_number_option" : true,
+        "measure_anisotropy_option"               : true
+    }
+}
