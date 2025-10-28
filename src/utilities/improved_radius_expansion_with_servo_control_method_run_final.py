@@ -140,6 +140,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.minimum_mean_confining_stress = 1000
         self.ZeroFrictionPhase = False
         self.zero_friction_phase_counter = 0
+        target_normal_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
+        self.target_mean_stress = (target_normal_stress[0] + target_normal_stress[1] + target_normal_stress[2]) / 3
+
+        if self.target_mean_stress < self.minimum_mean_confining_stress:
+            self.target_mean_stress = self.minimum_mean_confining_stress
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
@@ -276,12 +281,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.measured_stress_list.append(mean_stress)
 
-            target_normal_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
-            target_mean_stress = (target_normal_stress[0] + target_normal_stress[1] + target_normal_stress[2]) / 3
-
-            if target_mean_stress < self.minimum_mean_confining_stress:
-                target_mean_stress = self.minimum_mean_confining_stress
-
             if not self.is_start_servo_control:
 
                 if self.start_reset_velocity:
@@ -291,7 +290,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         time.sleep(5)
                         exit(0)
 
-                    if mean_stress < target_mean_stress: # (target stress, packing density) in the accessiable region
+                    if mean_stress < self.target_mean_stress: # (target stress, packing density) in the accessiable region
                         for properties in self.spheres_model_part.Properties:
                             for subproperties in properties.GetSubProperties():
                                 subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
@@ -313,7 +312,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.second_stage_flag = True
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
-                        if mean_stress > target_mean_stress:
+                        if mean_stress > self.target_mean_stress:
                             self.is_in_inaccessibale_region2 = True
                         self.is_start_servo_control = True
                         self.parameters["BoundingBoxMoveOption"].SetBool(True)
@@ -325,22 +324,29 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 subproperties[ROLLING_FRICTION] = self.initial_rolling_friction_coefficient
                         #self.copy_files_and_run_show_results()
                         #exit(0)
+                        #TODO:
+                        self.target_mean_stress = 1000
                     else:
                         self.SetAllParticleVelocityToZero()
             else: # servo control phase
 
                 mad = 0.0
                 if len(self.measured_stress_list) > 5:
-                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
+                    mad = np.mean([abs(x - self.target_mean_stress) for x in self.measured_stress_list[-5:]])
 
                 mad_threshold = self.tolerance_of_target_mean_stress
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
-                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                        with open("success.txt", 'w') as file:
-                            file.write("Simulation completed successfully.")
-                        self.copy_files_and_run_show_results()
-                        exit(0)
+                        output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
+                        self.WriteOutMdpaFileOfParticles(output_name)
+                        self.target_mean_stress += 10000
+
+                if self.target_mean_stress > 2e5:
+                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                    with open("success.txt", 'w') as file:
+                        file.write("Simulation completed successfully.")
+                    self.copy_files_and_run_show_results()
+                    exit(0)
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
