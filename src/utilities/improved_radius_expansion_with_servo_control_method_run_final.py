@@ -285,10 +285,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
                 if self.start_reset_velocity:
 
-                    if (self.final_packing_density - self.target_packing_density) > self.tolerance_of_packing_density:
-                        print("The packing density is higher than the target packing density, the simulation will be terminated.")
-                        time.sleep(5)
-                        exit(0)
+                    #if (self.final_packing_density - self.target_packing_density) > self.tolerance_of_packing_density:
+                    #    print("The packing density is higher than the target packing density, the simulation will be terminated.")
+                    #    time.sleep(5)
+                    #    exit(0)
 
                     if mean_stress < self.target_mean_stress: # (target stress, packing density) in the accessiable region
                         for properties in self.spheres_model_part.Properties:
