@@ -325,7 +325,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                         #TODO:
-                        self.target_mean_stress = 1000
+                        self.target_mean_stress = 20000
+                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([0.0, 2e4, 0.0])
                     else:
                         self.SetAllParticleVelocityToZero()
             else: # servo control phase
@@ -339,7 +340,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
                         output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
                         self.WriteOutMdpaFileOfParticles(output_name)
-                        self.target_mean_stress += 10000
+                        self.target_mean_stress += 20000
+                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([0.0, self.target_mean_stress, 0.0])
 
                 if self.target_mean_stress > 2e5:
                     self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
