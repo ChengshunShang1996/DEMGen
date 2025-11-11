@@ -326,7 +326,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         #exit(0)
                         #TODO:
                         self.target_mean_stress = 20000
-                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([0.0, 2e4, 0.0])
+                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([2e4, 2e4, 2e4])
                     else:
                         self.SetAllParticleVelocityToZero()
             else: # servo control phase
@@ -341,7 +341,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
                         self.WriteOutMdpaFileOfParticles(output_name)
                         self.target_mean_stress += 20000
-                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([0.0, self.target_mean_stress, 0.0])
+                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
                 if self.target_mean_stress > 2e5:
                     self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
@@ -349,6 +349,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         file.write("Simulation completed successfully.")
                     self.copy_files_and_run_show_results()
                     exit(0)
+            with open("target_stress.txt", 'a') as file:
+                file.write(str(self.target_mean_stress))
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
