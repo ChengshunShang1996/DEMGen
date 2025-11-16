@@ -187,7 +187,7 @@ By comparing the results of the two conditions, we could find that using periodi
 
 #### Case 4: Ongoing work
 
-Generating particle packings of complex shapes using a Clone and Extraction method.
+Generate particle packings of complex shapes using a Clone and Extraction method.
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
