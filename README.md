@@ -191,7 +191,7 @@ Generating particle packings with complex shapes using a Clone and Extraction me
 
 <p float="center">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="./docs/images/future/complex_shape.png" height="225"/>
+<img src="./docs/images/future/complex_shape.png" height="320"/>
 </p>
 
 ## Documentation
