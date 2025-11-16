@@ -114,7 +114,7 @@ Examples are available inside the folder [examples][examples_link].
 - [test_isotropic_compression_method][test_isotropic_compression_method_link]
 - [test_radius_expansion_method][test_radius_expansion_method_link]
 - [test_radius_expansion_with_servo_control_method][test_radius_expansion_with_servo_control_method_link]
-- [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link]. (**Important tip**: To run this method properly, you need to use the branch named "fix-stress-calculation" of Kratos DEM until the development in this branch is merged to the "master".)
+- [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link]. This is the Improved Radius Expansion method with Servo control and Random shifting (IRESR) used in the paper (under review now). **Important tip**: To run this method properly, you need to use the branch named "fix-stress-calculation" of Kratos DEM until the development in this branch is merged to the "master".
 
 ### Constructive methods
 
