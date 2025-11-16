@@ -194,13 +194,6 @@ Generating particle packings of complex shapes using a Clone and Extraction meth
 <img src="./docs/images/future/complex_shape.png" height="320"/>
 </p>
 
-Particle packings with adaptive particle size.
-
-<p float="center">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="./docs/images/future/adaptive.png" height="320"/>
-</p>
-
 ## Documentation
 
 Please read this README.md for information.
