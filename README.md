@@ -185,6 +185,15 @@ By comparing the results of the two conditions, we could find that using periodi
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
 
+#### Case 4: Ongoing work
+
+Generating particle packings with complex shapes using a Clone and Extraction method.
+
+<p float="center">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/future/complex_shape.png" height="225"/>
+</p>
+
 ## Documentation
 
 Please read this README.md for information.
