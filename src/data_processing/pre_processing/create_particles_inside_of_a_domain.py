@@ -24,6 +24,8 @@ class CreateParticlesInsideOfADomain():
 
     def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_density = 0.0):
 
+        self.clear_old_cases_folder()
+        
         self.particle_list = []
         self.particle_list_left = []
         self.particle_list_right = []
