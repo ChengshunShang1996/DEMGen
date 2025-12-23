@@ -343,7 +343,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.target_mean_stress += 20000
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
-                if self.target_mean_stress > 2e5:
+                if self.target_mean_stress > 2e5+1:
                     self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                     with open("success.txt", 'w') as file:
                         file.write("Simulation completed successfully.")
