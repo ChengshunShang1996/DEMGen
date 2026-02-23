@@ -54,16 +54,14 @@ Required Python Pakage:
 - matplotlib
 - pyevtk
 
-Environment variable setting in a Command Prompt:
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment (Python 3.10.11 and Visual Studio 2022) has been attached in the source code "./src/external/kratos_win". For using Kratos, the following environment variable need to be set:
 
-> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'
+> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos_win/Release \
+> set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos_win/Release/libs
 
-For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment (Python 3.10.11 and Visual Studio 2022) has been attached in the source code "./src/external/kratos". For using Kratos, the following environment variable need to be set in a Command Prompt:
+By run the script 'setup_kratos.py', this process will be done automatically. This step is only required for the first time of using this software. (The Linux version is under development, that means you need to compile your own Kratos if your system is Linux.)
 
-> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos \
-> set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos/libs
-
-Tip: This compiled Kratos may not work properly due to the different system environment setting. So it is recommanded to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
+Tip: the compiled Kratos may not work properly due to the different system environment setting. In that case, it is recommended to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
 
 ## Instructions
 
