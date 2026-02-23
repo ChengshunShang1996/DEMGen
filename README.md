@@ -59,7 +59,7 @@ For the dynamic generation methods, DEM calculations are required. The [DEM Appl
 > set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos_win/Release \
 > set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos_win/Release/libs
 
-By run the script 'setup_kratos.py', this process will be done automatically. This step is only required for the first time of using this software. (The Linux version is under development, that means you need to compile your own Kratos if your system is Linux.)
+By run the script 'setup_environment.py', this process will be done automatically. This step is only required for the first time of using this software. (The Linux version is under development, that means you need to compile your own Kratos if your system is Linux.)
 
 Tip: the compiled Kratos may not work properly due to the different system environment setting. In that case, it is recommended to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
 
