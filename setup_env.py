@@ -13,7 +13,7 @@ __license__     = "BSD 2-Clause License"
 
 import platform, os, sys, zipfile, subprocess
 
-def setup_kratos():
+def setup_environment():
     # Get the absolute path to the directory containing this script
     base = os.path.dirname(os.path.abspath(__file__))
     system = platform.system()
@@ -102,4 +102,4 @@ def setup_kratos():
     if kratos_path not in sys.path:
         sys.path.insert(0, kratos_path)
 
-setup_kratos()
+setup_environment()
