@@ -86,6 +86,7 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         time_step = self.spheres_model_part.ProcessInfo[TIME_STEPS]
         if time_step == 2:
             self.MeasureLocalPropertiesWithDifferentRadius()
+            self.MeasureGlobalProperties()
             self.PlotAndSaveResultsInPDF()
 
     def MeasureLocalPropertiesWithDifferentRadius(self):
@@ -161,6 +162,13 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
         print("Measurement finish")
 
+    def MeasureGlobalProperties(self):
+
+        if self.measure_conductivity_tensor_option:
+            measured_conductivity, measured_conductivity_trace = self.MeasureGlobalConductivityTensor()
+            with open("packing_properties_conductivity_global.txt", "w") as f_w:
+                f_w.write(str(measured_conductivity[0]) + ' ' + str(measured_conductivity[1]) + ' ' + str(measured_conductivity[2]) + ' ' + str(measured_conductivity_trace) + '\n')
+    
     def PlotAndSaveResultsInPDF(self):
         import matplotlib.pyplot as plt
         from matplotlib.backends.backend_pdf import PdfPages

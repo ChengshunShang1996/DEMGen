@@ -130,6 +130,7 @@ dmypy.json
 
 /.vscode/
 #my folders
+/src/external/kratos_win/Release/
 /example/test_gravitational_deposition_method/generated_cases/
 /example/test_isotropic_compression_method/generated_cases/
 /example/test_radius_expansion_method/generated_cases/

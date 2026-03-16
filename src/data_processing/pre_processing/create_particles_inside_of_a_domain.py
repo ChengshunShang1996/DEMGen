@@ -23,7 +23,7 @@ class CreateParticlesInsideOfADomain():
         self.clear_old_cases_folder()
 
     def Initialize(self, RVE_size, domain_scale_multiplier, packing_cnt, ini_path, try_packing_density = 0.0):
-
+        
         self.particle_list = []
         self.particle_list_left = []
         self.particle_list_right = []
@@ -88,7 +88,11 @@ class CreateParticlesInsideOfADomain():
 
         new_folder_name = "case_" + str(self.packing_cnt)
         aim_path = os.path.join(os.getcwd(),'generated_cases', new_folder_name)
-        os.makedirs(aim_path)
+        if os.path.exists(aim_path):
+            shutil.rmtree(aim_path, ignore_errors=True)
+            os.makedirs(aim_path)
+        else:
+            os.makedirs(aim_path)
 
     def copy_seed_files_to_aim_folders(self):
 
