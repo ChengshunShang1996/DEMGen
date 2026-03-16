@@ -322,6 +322,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
                                 subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                                 subproperties[ROLLING_FRICTION] = self.initial_rolling_friction_coefficient
+                        self.second_stage_flag = False
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                         #TODO:
@@ -337,19 +338,24 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 mad_threshold = self.tolerance_of_target_mean_stress
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
+                        
+                        #This is the last step
+                        if self.target_mean_stress <= 1000:
+                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                            with open("success.txt", 'w') as file:
+                                file.write("Simulation completed successfully.")
+                            self.copy_files_and_run_show_results()
+                            exit(0)
+                        
                         output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
                         self.WriteOutMdpaFileOfParticles(output_name)
                         self.target_mean_stress -= 20000
+                        if self.target_mean_stress < 1000:
+                            self.target_mean_stress = 1000
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
-                if self.target_mean_stress < 1000:
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                    with open("success.txt", 'w') as file:
-                        file.write("Simulation completed successfully.")
-                    self.copy_files_and_run_show_results()
-                    exit(0)
             with open("target_stress.txt", 'a') as file:
-                file.write(str(self.target_mean_stress))
+                file.write(str(self.target_mean_stress) + '\n')
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
