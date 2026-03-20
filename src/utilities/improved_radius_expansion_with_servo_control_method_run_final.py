@@ -281,6 +281,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
             self.measured_stress_list.append(mean_stress)
 
+            with open("target_stress.txt", 'a') as file:
+                file.write(str(self.target_mean_stress) + '\n')
+            
             if not self.is_start_servo_control:
 
                 if self.start_reset_velocity:
@@ -322,7 +325,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 subproperties[STATIC_FRICTION] = self.initial_friction_coefficient
                                 subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                                 subproperties[ROLLING_FRICTION] = self.initial_rolling_friction_coefficient
-                        self.second_stage_flag = False
                         #self.copy_files_and_run_show_results()
                         #exit(0)
                         #TODO:
@@ -354,8 +356,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                             self.target_mean_stress = 1000
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
-            with open("target_stress.txt", 'a') as file:
-                file.write(str(self.target_mean_stress) + '\n')
         self.final_check_counter += 1
 
     def FinalizeSolutionStep(self):
