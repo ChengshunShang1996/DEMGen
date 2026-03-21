@@ -125,6 +125,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.second_stage_flag = False
         self.is_in_inaccessibale_region2 = False
         self.is_start_servo_control = False
+        self.step_id = 0
 
     def Initialize(self):
         super().Initialize()
@@ -363,8 +364,9 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         final = 1000
                         steps = 20
                         ratio = (final / initial) ** (1 / steps)
-                        self.target_mean_stress *= ratio
-                        if self.target_mean_stress < final:
+                        self.target_mean_stress = initial * (ratio ** self.step_id)
+                        self.step_id += 1
+                        if self.step_id >= steps:
                             self.target_mean_stress = final
                         
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
