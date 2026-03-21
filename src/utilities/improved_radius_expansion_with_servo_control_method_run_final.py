@@ -358,9 +358,15 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         
                         output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
                         self.WriteOutMdpaFileOfParticles(output_name)
-                        self.target_mean_stress -= 20000
-                        if self.target_mean_stress < 1000:
-                            self.target_mean_stress = 1000
+                        
+                        initial = 200000
+                        final = 1000
+                        steps = 20
+                        ratio = (final / initial) ** (1 / steps)
+                        self.target_mean_stress *= ratio
+                        if self.target_mean_stress < final:
+                            self.target_mean_stress = final
+                        
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
         self.final_check_counter += 1
