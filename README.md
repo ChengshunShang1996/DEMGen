@@ -7,7 +7,7 @@
 ![Contributing][contributing-image]
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16282499.svg)](https://doi.org/10.5281/zenodo.16282499)
 
-[release-image]: https://img.shields.io/badge/release-1.0.0-green.svg?style=flat 
+[release-image]: https://img.shields.io/badge/release-1.1.0-green.svg?style=flat 
 
 [license-image]: https://img.shields.io/badge/license-BSD-green.svg?style=flat
 
@@ -54,16 +54,14 @@ Required Python Pakage:
 - matplotlib
 - pyevtk
 
-Environment variable setting in a Command Prompt:
+For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment (Python 3.10.11 and Visual Studio 2022) has been attached in the source code "./src/external/kratos_win". For using Kratos, the following environment variable need to be set:
 
-> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'
+> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos_win/Release \
+> set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos_win/Release/libs
 
-For the dynamic generation methods, DEM calculations are required. The [DEM Application][demapp_link] of the [Kratos Multiphysics][kratos_link] framework is adopted here. A compiled Kratos for Windows environment (Python 3.10.11 and Visual Studio 2022) has been attached in the source code "./src/external/kratos". For using Kratos, the following environment variable need to be set in a Command Prompt:
+By run the script 'setup_environment.py', this process will be done automatically. This step is only required for the first time of using this software. (The Linux version is under development, that means you need to compile your own Kratos if your system is Linux.)
 
-> set PYTHONPATH=%PYTHONPATH%;'path_to_DEMGen'/src/external/kratos \
-> set PATH=%PATH%;'path_to_DEMGen'/src/external/kratos/libs
-
-Tip: This compiled Kratos may not work properly due to the different system environment setting. So it is recommanded to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
+Tip: the compiled Kratos may not work properly due to the different system environment setting. In that case, it is recommended to compile your own Kratos according to the Kratos [INSTALL.md][kratos_install_link].
 
 ## Instructions
 
@@ -114,7 +112,7 @@ Examples are available inside the folder [examples][examples_link].
 - [test_isotropic_compression_method][test_isotropic_compression_method_link]
 - [test_radius_expansion_method][test_radius_expansion_method_link]
 - [test_radius_expansion_with_servo_control_method][test_radius_expansion_with_servo_control_method_link]
-- [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link]. (**Important tip**: To run this method properly, you need to use the branch named "fix-stress-calculation" of Kratos DEM until the development in this branch is merged to the "master".)
+- [test_improved_radius_expansion_with_servo_control_method][test_improved_radius_expansion_with_servo_control_method_link]. This is the Improved Radius Expansion method with Servo control and Random shifting (IRESR) used in the paper (under review now). **Important tip**: To run this method properly, you need to use the branch named "fix-stress-calculation" of Kratos DEM until the development in this branch is merged to the "master".
 
 ### Constructive methods
 
@@ -185,7 +183,14 @@ By comparing the results of the two conditions, we could find that using periodi
 <img src="./docs/images/results_constructive_method/hpc_packing.png" height="225" title="HPC packing"/> 
 </p>
 
-![Alt](./docs/example_of_packing_characterization/all_measured_results.pdf)
+#### Case 4: Ongoing work
+
+Generate particle packings of complex shapes using a Clone and Extraction method.
+
+<p float="center">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./docs/images/future/complex_shape.png" height="320"/>
+</p>
 
 ## Documentation
 
