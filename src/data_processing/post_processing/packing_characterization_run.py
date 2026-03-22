@@ -164,6 +164,11 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
 
     def MeasureGlobalProperties(self):
 
+        if self.measure_mean_coordination_number_option:
+            measured_mcn = self.MeasureGlobalMeanCoordinationNumber()
+            with open("packing_properties_mcn_global.txt", "w") as f_w:
+                f_w.write(str(measured_mcn) + '\n')
+        
         if self.measure_conductivity_tensor_option:
             measured_conductivity, measured_conductivity_trace = self.MeasureGlobalConductivityTensor()
             with open("packing_properties_conductivity_global.txt", "w") as f_w:
