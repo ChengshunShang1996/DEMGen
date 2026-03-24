@@ -260,14 +260,16 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
 
+            mcn = self.MeasureGlobalMeanCoordinationNumber()
+
             if self.is_start_servo_control:
                 with open("stress_tensor_1.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
-                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
+                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2]) + ' ' + str(mcn) +'\n')
             else:
                 with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
-                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+'\n')
+                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2]) + ' ' + str(mcn) +'\n')
 
                 #TODO: this should be optional, not always output
                 '''
