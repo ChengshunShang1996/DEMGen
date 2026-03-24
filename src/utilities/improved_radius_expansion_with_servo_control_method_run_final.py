@@ -270,15 +270,25 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             if self.is_start_servo_control:
                 with open("stress_tensor_1.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
-                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
-                                + str(mcn) + ' ' + str(measured_conductivity[0]) + ' ' + str(measured_conductivity[1]) + ' ' \
-                                + str(measured_conductivity[2]) + ' ' + str(measured_conductivity_trace)+ '\n')
+                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[0][1]) + ' ' + str(stress_tensor[0][2])+ ' ' \
+                                + str(stress_tensor[1][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[1][2])+ ' ' \
+                                + str(stress_tensor[2][0]) + ' ' + str(stress_tensor[2][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
+                                + str(mcn) + ' ' \
+                                + str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
+                                + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
+                                + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
+                                + str(measured_conductivity_trace)+ '\n')
             else:
                 with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
-                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
-                                + str(mcn) + ' ' + str(measured_conductivity[0]) + ' ' + str(measured_conductivity[1]) + ' ' \
-                                + str(measured_conductivity[2]) + ' ' + str(measured_conductivity_trace)+ '\n')
+                                + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[0][1]) + ' ' + str(stress_tensor[0][2])+ ' ' \
+                                + str(stress_tensor[1][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[1][2])+ ' ' \
+                                + str(stress_tensor[2][0]) + ' ' + str(stress_tensor[2][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
+                                + str(mcn) + ' ' \
+                                + str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
+                                + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
+                                + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
+                                + str(measured_conductivity_trace)+ '\n')
 
                 #TODO: this should be optional, not always output
                 '''
