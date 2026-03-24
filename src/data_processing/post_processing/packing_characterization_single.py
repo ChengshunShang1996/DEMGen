@@ -79,44 +79,12 @@ class PackingCharacterizationSingle(PackingCharacterization):
         elif self.parameters["generator_type"] =="dynamic":    
             aim_path = os.path.join(os.getcwd(), 'generated_cases', 'case_1', aim_folder_name)
 
-        seed_file_name_list = ['MaterialsDEM.json', 'ProjectParametersDEM.json', 'inletPGDEM_FEM_boundary.mdpa']
+        seed_file_name_list = ['MaterialsDEM.json', 'inletPGDEM_FEM_boundary.mdpa']
         for seed_file_name in seed_file_name_list:
             seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities','rem_seed_files', seed_file_name)
             aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
-            if seed_file_name == 'ProjectParametersDEM.json':
-                with open(seed_file_path_and_name, "r") as f_material:
-                    with open(aim_file_path_and_name, "w") as f_material_w:
-                        for line in f_material.readlines():
-                            if "BoundingBoxMaxX" in line:
-                                line = "    \"BoundingBoxMaxX\"                : " + str(self.parameters["domain_length_x"] / 2.0) + ', \n'
-                            elif "\"BoundingBoxMaxY\"" in line:
-                                line = "    \"BoundingBoxMaxY\"                : " + str(self.parameters["domain_length_y"] / 2.0) + ', \n'
-                            elif "BoundingBoxMaxZ" in line:
-                                line = "    \"BoundingBoxMaxZ\"                : " + str(self.parameters["domain_length_z"] / 2.0) + ', \n'
-                            elif "BoundingBoxMinX" in line:
-                                line = "    \"BoundingBoxMinX\"                : " + str(self.parameters["domain_length_x"] / -2.0) + ', \n'
-                            elif "\"BoundingBoxMinY\"" in line:
-                                line = "    \"BoundingBoxMinY\"                : " + str(self.parameters["domain_length_y"] / -2.0) + ', \n'
-                            elif "BoundingBoxMinZ" in line:
-                                line = "    \"BoundingBoxMinZ\"                : " + str(self.parameters["domain_length_z"] / -2.0) + ', \n'
-                            elif "FinalTime" in line:
-                                line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
-                            elif "\"GraphExportFreq\"" in line:
-                                line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
-                            elif "VelTrapGraphExportFreq" in line:
-                                line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
-                            elif "OutputTimeStep" in line:
-                                line = "    \"OutputTimeStep\"                 : " + str(self.dt) + ', \n'
-                            elif "NeighbourSearchFrequency" in line:
-                                line = "    \"NeighbourSearchFrequency\"       : " + str(1) + ', \n'
-                            elif "RadiusExpansionOption" in line:
-                                line = "    \"RadiusExpansionOption\"          : " + "false" + ', \n'
-                            elif "RadiusExpansionRateChangeOption" in line:
-                                line = "    \"RadiusExpansionRateChangeOption\": " + "false" + ', \n'
-                            f_material_w.write(line)
-            else:
-                if os.path.exists(seed_file_path_and_name):
-                    shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+            if os.path.exists(seed_file_path_and_name):
+                shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'data_processing', 'post_processing', 'packing_characterization_run.py')
         aim_file_path_and_name = os.path.join(aim_path, 'packing_characterization_run.py')
@@ -126,10 +94,53 @@ class PackingCharacterizationSingle(PackingCharacterization):
             seed_file_path_and_name = os.path.join(os.getcwd(), 'show_packing', 'inletPGDEM.mdpa')
             aim_file_path_and_name = os.path.join(aim_path, 'inletPGDEM.mdpa')
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
+            seed_file_path_and_name = os.path.join(os.getcwd(), 'show_packing', 'ProjectParametersDEM.json')
+            aim_file_path_and_name = os.path.join(aim_path, 'ProjectParametersDEM.json')
+            with open(seed_file_path_and_name, "r") as f_material:
+                with open(aim_file_path_and_name, "w") as f_material_w:
+                    for line in f_material.readlines():
+                        if "FinalTime" in line:
+                            line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
+                        elif "\"GraphExportFreq\"" in line:
+                            line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
+                        elif "VelTrapGraphExportFreq" in line:
+                            line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
+                        elif "OutputTimeStep" in line:
+                            line = "    \"OutputTimeStep\"                 : " + str(self.dt) + ', \n'
+                        elif "NeighbourSearchFrequency" in line:
+                            line = "    \"NeighbourSearchFrequency\"       : " + str(1) + ', \n'
+                        elif "RadiusExpansionOption" in line:
+                            line = "    \"RadiusExpansionOption\"          : " + "false" + ', \n'
+                        elif "RadiusExpansionRateChangeOption" in line:
+                            line = "    \"RadiusExpansionRateChangeOption\": " + "false" + ', \n'
+                        f_material_w.write(line)
+
         elif self.parameters["generator_type"] =="dynamic":
             seed_file_path_and_name = os.path.join(os.getcwd(), 'generated_cases', 'case_1', 'show_packing', 'inletPGDEM.mdpa')
             aim_file_path_and_name = os.path.join(aim_path, 'inletPGDEM.mdpa')
             shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name)
+
+            seed_file_path_and_name = os.path.join(os.getcwd(), 'generated_cases', 'case_1', 'show_packing', 'ProjectParametersDEM.json')
+            aim_file_path_and_name = os.path.join(aim_path, 'ProjectParametersDEM.json')
+            with open(seed_file_path_and_name, "r") as f_material:
+                with open(aim_file_path_and_name, "w") as f_material_w:
+                    for line in f_material.readlines():
+                        if "FinalTime" in line:
+                            line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
+                        elif "\"GraphExportFreq\"" in line:
+                            line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
+                        elif "VelTrapGraphExportFreq" in line:
+                            line = "    \"VelTrapGraphExportFreq\"         : " + str(self.dt) + ', \n'
+                        elif "OutputTimeStep" in line:
+                            line = "    \"OutputTimeStep\"                 : " + str(self.dt) + ', \n'
+                        elif "NeighbourSearchFrequency" in line:
+                            line = "    \"NeighbourSearchFrequency\"       : " + str(1) + ', \n'
+                        elif "RadiusExpansionOption" in line:
+                            line = "    \"RadiusExpansionOption\"          : " + "false" + ', \n'
+                        elif "RadiusExpansionRateChangeOption" in line:
+                            line = "    \"RadiusExpansionRateChangeOption\": " + "false" + ', \n'
+                        f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(os.getcwd(), 'ParametersDEMGen.json')
         aim_file_path_and_name = os.path.join(aim_path, 'ParametersDEMGen.json')
