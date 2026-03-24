@@ -260,7 +260,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             with open("normalized_kinematic_energy.txt", 'a') as file:
                 file.write(str(self.time) + ' ' + str(self.normalized_kinematic_energy) + ' ' + str(measured_unbalanced_force) + '\n')
 
-
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
 
