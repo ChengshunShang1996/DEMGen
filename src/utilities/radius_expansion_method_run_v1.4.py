@@ -302,7 +302,19 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 with open(seed_file_path_and_name, "r") as f_material:
                     with open(aim_file_path_and_name, "w") as f_material_w:
                         for line in f_material.readlines():
-                            if "FinalTime" in line:
+                            if "BoundingBoxMaxX" in line:
+                                line = "    \"BoundingBoxMaxX\"                : " + str(self.BoundingBoxMaxX_update) + ', \n'
+                            elif "\"BoundingBoxMaxY\"" in line:
+                                line = "    \"BoundingBoxMaxY\"                : " + str(self.BoundingBoxMaxY_update) + ', \n'
+                            elif "BoundingBoxMaxZ" in line:
+                                line = "    \"BoundingBoxMaxZ\"                : " + str(self.BoundingBoxMaxZ_update) + ', \n'
+                            elif "BoundingBoxMinX" in line:
+                                line = "    \"BoundingBoxMinX\"                : " + str(self.BoundingBoxMinX_update) + ', \n'
+                            elif "\"BoundingBoxMinY\"" in line:
+                                line = "    \"BoundingBoxMinY\"                : " + str(self.BoundingBoxMinY_update) + ', \n'
+                            elif "BoundingBoxMinZ" in line:
+                                line = "    \"BoundingBoxMinZ\"                : " + str(self.BoundingBoxMinZ_update) + ', \n'
+                            elif "FinalTime" in line:
                                 line = "    \"FinalTime\"                      : " + str(self.dt * 2) + ', \n'
                             elif "\"GraphExportFreq\"" in line:
                                 line = "    \"GraphExportFreq\"                : " + str(self.dt) + ', \n'
