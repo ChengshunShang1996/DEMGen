@@ -172,7 +172,10 @@ class ParticlePackingCharacterizationRun(DEMAnalysisStage):
         if self.measure_conductivity_tensor_option:
             measured_conductivity, measured_conductivity_trace = self.MeasureGlobalConductivityTensor()
             with open("packing_properties_conductivity_global.txt", "w") as f_w:
-                f_w.write(str(measured_conductivity[0]) + ' ' + str(measured_conductivity[1]) + ' ' + str(measured_conductivity[2]) + ' ' + str(measured_conductivity_trace) + '\n')
+                f_w.write(str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
+                        + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
+                        + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
+                        + str(measured_conductivity_trace) + '\n')
     
     def PlotAndSaveResultsInPDF(self):
         import matplotlib.pyplot as plt
