@@ -314,7 +314,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         if measured_unbalanced_force < self.tolerance_of_unbalanced_force or mean_stress < self.tolerance_of_target_mean_stress:
                             self.second_stage_flag = True
-                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                            #self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                             self.PrintResultsForGid(self.time)
                             self.is_start_servo_control = True
                             self.parameters["BoundingBoxMoveOption"].SetBool(True)
@@ -327,7 +327,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         #exit(0)
                     elif measured_unbalanced_force < self.tolerance_of_unbalanced_force: # (target stress, packing density) in the inaccessiable region (2)
                         self.second_stage_flag = True
-                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        #self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
                         if mean_stress > self.target_mean_stress:
                             self.is_in_inaccessibale_region2 = True
@@ -355,8 +355,19 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                 mad_threshold = self.tolerance_of_target_mean_stress
                 if mad < mad_threshold and len(self.measured_stress_list) > 5:
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
-                        output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
+                        
+                        if self.target_mean_stress >= 2e5:
+                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                            with open("success.txt", 'w') as file:
+                                file.write("Simulation completed successfully.")
+                            self.copy_files_and_run_show_results()
+                            exit(0)
+                        
+                        output_name = f"inletPGDEM_{round(self.target_mean_stress)}.mdpa"
+                        self.second_stage_flag = False
                         self.WriteOutMdpaFileOfParticles(output_name)
+                        self.second_stage_flag = True
+
                         initial = 1000
                         final = 200000
                         steps = 20
@@ -367,12 +378,6 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                             self.target_mean_stress = final
                         self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
 
-                if self.target_mean_stress > 2e5+1:
-                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                    with open("success.txt", 'w') as file:
-                        file.write("Simulation completed successfully.")
-                    self.copy_files_and_run_show_results()
-                    exit(0)
             with open("target_stress.txt", 'a') as file:
                 file.write(str(self.target_mean_stress))
         self.final_check_counter += 1
