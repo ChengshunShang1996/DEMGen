@@ -317,7 +317,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 subproperties[DYNAMIC_FRICTION] = self.initial_friction_coefficient
                         if measured_unbalanced_force < self.tolerance_of_unbalanced_force or mean_stress < self.tolerance_of_target_mean_stress:
                             self.second_stage_flag = True
-                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                            #self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                             self.PrintResultsForGid(self.time)
                             self.is_start_servo_control = True
                             self.parameters["BoundingBoxMoveOption"].SetBool(True)
@@ -330,7 +330,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         #exit(0)
                     elif measured_unbalanced_force < self.tolerance_of_unbalanced_force: # (target stress, packing density) in the inaccessiable region (2)
                         self.second_stage_flag = True
-                        self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                        #self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         self.PrintResultsForGid(self.time)
                         if mean_stress > self.target_mean_stress:
                             self.is_in_inaccessibale_region2 = True
@@ -366,8 +366,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                             self.copy_files_and_run_show_results()
                             exit(0)
                         
-                        output_name = f"inletPGDEM_{self.target_mean_stress}.mdpa"
+                        output_name = f"inletPGDEM_{round(self.target_mean_stress)}.mdpa"
+                        self.second_stage_flag = False
                         self.WriteOutMdpaFileOfParticles(output_name)
+                        self.second_stage_flag = True
                         
                         initial = 200000
                         final = 1000
