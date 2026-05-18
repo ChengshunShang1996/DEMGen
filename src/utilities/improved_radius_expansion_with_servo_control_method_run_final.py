@@ -387,7 +387,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                         + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
                                         + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
                                         + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                        + '\n')
+                                        + str(shear_stress) + '\n')
                         
                         if self.target_mean_stress >= 2e5:
                             self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
