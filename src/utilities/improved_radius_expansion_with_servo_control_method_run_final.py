@@ -263,6 +263,13 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             stress_tensor = self.MeasureSphereForGettingGlobalStressTensor()
             mean_stress = (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3
 
+            stress_tensor_tangential = self.MeasureGlobalStressTensorTangential()
+            mean_stress_tangential = (stress_tensor_tangential[0][0] + stress_tensor_tangential[1][1] + stress_tensor_tangential[2][2])/3
+            sum_sigma = stress_tensor_tangential[0][0]**2 + stress_tensor_tangential[0][1]**2 + stress_tensor_tangential[0][2]**2 + \
+                        stress_tensor_tangential[1][0]**2 + stress_tensor_tangential[1][1]**2 + stress_tensor_tangential[1][2]**2 + \
+                        stress_tensor_tangential[2][0]**2 + stress_tensor_tangential[2][1]**2 + stress_tensor_tangential[2][2]**2 
+            shear_stress = np.sqrt(3/2 * sum_sigma)
+
             mcn = self.MeasureGlobalMeanCoordinationNumber()
             measured_conductivity, measured_conductivity_trace = self.MeasureGlobalConductivityTensor()
 
