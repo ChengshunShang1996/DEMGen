@@ -144,10 +144,10 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         target_normal_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
         self.target_mean_stress = (target_normal_stress[0] + target_normal_stress[1] + target_normal_stress[2]) / 3
         self.servo_control_phase_1 = True
-        self.servo_control_phase_1_target_stress = 20000
-        self.servo_control_phase_2_target_density = 0.65
         self.servo_control_phase_1_steps = 20
         self.zero_friction_phase_counter_target = 100
+        self.servo_control_phase_1_target_stress = 20000
+        self.servo_control_phase_2_target_density = 0.65
 
         if self.target_mean_stress < self.minimum_mean_confining_stress:
             self.target_mean_stress = self.minimum_mean_confining_stress

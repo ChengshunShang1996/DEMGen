@@ -54,6 +54,8 @@ class CreateParticlesInsideOfADomain():
         self.tolerance_of_unbalanced_force = self.parameters["tolerance_of_unbalanced_force"].GetDouble()
         self.tolerance_of_target_mean_stress = self.parameters["tolerance_of_target_mean_stress"].GetDouble()
         self.minimum_mean_stress = self.parameters["minimum_mean_stress"].GetDouble()
+        self.servo_control_phase_1_target_stress = self.parameters["servo_control_phase_1_target_stress"].GetDouble()
+        self.servo_control_phase_2_target_density = self.parameters["servo_control_phase_2_target_density"].GetDouble()
         if try_packing_density != 0.0:
             self.parameters["target_packing_density"].SetDouble(try_packing_density)
         print("try_packing_density = {}".format(try_packing_density))
@@ -160,6 +162,10 @@ class CreateParticlesInsideOfADomain():
                                 line = line.replace("100", str(self.tolerance_of_target_mean_stress))
                             if "self.minimum_mean_stress =" in line:
                                 line = line.replace("1000", str(self.minimum_mean_stress))
+                            if "self.servo_control_phase_1_target_stress = " in line:
+                                line = line.replace("20000", str(self.servo_control_phase_1_target_stress))
+                            if "self.servo_control_phase_2_target_density = " in line:
+                                line = line.replace("0.65", str(self.servo_control_phase_2_target_density))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
