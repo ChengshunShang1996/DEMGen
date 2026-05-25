@@ -433,6 +433,23 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     if mad < mad_threshold and len(self.measured_stress_list) > 5:
                         if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
                             print("The stress is stable, and the simulation reaches to the 2nd phase.")
+
+                            with open("stress_tensor_save.txt", 'a') as file:
+                                file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
+                                            + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[0][1]) + ' ' + str(stress_tensor[0][2])+ ' ' \
+                                            + str(stress_tensor[1][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[1][2])+ ' ' \
+                                            + str(stress_tensor[2][0]) + ' ' + str(stress_tensor[2][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
+                                            + str(mcn) + ' ' \
+                                            + str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
+                                            + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
+                                            + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
+                                            + str(measured_conductivity_trace)+ ' ' \
+                                            + str(mean_stress_tangential)+ ' ' \
+                                            + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
+                                            + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
+                                            + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
+                                            + str(shear_stress) + '\n')
+                                
                             if self.is_in_inaccessibale_region2:
                                 self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                                 with open("success.txt", 'w') as file:
