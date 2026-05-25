@@ -143,6 +143,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.zero_friction_phase_counter = 0
         target_normal_stress = self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].GetVector()
         self.target_mean_stress = (target_normal_stress[0] + target_normal_stress[1] + target_normal_stress[2]) / 3
+        self.servo_control_phase_1 = True
+        self.servo_control_phase_1_target_stress = 20000
+        self.servo_control_phase_2_target_density = 0.65
+        self.servo_control_phase_1_steps = 20
+        self.zero_friction_phase_counter_target = 100
 
         if self.target_mean_stress < self.minimum_mean_confining_stress:
             self.target_mean_stress = self.minimum_mean_confining_stress
@@ -231,7 +236,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         if self.DEM_parameters["ContactMeshOption"].GetBool():
             self._GetSolver().PrepareContactElementsForPrinting()
 
-        if self.ZeroFrictionPhase and self.zero_friction_phase_counter == 100:
+        if self.ZeroFrictionPhase and self.zero_friction_phase_counter == self.zero_friction_phase_counter_target:
             self.zero_friction_phase_counter = 0
             for properties in self.spheres_model_part.Properties:
                 for subproperties in properties.GetSubProperties():
@@ -365,51 +370,96 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                         self.SetAllParticleVelocityToZero()
             else: # servo control phase
 
-                mad = 0.0
-                if len(self.measured_stress_list) > 5:
-                    mad = np.mean([abs(x - self.target_mean_stress) for x in self.measured_stress_list[-5:]])
+                if self.servo_control_phase_1:
 
-                mad_threshold = self.tolerance_of_target_mean_stress
-                if mad < mad_threshold and len(self.measured_stress_list) > 5:
-                    if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
-                        
-                        with open("stress_tensor_save.txt", 'a') as file:
-                            file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
-                                        + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[0][1]) + ' ' + str(stress_tensor[0][2])+ ' ' \
-                                        + str(stress_tensor[1][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[1][2])+ ' ' \
-                                        + str(stress_tensor[2][0]) + ' ' + str(stress_tensor[2][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
-                                        + str(mcn) + ' ' \
-                                        + str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
-                                        + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
-                                        + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
-                                        + str(measured_conductivity_trace)+ ' ' \
-                                        + str(mean_stress_tangential)+ ' ' \
-                                        + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
-                                        + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
-                                        + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                        + str(shear_stress) + '\n')
-                        
-                        if self.target_mean_stress >= 2e5:
-                            self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                            with open("success.txt", 'w') as file:
-                                file.write("Simulation completed successfully.")
-                            self.copy_files_and_run_show_results()
-                            exit(0)
-                        
-                        output_name = f"inletPGDEM_{round(self.target_mean_stress)}.mdpa"
-                        self.second_stage_flag = False
-                        self.WriteOutMdpaFileOfParticles(output_name)
-                        self.second_stage_flag = True
+                    mad = 0.0
+                    if len(self.measured_stress_list) > 5:
+                        mad = np.mean([abs(x - self.target_mean_stress) for x in self.measured_stress_list[-5:]])
 
-                        initial = 1000
-                        final = 200000
-                        steps = 20
-                        ratio = (final / initial) ** (1 / steps)
-                        self.target_mean_stress = initial * (ratio ** self.step_id)
-                        self.step_id += 1
-                        if self.step_id >= steps:
-                            self.target_mean_stress = final
-                        self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
+                    mad_threshold = self.tolerance_of_target_mean_stress
+                    if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                        if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
+                            
+                            with open("stress_tensor_save.txt", 'a') as file:
+                                file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
+                                            + str(stress_tensor[0][0]) + ' ' + str(stress_tensor[0][1]) + ' ' + str(stress_tensor[0][2])+ ' ' \
+                                            + str(stress_tensor[1][0]) + ' ' + str(stress_tensor[1][1]) + ' ' + str(stress_tensor[1][2])+ ' ' \
+                                            + str(stress_tensor[2][0]) + ' ' + str(stress_tensor[2][1]) + ' ' + str(stress_tensor[2][2])+ ' ' \
+                                            + str(mcn) + ' ' \
+                                            + str(measured_conductivity[0][0]) + ' ' + str(measured_conductivity[0][1]) + ' ' + str(measured_conductivity[0][2]) + ' ' \
+                                            + str(measured_conductivity[1][0]) + ' ' + str(measured_conductivity[1][1]) + ' ' + str(measured_conductivity[1][2]) + ' ' \
+                                            + str(measured_conductivity[2][0]) + ' ' + str(measured_conductivity[2][1]) + ' ' + str(measured_conductivity[2][2]) + ' ' \
+                                            + str(measured_conductivity_trace)+ ' ' \
+                                            + str(mean_stress_tangential)+ ' ' \
+                                            + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
+                                            + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
+                                            + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
+                                            + str(shear_stress) + '\n')
+                            
+                            if self.target_mean_stress >= self.servo_control_phase_1_target_stress:
+                                self.servo_control_phase_1 = True
+                                self.target_mean_stress = self.servo_control_phase_1_target_stress
+                                self.target_packing_density = self.servo_control_phase_2_target_density
+                                self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
+                                self.zero_friction_phase_counter_target = 1000
+                                self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                                with open("success.txt", 'w') as file:
+                                    file.write("Simulation completed successfully.")
+                                self.copy_files_and_run_show_results()
+                                exit(0)
+                            
+                            output_name = f"inletPGDEM_{round(self.target_mean_stress)}.mdpa"
+                            self.second_stage_flag = False
+                            self.WriteOutMdpaFileOfParticles(output_name)
+                            self.second_stage_flag = True
+
+                            initial = 1000
+                            final = self.servo_control_phase_1_target_stress
+                            steps = self.servo_control_phase_1_steps
+                            ratio = (final / initial) ** (1 / steps)
+                            self.target_mean_stress = initial * (ratio ** self.step_id)
+                            self.step_id += 1
+                            if self.step_id >= steps:
+                                self.target_mean_stress = final
+                            self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
+                
+                else: #servo_control_phase_2 # Go upward
+                    
+                    mad = 0.0
+                    if len(self.measured_stress_list) > 5:
+                        mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
+
+                    mad_threshold = self.tolerance_of_target_mean_stress
+                    if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                        if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
+                            print("The stress is stable, and the simulation reaches to the 2nd phase.")
+                            if self.is_in_inaccessibale_region2:
+                                self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                                with open("success.txt", 'w') as file:
+                                    file.write("Simulation completed successfully.")
+                                self.copy_files_and_run_show_results()
+                                exit(0)
+                            else:
+                                if (self.final_packing_density - self.target_packing_density) > self.tolerance_of_packing_density:
+                                    print("2 stage: The packing density is higher than the target packing density, the simulation will be terminated.")
+                                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                                    with open("success.txt", 'w') as file:
+                                        file.write("Simulation completed successfully.")
+                                    self.copy_files_and_run_show_results()
+                                    exit(0)
+                                elif (self.target_packing_density - self.final_packing_density) > self.tolerance_of_packing_density:
+                                    for properties in self.spheres_model_part.Properties:
+                                        for subproperties in properties.GetSubProperties():
+                                            subproperties[STATIC_FRICTION] = 0.0
+                                            subproperties[DYNAMIC_FRICTION] = 0.0
+                                    self.ZeroFrictionPhase = True
+                                    self.zero_friction_phase_counter = 0
+                                else:
+                                    self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                                    with open("success.txt", 'w') as file:
+                                        file.write("Simulation completed successfully.")
+                                    self.copy_files_and_run_show_results()
+                                    exit(0)
 
             with open("target_stress.txt", 'a') as file:
                 file.write(str(self.target_mean_stress))
