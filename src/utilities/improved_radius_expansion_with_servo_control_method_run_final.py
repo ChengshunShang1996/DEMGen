@@ -397,16 +397,16 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                             + str(shear_stress) + '\n')
                             
                             if self.target_mean_stress >= self.servo_control_phase_1_target_stress:
-                                self.servo_control_phase_1 = True
+                                self.servo_control_phase_1 = False
                                 self.target_mean_stress = self.servo_control_phase_1_target_stress
                                 self.target_packing_density = self.servo_control_phase_2_target_density
                                 self.parameters["BoundingBoxServoLoadingSettings"]["BoundingBoxServoLoadingStress"].SetVector([self.target_mean_stress, self.target_mean_stress, self.target_mean_stress])
                                 self.zero_friction_phase_counter_target = 1000
-                                self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
-                                with open("success.txt", 'w') as file:
-                                    file.write("Simulation completed successfully.")
-                                self.copy_files_and_run_show_results()
-                                exit(0)
+                                #self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
+                                #with open("success.txt", 'w') as file:
+                                #    file.write("Simulation completed successfully.")
+                                #self.copy_files_and_run_show_results()
+                                #exit(0)
                             
                             output_name = f"inletPGDEM_{round(self.target_mean_stress)}.mdpa"
                             self.second_stage_flag = False
