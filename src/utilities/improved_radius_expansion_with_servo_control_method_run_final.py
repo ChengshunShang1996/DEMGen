@@ -427,7 +427,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                     
                     mad = 0.0
                     if len(self.measured_stress_list) > 5:
-                        mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
+                        mad = np.mean([abs(x - self.target_mean_stress) for x in self.measured_stress_list[-5:]])
 
                     mad_threshold = self.tolerance_of_target_mean_stress
                     if mad < mad_threshold and len(self.measured_stress_list) > 5:
