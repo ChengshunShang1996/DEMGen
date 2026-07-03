@@ -403,7 +403,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
 
                         initial = 1000
                         final = 200000
-                        steps = 20
+                        steps = 1000 # 20
                         ratio = (final / initial) ** (1 / steps)
                         self.target_mean_stress = initial * (ratio ** self.step_id)
                         self.step_id += 1
