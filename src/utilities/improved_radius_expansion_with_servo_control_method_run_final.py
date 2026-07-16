@@ -278,6 +278,8 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             mcn = self.MeasureGlobalMeanCoordinationNumber()
             measured_conductivity, measured_conductivity_trace = self.MeasureGlobalConductivityTensor()
 
+            eigenvalues, second_invariant_of_deviatoric_tensor, measured_fabric_tensor = self.MeasureGlobalFabricTensor()
+
             if self.is_start_servo_control:
                 with open("stress_tensor_1.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
@@ -293,7 +295,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
                                 + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
                                 + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                + str(shear_stress) + '\n')
+                                + str(shear_stress) + ' ' \
+                                + str(measured_fabric_tensor[0][0]) + ' ' + str(measured_fabric_tensor[0][1]) + ' ' + str(measured_fabric_tensor[0][2])+ ' ' \
+                                + str(measured_fabric_tensor[1][0]) + ' ' + str(measured_fabric_tensor[1][1]) + ' ' + str(measured_fabric_tensor[1][2])+ ' ' \
+                                + str(measured_fabric_tensor[2][0]) + ' ' + str(measured_fabric_tensor[2][1]) + ' ' + str(measured_fabric_tensor[2][2])+ ' ' \
+                                + str(second_invariant_of_deviatoric_tensor) + '\n')
             else:
                 with open("stress_tensor_0.txt", 'a') as file:
                     file.write(str(self.time) + ' ' + str(mean_stress) + ' ' + str(self.final_packing_density) + ' ' \
@@ -309,7 +315,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                 + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
                                 + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
                                 + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                + str(shear_stress) + '\n')
+                                + str(shear_stress) + ' ' \
+                                + str(measured_fabric_tensor[0][0]) + ' ' + str(measured_fabric_tensor[0][1]) + ' ' + str(measured_fabric_tensor[0][2])+ ' ' \
+                                + str(measured_fabric_tensor[1][0]) + ' ' + str(measured_fabric_tensor[1][1]) + ' ' + str(measured_fabric_tensor[1][2])+ ' ' \
+                                + str(measured_fabric_tensor[2][0]) + ' ' + str(measured_fabric_tensor[2][1]) + ' ' + str(measured_fabric_tensor[2][2])+ ' ' \
+                                + str(second_invariant_of_deviatoric_tensor) + '\n')
 
                 #TODO: this should be optional, not always output
                 '''
@@ -394,7 +404,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                             + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
                                             + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
                                             + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                            + str(shear_stress) + '\n')
+                                            + str(shear_stress) + ' ' \
+                                            + str(measured_fabric_tensor[0][0]) + ' ' + str(measured_fabric_tensor[0][1]) + ' ' + str(measured_fabric_tensor[0][2])+ ' ' \
+                                            + str(measured_fabric_tensor[1][0]) + ' ' + str(measured_fabric_tensor[1][1]) + ' ' + str(measured_fabric_tensor[1][2])+ ' ' \
+                                            + str(measured_fabric_tensor[2][0]) + ' ' + str(measured_fabric_tensor[2][1]) + ' ' + str(measured_fabric_tensor[2][2])+ ' ' \
+                                            + str(second_invariant_of_deviatoric_tensor) + '\n')
                             
                             if self.target_mean_stress >= self.servo_control_phase_1_target_stress:
                                 self.servo_control_phase_1 = False
@@ -448,7 +462,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
                                             + str(stress_tensor_tangential[0][0]) + ' ' + str(stress_tensor_tangential[0][1]) + ' ' + str(stress_tensor_tangential[0][2])+ ' ' \
                                             + str(stress_tensor_tangential[1][0]) + ' ' + str(stress_tensor_tangential[1][1]) + ' ' + str(stress_tensor_tangential[1][2])+ ' ' \
                                             + str(stress_tensor_tangential[2][0]) + ' ' + str(stress_tensor_tangential[2][1]) + ' ' + str(stress_tensor_tangential[2][2])+ ' ' \
-                                            + str(shear_stress) + '\n')
+                                            + str(shear_stress) + ' ' \
+                                            + str(measured_fabric_tensor[0][0]) + ' ' + str(measured_fabric_tensor[0][1]) + ' ' + str(measured_fabric_tensor[0][2])+ ' ' \
+                                            + str(measured_fabric_tensor[1][0]) + ' ' + str(measured_fabric_tensor[1][1]) + ' ' + str(measured_fabric_tensor[1][2])+ ' ' \
+                                            + str(measured_fabric_tensor[2][0]) + ' ' + str(measured_fabric_tensor[2][1]) + ' ' + str(measured_fabric_tensor[2][2])+ ' ' \
+                                            + str(second_invariant_of_deviatoric_tensor) + '\n')
                                 
                             if self.is_in_inaccessibale_region2:
                                 self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
