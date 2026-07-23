@@ -47,7 +47,7 @@
         }
     },
     "VirtualMassCoefficient"         : 1.0,
-    "RollingFrictionOption"          : false,
+    "RollingFrictionOption"          : true,
     "GlobalDamping"                  : 0.0,
     "ContactMeshOption"              : true,
     "OutputFileType"                 : "Ascii",
