@@ -177,6 +177,9 @@ class CreateParticlesInsideOfADomain():
         radius_scale_multiplier = self.parameters["random_variable_settings"]["radius_scale_multiplier"].GetDouble()
         aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * target_packing_density * (radius_scale_multiplier ** 3)
 
+        seed = self.parameters["SEED"].GetInt()
+        random.seed(seed)
+
         check_intial_overlap_option = False
         if "check_initial_overlap_option" in self.parameters.keys():
             check_intial_overlap_option = self.parameters["check_initial_overlap_option"].GetBool()
@@ -198,7 +201,6 @@ class CreateParticlesInsideOfADomain():
                     "p_group_id": 0
                     }
 
-            seed = self.parameters["SEED"].GetInt()
             creator_destructor = ParticleCreatorDestructor()
             self.Fast_Filling_Creator = Fast_Filling_Creator(self.parameters, seed)
             r = self.Fast_Filling_Creator.GetRandomParticleRadius(creator_destructor)
