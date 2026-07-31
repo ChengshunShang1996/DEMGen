@@ -178,7 +178,11 @@ class CreateParticlesInsideOfADomain():
         aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * target_packing_density * (radius_scale_multiplier ** 3)
 
         seed = self.parameters["SEED"].GetInt()
-        random.seed(seed)
+        if "DO_USE_SEED" in self.parameters.keys():
+            if self.parameters["DO_USE_SEED"].GetBool():
+                random.seed(seed)
+        else:
+            print("DO_USE_SEED is not specified in the ParametersDEMGen.json file, so the random seed will not be used.")
 
         creator_destructor = ParticleCreatorDestructor()
         self.Fast_Filling_Creator = Fast_Filling_Creator(self.parameters, seed)
