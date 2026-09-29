@@ -518,13 +518,18 @@ if __name__ == "__main__":
     radius_multiplier = 1.0
     NormalizedKineticEnergy = 1e8
     Initial_radius_scaling_factor = 0.5
-    max_radius_multiplier = 1.0 / Initial_radius_scaling_factor
+    max_radius_multiplier = 1.0 / Initial_radius_scaling_factor #It should be an integer multiple of 0.2.
+    radius_multiplier_delta = 0.2
+
+    ratio = (max_radius_multiplier - radius_multiplier) / radius_multiplier_delta
+    if not math.isclose(ratio, round(ratio), rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(f"max_radius_multiplier {max_radius_multiplier} is not an integer multiple of radius_multiplier_delta {radius_multiplier_delta}")
 
     shutil.copyfile('inletPGDEM_ini.mdpa', 'inletPGDEM.mdpa')
 
     ini_p_pram_list = GetParticleDataFromMdpa('inletPGDEM_ini.mdpa')
 
-    while radius_multiplier < (max_radius_multiplier + 0.2):
+    while radius_multiplier < (max_radius_multiplier + radius_multiplier_delta):
         if os.path.exists('inletPG_Post_Files'):
             shutil.rmtree('inletPG_Post_Files', ignore_errors=True)
         with open("ProjectParametersDEM.json", 'r') as parameter_file:
@@ -539,7 +544,7 @@ if __name__ == "__main__":
         print(' ')
         print("----------------------------Loop {} finished!".format(radius_multiplier))
         print(' ')
-        radius_multiplier += 0.2
+        radius_multiplier += radius_multiplier_delta
         radius_multiplier = round(radius_multiplier, 1)
 
     radius_multiplier = max_radius_multiplier

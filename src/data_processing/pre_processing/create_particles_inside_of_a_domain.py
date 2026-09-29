@@ -160,6 +160,8 @@ class CreateParticlesInsideOfADomain():
                                 line = line.replace("100", str(self.tolerance_of_target_mean_stress))
                             if "self.minimum_mean_stress =" in line:
                                 line = line.replace("1000", str(self.minimum_mean_stress))
+                            if "Initial_radius_scaling_factor =" in line:
+                                line = line.replace("0.5", str(self.radius_scale_multiplier))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
