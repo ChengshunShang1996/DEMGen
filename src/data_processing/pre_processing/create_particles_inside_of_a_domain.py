@@ -68,7 +68,7 @@ class CreateParticlesInsideOfADomain():
 
         self.convergence_data_count = 5
         if "convergence_data_count" in self.parameters.keys():
-            self.convergence_data_count = self.parameters["convergence_data_count"].GetDouble()
+            self.convergence_data_count = self.parameters["convergence_data_count"].GetInt()
 
         self.packing_cnt = packing_cnt
         self.ini_path = ini_path
