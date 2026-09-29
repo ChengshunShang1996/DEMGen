@@ -63,6 +63,13 @@ class RadiusExpansionWithServoControlMethod(DynamicMethod):
         packing_density_delta_list = self.parameters["random_particle_generation_parameters"]["packing_density_delta_list"]
         try_packing_density_list = [target_packing_density - delta for delta in packing_density_delta_list]
         self.packing_cnt = 1
+
+        if "DO_USE_SEED" not in self.parameters["random_particle_generation_parameters"].keys():
+            self.parameters["random_particle_generation_parameters"]["DO_USE_SEED"] = False
+        we_are_using_seed = self.parameters["random_particle_generation_parameters"]["DO_USE_SEED"] or self.parameters["random_particle_generation_parameters"]["random_variable_settings"]["do_use_seed"] == "true"
+        if we_are_using_seed and packing_num > 1:
+            os.error("Error: You are using a seed for particle generation, but you have specified packing_num > 1. This may lead to the same particle configuration being generated for each packing. Consider setting DO_USE_SEED to false or setting packing_num = 1.")
+
         if os.path.isfile("generation_marker.txt"):
             os.remove("generation_marker.txt")
         while self.packing_cnt <= packing_num:

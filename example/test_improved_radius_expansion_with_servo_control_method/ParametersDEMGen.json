@@ -15,7 +15,7 @@
             "possible_values" : [0.000075,0.00009,0.0001,0.00011,0.000125,0.0001375,0.00015,0.000175],
             "relative_frequencies" : [0.20754,0.15525,0.13346,0.13821,0.1751,0.09922,0.05418,0.03704],
             "radius_scale_multiplier": 0.5,
-            "do_use_seed" : true,
+            "do_use_seed" : false,
             "seed" : 1,
             "relative_closeness_tolerance" : 1e-8
         },
@@ -25,6 +25,7 @@
         "MAXIMUM_RADIUS" : 0.000175,
         "STANDARD_DEVIATION" : 0.0,
         "SEED" : 1,
+        "DO_USE_SEED" : false,
         "NAME" : "DEMGen",
         "target_packing_density": 0.64,
         "tolerance_of_packing_density": 0.0001,

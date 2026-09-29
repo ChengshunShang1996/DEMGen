@@ -66,6 +66,10 @@ class CreateParticlesInsideOfADomain():
             scaled_psd.append(original_psd[i] * self.radius_scale_multiplier)
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_psd)
 
+        self.convergence_data_count = 5
+        if "convergence_data_count" in self.parameters.keys():
+            self.convergence_data_count = self.parameters["convergence_data_count"].GetDouble()
+
         self.packing_cnt = packing_cnt
         self.ini_path = ini_path
 
@@ -160,6 +164,10 @@ class CreateParticlesInsideOfADomain():
                                 line = line.replace("100", str(self.tolerance_of_target_mean_stress))
                             if "self.minimum_mean_stress =" in line:
                                 line = line.replace("1000", str(self.minimum_mean_stress))
+                            if "Initial_radius_scaling_factor =" in line:
+                                line = line.replace("0.5", str(self.radius_scale_multiplier))
+                            if "self.convergence_data_count =" in line:
+                                line = line.replace("5", str(self.convergence_data_count))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')
@@ -178,7 +186,11 @@ class CreateParticlesInsideOfADomain():
         aim_volume = RVE_size[0] * RVE_size[1] * RVE_size[2] * target_packing_density * (radius_scale_multiplier ** 3)
 
         seed = self.parameters["SEED"].GetInt()
-        random.seed(seed)
+        if "DO_USE_SEED" in self.parameters.keys():
+            if self.parameters["DO_USE_SEED"].GetBool():
+                random.seed(seed)
+        else:
+            print("DO_USE_SEED is not specified in the ParametersDEMGen.json file, so the random seed will not be used.")
 
         creator_destructor = ParticleCreatorDestructor()
         self.Fast_Filling_Creator = Fast_Filling_Creator(self.parameters, seed)

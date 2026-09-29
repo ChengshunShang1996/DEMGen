@@ -142,6 +142,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.minimum_mean_confining_stress = 1000
         self.ZeroFrictionPhase = False
         self.zero_friction_phase_counter = 0
+        self.convergence_data_count = 5
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
@@ -334,11 +335,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             else: # servo control phase
 
                 mad = 0.0
-                if len(self.measured_stress_list) > 5:
-                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
+                if len(self.measured_stress_list) > self.convergence_data_count:
+                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-self.convergence_data_count:]])
 
                 mad_threshold = self.tolerance_of_target_mean_stress
-                if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                if mad < mad_threshold and len(self.measured_stress_list) > self.convergence_data_count:
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
                         print("The stress is stable, and the simulation reaches to the 2nd phase.")
                         if self.is_in_inaccessibale_region2:
@@ -519,12 +520,17 @@ if __name__ == "__main__":
     NormalizedKineticEnergy = 1e8
     Initial_radius_scaling_factor = 0.5
     max_radius_multiplier = 1.0 / Initial_radius_scaling_factor
+    radius_multiplier_delta = 0.2
+
+    ratio = (max_radius_multiplier - radius_multiplier) / radius_multiplier_delta
+    if not math.isclose(ratio, round(ratio), rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(f"max_radius_multiplier {max_radius_multiplier} is not an integer multiple of radius_multiplier_delta {radius_multiplier_delta}")
 
     shutil.copyfile('inletPGDEM_ini.mdpa', 'inletPGDEM.mdpa')
 
     ini_p_pram_list = GetParticleDataFromMdpa('inletPGDEM_ini.mdpa')
 
-    while radius_multiplier < (max_radius_multiplier + 0.2):
+    while radius_multiplier < (max_radius_multiplier + radius_multiplier_delta):
         if os.path.exists('inletPG_Post_Files'):
             shutil.rmtree('inletPG_Post_Files', ignore_errors=True)
         with open("ProjectParametersDEM.json", 'r') as parameter_file:
@@ -539,7 +545,7 @@ if __name__ == "__main__":
         print(' ')
         print("----------------------------Loop {} finished!".format(radius_multiplier))
         print(' ')
-        radius_multiplier += 0.2
+        radius_multiplier += radius_multiplier_delta
         radius_multiplier = round(radius_multiplier, 1)
 
     radius_multiplier = max_radius_multiplier
