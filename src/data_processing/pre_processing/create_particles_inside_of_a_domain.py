@@ -66,6 +66,10 @@ class CreateParticlesInsideOfADomain():
             scaled_psd.append(original_psd[i] * self.radius_scale_multiplier)
         self.parameters["random_variable_settings"]["possible_values"].SetVector(scaled_psd)
 
+        self.convergence_data_count = 5
+        if "convergence_data_count" in self.parameters.keys():
+            self.convergence_data_count = self.parameters["convergence_data_count"].GetDouble()
+
         self.packing_cnt = packing_cnt
         self.ini_path = ini_path
 
@@ -162,6 +166,8 @@ class CreateParticlesInsideOfADomain():
                                 line = line.replace("1000", str(self.minimum_mean_stress))
                             if "Initial_radius_scaling_factor =" in line:
                                 line = line.replace("0.5", str(self.radius_scale_multiplier))
+                            if "self.convergence_data_count =" in line:
+                                line = line.replace("5", str(self.convergence_data_count))
                             f_material_w.write(line)
 
         seed_file_path_and_name = os.path.join(self.ini_path, 'src', 'utilities', 'show_packing.py')

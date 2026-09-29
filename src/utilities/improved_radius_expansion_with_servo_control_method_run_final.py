@@ -140,6 +140,7 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
         self.minimum_mean_confining_stress = 1000
         self.ZeroFrictionPhase = False
         self.zero_friction_phase_counter = 0
+        self.convergence_data_count = 5
 
     def ReadMaterialsFile(self):
         adapted_to_current_os_relative_path = pathlib.Path(self.DEM_parameters["solver_settings"]["material_import_settings"]["materials_filename"].GetString())
@@ -331,11 +332,11 @@ class DEMAnalysisStageWithFlush(DEMAnalysisStage):
             else: # servo control phase
 
                 mad = 0.0
-                if len(self.measured_stress_list) > 5:
-                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-5:]])
+                if len(self.measured_stress_list) > self.convergence_data_count:
+                    mad = np.mean([abs(x - target_mean_stress) for x in self.measured_stress_list[-self.convergence_data_count:]])
 
                 mad_threshold = self.tolerance_of_target_mean_stress
-                if mad < mad_threshold and len(self.measured_stress_list) > 5:
+                if mad < mad_threshold and len(self.measured_stress_list) > self.convergence_data_count:
                     if measured_unbalanced_force < self.tolerance_of_unbalanced_force:
                         self.WriteOutMdpaFileOfParticles("inletPGDEM.mdpa")
                         with open("success.txt", 'w') as file:
