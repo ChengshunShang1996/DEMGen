@@ -530,7 +530,7 @@ if __name__ == "__main__":
 
     ini_p_pram_list = GetParticleDataFromMdpa('inletPGDEM_ini.mdpa')
 
-    while radius_multiplier < (max_radius_multiplier + radius_multiplier_delta):
+    while radius_multiplier < round(max_radius_multiplier + radius_multiplier_delta, 1):
         if os.path.exists('inletPG_Post_Files'):
             shutil.rmtree('inletPG_Post_Files', ignore_errors=True)
         with open("ProjectParametersDEM.json", 'r') as parameter_file:
